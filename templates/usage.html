@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Usage · Requirements Studio</title>
+  {% include "_styles.html" %}
+  <style>
+    :root { --bar: #3987e5; --bar-hover: #5c9ef0; --grid: #2a2a2a; }
+    main { max-width: 960px; margin: 0 auto; padding: 56px 20px 64px; }
+    .nav { display: flex; align-items: center; gap: 8px; }
+    .nav a.link { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; padding: 6px 12px; border-radius: 999px; }
+    .nav a.link:hover { color: var(--text); }
+    .nav a.link.here { color: var(--text); background: var(--raised); }
+    h1 { font-size: clamp(44px, 8vw, 64px); font-weight: 500; letter-spacing: -.04em; line-height: 1.02; margin: 0 0 12px; }
+    .lead { font-size: 18px; color: #c9c9c9; margin: 0 0 28px; }
+
+    .seg { display: inline-flex; padding: 4px; gap: 2px; border: 1px solid var(--border-strong); border-radius: 999px; margin-bottom: 24px; }
+    .seg button { background: none; border: 0; color: var(--muted); font: inherit; font-weight: 500; font-size: 15px; padding: 8px 18px; border-radius: 999px; cursor: pointer; }
+    .seg button.active { background: var(--raised); color: var(--text); }
+
+    .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+    .tile { padding: 24px; }
+    .tile .label { color: var(--muted); font-size: 14px; }
+    .tile .value { font-size: clamp(32px, 5vw, 44px); font-weight: 600; letter-spacing: -.03em; line-height: 1.15; margin-top: 6px; }
+    .tile .sub { color: var(--faint); font-size: 13px; margin-top: 4px; }
+    .tile .value a { color: inherit; font-size: 18px; font-weight: 500; }
+
+    .card.block { padding: 28px; margin-bottom: 16px; }
+    .block-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+    .block-head h2 { font-size: 22px; font-weight: 500; letter-spacing: -.02em; margin: 0; }
+    .linkish { background: none; border: 0; color: var(--muted); font: inherit; font-size: 14px; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+
+    .chart { position: relative; }
+    .chart svg { display: block; width: 100%; height: 260px; overflow: visible; }
+    .chart .axis { fill: var(--faint); font-size: 12px; font-variant-numeric: tabular-nums; }
+    .chart .gridline { stroke: var(--grid); stroke-width: 1; }
+    .chart .bar { fill: var(--bar); }
+    .chart .bar.hot { fill: var(--bar-hover); }
+    .tip {
+      position: absolute; pointer-events: none; background: #f2f2f2; color: #0a0a0a; border-radius: 12px;
+      padding: 10px 12px; font-size: 13px; line-height: 1.45; white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,.4);
+      transform: translate(-50%, calc(-100% - 10px)); opacity: 0; transition: opacity .1s;
+    }
+    .tip.show { opacity: 1; }
+    .tip b { font-weight: 600; }
+    .empty { color: var(--muted); text-align: center; padding: 60px 0; }
+
+    .rows { display: grid; gap: 14px; }
+    .hrow { display: grid; grid-template-columns: minmax(120px, 200px) 1fr auto; gap: 14px; align-items: center; }
+    .hrow .name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hrow .track { height: 12px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+    .hrow .fill { height: 100%; border-radius: 6px; background: var(--bar); min-width: 4px; }
+    .hrow .num { font-variant-numeric: tabular-nums; color: #dcdcdc; text-align: right; font-size: 14px; white-space: nowrap; }
+    .hrow .num span { color: var(--faint); margin-left: 8px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+    th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+    th:first-child, td:first-child { text-align: left; }
+    th { color: var(--muted); font-weight: 500; }
+    .table-wrap { max-height: 360px; overflow: auto; margin-top: 8px; }
+
+    .prices { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; }
+    .prices > div { min-width: 0; }
+    .prices label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+    .note { color: var(--faint); font-size: 13px; margin: 12px 0 0; }
+    .off { background: var(--warn-bg); color: var(--warn-text); border-radius: 16px; padding: 18px 20px; }
+
+    @media (max-width: 720px) {
+      .tiles { grid-template-columns: 1fr; }
+      .hrow { grid-template-columns: 1fr auto; }
+      .hrow .track { grid-column: 1 / -1; grid-row: 2; }
+      .prices { grid-template-columns: 1fr 1fr; }
+      .prices .btn { grid-column: 1 / -1; }
+      .card.block { padding: 22px 18px; }
+      .topbar .brand span { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('home') }}">{% include "_logo.html" %}<span>Requirements Studio</span></a>
+    <nav class="nav">
+      {% for label, href, here in nav %}<a class="link {{ 'here' if here }}" href="{{ href }}">{{ label }}</a>{% endfor %}
+      <form method="post" action="{{ signout_url }}"><button class="btn btn-outline btn-sm" type="submit">Sign out</button></form>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Usage</h1>
+    <p class="lead">AI tokens used by {{ scope }}. Every question, document and Azure DevOps send counts.</p>
+
+    {% if not tracking %}
+      <div class="off">Usage tracking is off because the site has no database yet. Add one (set <code>DATABASE_URL</code>) and usage will be recorded from then on.</div>
+    {% else %}
+      <div class="seg" role="tablist" aria-label="Time range">
+        <button data-days="7">7 days</button>
+        <button data-days="30" class="active">30 days</button>
+        <button data-days="90">90 days</button>
+      </div>
+
+      <div class="tiles">
+        <div class="card tile"><div class="label">Tokens used</div><div class="value" id="tTokens">–</div><div class="sub" id="tSplit"></div></div>
+        <div class="card tile"><div class="label">Estimated cost</div><div class="value" id="tCost">–</div><div class="sub" id="tCostSub"></div></div>
+        <div class="card tile"><div class="label">AI calls</div><div class="value" id="tCalls">–</div><div class="sub" id="tAvg"></div></div>
+      </div>
+
+      <section class="card block">
+        <div class="block-head"><h2>Tokens per day</h2><button class="linkish" id="toggleTable">Show as table</button></div>
+        <div class="chart" id="chart"><svg id="svg" role="img" aria-label="Tokens per day"></svg><div class="tip" id="tip"></div></div>
+        <div class="table-wrap" id="dayTable" hidden></div>
+      </section>
+
+      {% if show_orgs %}
+      <section class="card block">
+        <div class="block-head"><h2>By organization</h2></div>
+        <div class="rows" id="byOrg"></div>
+      </section>
+      {% endif %}
+
+      <section class="card block">
+        <div class="block-head"><h2>By feature</h2></div>
+        <div class="rows" id="byFeature"></div>
+      </section>
+
+      <section class="card block">
+        <div class="block-head"><h2>Prices</h2></div>
+        {% if can_edit_prices %}
+          <form class="prices" method="post" action="{{ prices_url }}">
+            <div><label for="pin">Input, $ per 1M tokens</label><input id="pin" name="input" type="text" inputmode="decimal" placeholder="e.g. 1.25"></div>
+            <div><label for="pout">Output, $ per 1M tokens</label><input id="pout" name="output" type="text" inputmode="decimal" placeholder="e.g. 10"></div>
+            <button class="btn btn-secondary" type="submit">Save prices</button>
+          </form>
+          <p class="note">Find your model's prices on OpenAI's pricing page. Costs here are estimates.</p>
+        {% else %}
+          <p class="muted" id="priceText" style="margin:0"></p>
+          <p class="note">Your admin sets these. Costs here are estimates.</p>
+        {% endif %}
+      </section>
+    {% endif %}
+  </main>
+
+{% if tracking %}
+<script>
+  const API = {{ api_url|tojson }};
+  const $ = (id) => document.getElementById(id);
+  const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
+  const full = new Intl.NumberFormat("en");
+  const money = (n) => n >= 100 ? "$" + full.format(Math.round(n)) : "$" + n.toFixed(n < 1 ? 4 : 2);
+  const dayLabel = (d) => new Date(d + "T00:00:00Z").toLocaleDateString("en", { month: "short", day: "numeric", timeZone: "UTC" });
+  let data = null, days = 30;
+
+  async function load() {
+    const res = await fetch(API + "?days=" + days);
+    data = await res.json();
+    if (!res.ok) { $("chart").innerHTML = '<p class="empty">' + (data.error || "Couldn't load usage.") + "</p>"; return; }
+    render();
+  }
+
+  function render() {
+    const t = data.total, priced = data.prices.input > 0 || data.prices.output > 0;
+    $("tTokens").textContent = compact.format(t.tokens);
+    $("tSplit").textContent = full.format(t.input) + " in · " + full.format(t.output) + " out";
+    if (priced) { $("tCost").textContent = money(t.cost); $("tCostSub").textContent = "Last " + data.days + " days"; }
+    else if ($("pin")) { $("tCost").innerHTML = '<a href="#pin">Set prices</a>'; $("tCostSub").textContent = "Add prices below to see cost"; }
+    else { $("tCost").textContent = "–"; $("tCostSub").textContent = "Your admin hasn't set prices yet"; }
+    $("tCalls").textContent = full.format(t.calls);
+    $("tAvg").textContent = t.calls ? compact.format(Math.round(t.tokens / t.calls)) + " tokens per call" : "No calls yet";
+    if ($("pin") && priced) { $("pin").value = data.prices.input; $("pout").value = data.prices.output; }
+    if ($("priceText")) $("priceText").textContent = priced
+      ? "$" + data.prices.input + " per 1M input tokens · $" + data.prices.output + " per 1M output tokens"
+      : "No prices set yet.";
+    drawChart();
+    drawRows("byFeature", data.by_feature.map((f) => ({ name: f.label, ...f })), priced);
+    if ($("byOrg")) drawRows("byOrg", data.by_org.map((o) => ({ name: o.name || "Unknown org", ...o })), priced);
+    drawTable(priced);
+  }
+
+  function drawRows(id, rows, priced) {
+    const el = $(id);
+    if (!rows.length) { el.innerHTML = '<p class="muted" style="margin:0">Nothing yet.</p>'; return; }
+    const max = Math.max(...rows.map((r) => r.tokens), 1);
+    el.innerHTML = "";
+    rows.sort((a, b) => b.tokens - a.tokens).forEach((r) => {
+      const row = document.createElement("div");
+      row.className = "hrow";
+      const name = document.createElement("div"); name.className = "name"; name.textContent = r.name; name.title = r.name;
+      const track = document.createElement("div"); track.className = "track";
+      const fill = document.createElement("div"); fill.className = "fill"; fill.style.width = (r.tokens / max * 100) + "%";
+      track.append(fill);
+      const num = document.createElement("div"); num.className = "num";
+      num.textContent = full.format(r.tokens);
+      const extra = document.createElement("span");
+      extra.textContent = priced ? money(r.cost) : r.calls + " calls";
+      num.append(extra);
+      row.append(name, track, num);
+      el.append(row);
+    });
+  }
+
+  function niceMax(v) {
+    if (v <= 0) return 1000;
+    const p = Math.pow(10, Math.floor(Math.log10(v))), n = v / p;
+    return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p;
+  }
+
+  function drawChart() {
+    const svg = $("svg"), W = svg.clientWidth || 600, H = 260;
+    const pad = { l: 44, r: 4, t: 8, b: 28 };
+    const rows = data.by_day, n = rows.length;
+    const max = niceMax(Math.max(...rows.map((d) => d.tokens)));
+    const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+    const slot = iw / n, gap = Math.max(2, slot * 0.25), bw = Math.max(2, slot - gap);
+    const y = (v) => pad.t + ih - (v / max) * ih;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    let out = "";
+    for (let i = 0; i <= 4; i++) {
+      const v = (max / 4) * i, yy = y(v);
+      out += `<line class="gridline" x1="${pad.l}" x2="${W - pad.r}" y1="${yy}" y2="${yy}"/>`;
+      out += `<text class="axis" x="${pad.l - 8}" y="${yy + 4}" text-anchor="end">${compact.format(v)}</text>`;
+    }
+    const every = Math.ceil(n / (W < 500 ? 4 : 7));
+    rows.forEach((d, i) => {
+      const x = pad.l + i * slot + gap / 2, h = (d.tokens / max) * ih, r = Math.min(4, h, bw / 2);
+      if (h > 0) {
+        const top = y(d.tokens), base = pad.t + ih;
+        out += `<path class="bar" data-i="${i}" d="M${x},${base} V${top + r} Q${x},${top} ${x + r},${top} H${x + bw - r} Q${x + bw},${top} ${x + bw},${top + r} V${base} Z"/>`;
+      }
+      if ((n - 1 - i) % every === 0) out += `<text class="axis" x="${x + bw / 2}" y="${H - 8}" text-anchor="middle">${dayLabel(d.day)}</text>`;
+      out += `<rect data-i="${i}" class="hit" x="${pad.l + i * slot}" y="${pad.t}" width="${slot}" height="${ih}" fill="transparent"/>`;
+    });
+    svg.innerHTML = out;
+    const tip = $("tip");
+    const show = (i) => {
+      const d = rows[i], priced = data.prices.input > 0 || data.prices.output > 0;
+      svg.querySelectorAll(".bar").forEach((b) => b.classList.toggle("hot", +b.dataset.i === i));
+      tip.innerHTML = `<b>${dayLabel(d.day)}</b><br>${full.format(d.tokens)} tokens<br>${full.format(d.input)} in · ${full.format(d.output)} out`
+        + (priced ? `<br>${money(d.cost)}` : "");
+      const x = pad.l + i * slot + slot / 2;
+      tip.style.left = Math.min(Math.max(x / W * svg.clientWidth, 80), svg.clientWidth - 80) + "px";
+      tip.style.top = (y(d.tokens) / H * 260) + "px";
+      tip.classList.add("show");
+    };
+    svg.querySelectorAll(".hit").forEach((h) => {
+      h.addEventListener("pointerenter", () => show(+h.dataset.i));
+      h.addEventListener("pointerdown", () => show(+h.dataset.i));
+    });
+    svg.addEventListener("pointerleave", () => { tip.classList.remove("show"); svg.querySelectorAll(".bar.hot").forEach((b) => b.classList.remove("hot")); });
+  }
+
+  function drawTable(priced) {
+    const rows = [...data.by_day].reverse();
+    $("dayTable").innerHTML = "<table><thead><tr><th>Day</th><th>Input</th><th>Output</th><th>Total</th>" + (priced ? "<th>Cost</th>" : "") + "</tr></thead><tbody>"
+      + rows.map((d) => `<tr><td>${dayLabel(d.day)}</td><td>${full.format(d.input)}</td><td>${full.format(d.output)}</td><td>${full.format(d.tokens)}</td>` + (priced ? `<td>${money(d.cost)}</td>` : "") + "</tr>").join("")
+      + "</tbody></table>";
+  }
+
+  $("toggleTable").onclick = () => {
+    const t = $("dayTable"), hide = !t.hidden;
+    t.hidden = hide; $("chart").hidden = !hide;
+    $("toggleTable").textContent = hide ? "Show as table" : "Show as chart";
+  };
+  document.querySelectorAll(".seg button").forEach((b) => b.onclick = () => {
+    document.querySelectorAll(".seg button").forEach((x) => x.classList.toggle("active", x === b));
+    days = +b.dataset.days; load();
+  });
+  let resizeTimer;
+  addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => data && drawChart(), 150); });
+  load();
+</script>
+{% endif %}
+</body>
+</html>

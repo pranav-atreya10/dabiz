@@ -88,6 +88,8 @@
       color: var(--muted); font-size: 14px; font-weight: 500; max-width: 40vw;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
+    .usage-link { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; }
+    .usage-link:hover { color: var(--text); }
     footer { text-align: center; font-size: 13px; color: var(--faint); margin-top: 40px; }
 
     @media (max-width: 640px) {
@@ -109,6 +111,7 @@
     <a class="brand" href="{{ url_for('home') }}">{% include "_logo.html" %}<span>Requirements Studio</span></a>
     <div class="who">
       <span class="org-name" title="Signed in as {{ org.name }}">{{ org.name }}</span>
+      <a class="usage-link" href="{{ url_for('usage_page') }}">Usage</a>
       <form method="post" action="{{ url_for('logout') }}"><button class="btn btn-outline btn-sm" type="submit">Sign out</button></form>
     </div>
   </header>

@@ -1,7 +1,8 @@
-"""Org storage. Uses Postgres when DATABASE_URL is set, otherwise a local SQLite file.
+"""Storage for orgs, usage and settings. Uses Postgres when DATABASE_URL is set,
+otherwise a local SQLite file.
 
-SQLite is only for running on your own computer: on Vercel the file would be wiped
-between requests, so set DATABASE_URL there (for example a free Neon Postgres database).
+SQLite is only for running on your own computer. On Vercel the disk is wiped between
+requests, so without DATABASE_URL storage is turned off there (see `available()`).
 """
 
 import base64
@@ -14,23 +15,42 @@ from contextlib import contextmanager
 from cryptography.fernet import Fernet, InvalidToken
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
-SQLITE_PATH = os.environ.get("SQLITE_PATH", "orgs.db")
+SQLITE_PATH = os.environ.get("SQLITE_PATH", "app.db")
 
-SCHEMA = """
-CREATE TABLE IF NOT EXISTS orgs (
-    id {id_type},
-    name TEXT NOT NULL,
-    code_hash TEXT NOT NULL UNIQUE,
-    code_version INTEGER NOT NULL DEFAULT 1,
-    azdo_org_url TEXT NOT NULL DEFAULT '',
-    azdo_project TEXT NOT NULL DEFAULT '',
-    azdo_pat_encrypted TEXT NOT NULL DEFAULT '',
-    azdo_story_type TEXT NOT NULL DEFAULT 'User Story',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
-"""
+SCHEMA = [
+    """CREATE TABLE IF NOT EXISTS orgs (
+        id {id_type},
+        name TEXT NOT NULL,
+        code_hash TEXT NOT NULL UNIQUE,
+        code_version INTEGER NOT NULL DEFAULT 1,
+        azdo_org_url TEXT NOT NULL DEFAULT '',
+        azdo_project TEXT NOT NULL DEFAULT '',
+        azdo_pat_encrypted TEXT NOT NULL DEFAULT '',
+        azdo_story_type TEXT NOT NULL DEFAULT 'User Story',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )""",
+    """CREATE TABLE IF NOT EXISTS usage (
+        id {id_type},
+        org_id INTEGER,
+        feature TEXT NOT NULL,
+        model TEXT NOT NULL,
+        input_tokens INTEGER NOT NULL,
+        output_tokens INTEGER NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )""",
+    "CREATE INDEX IF NOT EXISTS usage_org_time ON usage (org_id, created_at)",
+    """CREATE TABLE IF NOT EXISTS settings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+    )""",
+]
 
 COLUMNS = "id, name, code_version, azdo_org_url, azdo_project, azdo_pat_encrypted, azdo_story_type, created_at"
+
+
+def available():
+    """False on Vercel without DATABASE_URL, where a SQLite file wouldn't survive."""
+    return bool(DATABASE_URL) or not os.environ.get("VERCEL")
 
 
 @contextmanager
@@ -61,7 +81,18 @@ def query(sql, params=(), one=False):
 
 def init():
     id_type = "SERIAL PRIMARY KEY" if DATABASE_URL else "INTEGER PRIMARY KEY AUTOINCREMENT"
-    query(SCHEMA.format(id_type=id_type))
+    for statement in SCHEMA:
+        query(statement.format(id_type=id_type))
+
+
+def get_setting(key, default=""):
+    row = query("SELECT value FROM settings WHERE key = ?", (key,), one=True)
+    return row["value"] if row else default
+
+
+def set_setting(key, value):
+    query("DELETE FROM settings WHERE key = ?", (key,))
+    query("INSERT INTO settings (key, value) VALUES (?, ?)", (key, value))
 
 
 # ---------- Org codes ----------
@@ -143,4 +174,5 @@ def update_devops(org_id, org_url, project, story_type, pat=None):
 
 
 def delete_org(org_id):
+    """Delete an org. Its usage history is kept (it shows up as a deleted org)."""
     query("DELETE FROM orgs WHERE id = ?", (org_id,))

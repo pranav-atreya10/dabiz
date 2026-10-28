@@ -14,13 +14,14 @@ from pydantic import BaseModel
 
 import db
 import devops
+import usage
 
 # Change the model without touching code by setting OPENAI_MODEL.
 MODEL = os.environ.get("OPENAI_MODEL", "gpt-5")
 
 # Each org signs in with its own code (made on the admin page). SECRET_KEY signs login
 # cookies and encrypts saved Azure DevOps tokens; ADMIN_PASSWORD opens the admin page.
-# If either is missing, that part of the site stays locked.
+# If either is missing, or there's no database to keep orgs in, that part of the site stays locked.
 SECRET_KEY = os.environ.get("SECRET_KEY", "")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
 
@@ -33,9 +34,9 @@ _db_ready = False
 
 @app.before_request
 def setup_db():
-    """Create the orgs table the first time the app runs."""
+    """Create the tables the first time the app runs (when storage is available)."""
     global _db_ready
-    if not _db_ready and SECRET_KEY:
+    if not _db_ready and SECRET_KEY and db.available():
         db.init()
         _db_ready = True
 
@@ -101,7 +102,7 @@ def get_client():
 def current_org():
     """The signed-in org, or None. Signs out anyone whose org was deleted or whose code was changed."""
     org_id = session.get("org_id")
-    if not SECRET_KEY or org_id is None:
+    if not SECRET_KEY or not db.available() or org_id is None:
         return None
     org = db.get_org(org_id)
     if not org or org["code_version"] != session.get("code_version"):
@@ -126,8 +127,9 @@ def login_required(view):
 @app.route("/login", methods=["GET", "POST"])
 def login():
     error = None
-    if not SECRET_KEY:
-        error = "This site is locked. The owner needs to set SECRET_KEY."
+    locked = not (SECRET_KEY and db.available())
+    if locked:
+        error = "This site is locked. The owner needs to set SECRET_KEY and DATABASE_URL."
     elif request.method == "POST":
         org = db.find_org_by_code(request.form.get("code", ""))
         if org:
@@ -136,7 +138,7 @@ def login():
         error = "That org code isn't right."
     elif current_org():
         return redirect(url_for("index"))
-    return render_template("login.html", error=error, locked=not SECRET_KEY)
+    return render_template("login.html", error=error, locked=locked)
 
 
 @app.post("/logout")
@@ -156,7 +158,7 @@ def admin_token():
 def admin_required(view):
     @wraps(view)
     def wrapper(*args, **kwargs):
-        if SECRET_KEY and ADMIN_PASSWORD and hmac.compare_digest(session.get("admin", ""), admin_token()):
+        if SECRET_KEY and ADMIN_PASSWORD and db.available() and hmac.compare_digest(session.get("admin", ""), admin_token()):
             return view(*args, **kwargs)
         return redirect(url_for("admin_login"))
 
@@ -166,9 +168,9 @@ def admin_required(view):
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
     error = None
-    locked = not (SECRET_KEY and ADMIN_PASSWORD)
+    locked = not (SECRET_KEY and ADMIN_PASSWORD and db.available())
     if locked:
-        error = "The admin page is locked. The owner needs to set SECRET_KEY and ADMIN_PASSWORD."
+        error = "The admin page is locked. The owner needs to set SECRET_KEY, ADMIN_PASSWORD and DATABASE_URL."
     elif request.method == "POST":
         if hmac.compare_digest(request.form.get("password", "").encode(), ADMIN_PASSWORD.encode()):
             session["admin"] = admin_token()
@@ -258,6 +260,7 @@ def questions():
             input=f"Main idea:\n{idea}",
             text_format=Questions,
         )
+        usage.record(g.org["id"], "questions", MODEL, response)
         if response.output_parsed is None:
             raise RuntimeError("The AI didn't return any questions. Try again.")
         return jsonify(questions=response.output_parsed.questions)
@@ -281,6 +284,7 @@ def requirements():
             instructions=DOC_SYSTEM,
             input=f"Main idea:\n{idea}\n\nQuestions and answers:\n{qa}",
         )
+        usage.record(g.org["id"], "document", MODEL, response)
         return jsonify(document=response.output_text)
     except (openai.OpenAIError, RuntimeError) as e:
         return jsonify(error=str(e)), 502
@@ -307,11 +311,65 @@ def devops_send():
             input=document,
             text_format=Plan,
         )
+        usage.record(g.org["id"], "devops", MODEL, response)
         if response.output_parsed is None or not response.output_parsed.epics:
             raise RuntimeError("Couldn't find any epics in the document to send.")
         return jsonify(items=devops.send_plan(response.output_parsed, g.org))
     except (openai.OpenAIError, RuntimeError) as e:
         return jsonify(error=str(e)), 502
+
+
+
+def _days():
+    return {"7": 7, "90": 90}.get(request.args.get("days"), 30)
+
+
+@app.get("/usage")
+@login_required
+def usage_page():
+    return render_template(
+        "usage.html", tracking=True, scope=g.org["name"], show_orgs=False,
+        can_edit_prices=False, api_url=url_for("usage_data"),
+        nav=[("Tool", url_for("index"), False), ("Usage", url_for("usage_page"), True)],
+        signout_url=url_for("logout"),
+    )
+
+
+@app.get("/api/usage")
+@login_required
+def usage_data():
+    return jsonify(usage.summary(g.org["id"], days=_days()))
+
+
+@app.get("/admin/usage")
+@admin_required
+def admin_usage():
+    return render_template(
+        "usage.html", tracking=True, scope="all orgs", show_orgs=True,
+        can_edit_prices=True, prices_url=url_for("admin_prices"), api_url=url_for("admin_usage_data"),
+        nav=[("Orgs", url_for("admin"), False), ("Usage", url_for("admin_usage"), True)],
+        signout_url=url_for("admin_logout"),
+    )
+
+
+@app.get("/admin/api/usage")
+@admin_required
+def admin_usage_data():
+    data = usage.summary(all_orgs=True, days=_days())
+    names = {o["id"]: o["name"] for o in db.list_orgs()}
+    for row in data["by_org"]:
+        row["name"] = names.get(row["org_id"], "Deleted org")
+    return jsonify(data)
+
+
+@app.post("/admin/usage/prices")
+@admin_required
+def admin_prices():
+    try:
+        usage.set_prices(float(request.form.get("input") or 0), float(request.form.get("output") or 0))
+    except ValueError:
+        flash("Prices must be numbers.", "error")
+    return redirect(url_for("admin_usage"))
 
 
 if __name__ == "__main__":

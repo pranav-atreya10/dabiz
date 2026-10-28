@@ -38,3 +38,14 @@ python app.py
 
 Then open http://localhost:5000 (landing page). Go to `/admin` to create an org and get its code,
 then sign in at `/login` with that code. The tool is at `/app`.
+
+## Usage tracking
+
+Every AI call (questions, document, Azure DevOps send) records how many tokens it used and which
+org made it.
+
+- Each org sees its own usage at `/usage` (link in the app's top bar).
+- The admin sees every org at `/admin/usage`, with a split by org, and sets the prices there
+  (dollars per 1M input/output tokens) so the pages can show estimated cost.
+- Charts show tokens per day for 7, 30 or 90 days, with hover details and a table view, plus a
+  split by feature.
