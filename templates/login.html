@@ -6,15 +6,13 @@
   <title>Sign in · Requirements Studio</title>
   {% include "_styles.html" %}
   <style>
-    .wrap { min-height: calc(100vh - 48px); display: grid; place-items: center; padding: 24px 16px; }
-    .card {
-      width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--border);
-      border-radius: 8px; box-shadow: var(--shadow); padding: 32px 28px;
-    }
-    h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
-    label { display: block; font-weight: 600; margin: 20px 0 6px; }
-    .btn { width: 100%; justify-content: center; margin-top: 16px; }
-    .note { margin-top: 20px; font-size: 12px; }
+    .wrap { min-height: calc(100vh - 64px); display: grid; place-items: center; padding: 32px 16px; }
+    .login { width: 100%; max-width: 440px; padding: 40px 32px; }
+    h1 { font-size: 40px; font-weight: 500; letter-spacing: -.03em; line-height: 1.1; margin: 28px 0 10px; }
+    .lead { font-size: 17px; margin: 0 0 28px; }
+    label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+    .btn { width: 100%; margin-top: 18px; }
+    .note { margin: 24px 0 0; font-size: 13px; color: var(--faint); text-align: center; }
   </style>
 </head>
 <body>
@@ -22,14 +20,19 @@
     <div class="brand">{% include "_logo.html" %}<span>Requirements Studio</span></div>
   </header>
   <main class="wrap">
-    <form class="card" method="post" action="{{ url_for('login') }}">
+    <form class="card login" method="post" action="{{ url_for('login') }}">
+      <div class="icon-tile">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <rect x="5" y="10.5" width="14" height="10" rx="3"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>
+        </svg>
+      </div>
       <h1>Sign in</h1>
-      <p class="muted" style="margin:0">Enter your team's access password to continue.</p>
+      <p class="lead muted">Enter your team's access password to continue.</p>
       <label for="password">Password</label>
       <input id="password" name="password" type="password" autocomplete="current-password" autofocus {% if locked %}disabled{% endif %}>
       <p class="error">{{ error or "" }}</p>
-      <button class="btn btn-primary" type="submit" {% if locked %}disabled{% endif %}>Sign in</button>
-      <p class="note muted">Authorized users only.</p>
+      <button class="btn btn-primary" type="submit" {% if locked %}disabled{% endif %}>Continue <span class="arrow">→</span></button>
+      <p class="note">Authorized users only.</p>
     </form>
   </main>
 </body>
