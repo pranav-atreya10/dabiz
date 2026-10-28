@@ -162,7 +162,8 @@
     $("tTokens").textContent = compact.format(t.tokens);
     $("tSplit").textContent = full.format(t.input) + " in · " + full.format(t.output) + " out";
     if (priced) { $("tCost").textContent = money(t.cost); $("tCostSub").textContent = "Last " + data.days + " days"; }
-    else { $("tCost").innerHTML = '<a href="#pin">Set prices</a>'; $("tCostSub").textContent = "Add prices below to see cost"; }
+    else if ($("pin")) { $("tCost").innerHTML = '<a href="#pin">Set prices</a>'; $("tCostSub").textContent = "Add prices below to see cost"; }
+    else { $("tCost").textContent = "–"; $("tCostSub").textContent = "Your admin hasn't set prices yet"; }
     $("tCalls").textContent = full.format(t.calls);
     $("tAvg").textContent = t.calls ? compact.format(Math.round(t.tokens / t.calls)) + " tokens per call" : "No calls yet";
     if ($("pin") && priced) { $("pin").value = data.prices.input; $("pout").value = data.prices.output; }
