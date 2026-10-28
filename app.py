@@ -5,6 +5,7 @@ questions -> person answers -> Claude writes a requirements doc to download.
 """
 
 import json
+import os
 
 import anthropic
 from flask import Flask, jsonify, render_template, request
@@ -50,6 +51,8 @@ QUESTIONS_SCHEMA = {
 
 def ask_claude(system, user_text, output_config=None):
     """Send one request to Claude and return the text of the reply."""
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        raise RuntimeError("The server has no Claude API key set (ANTHROPIC_API_KEY).")
     response = client.beta.messages.create(
         model=MODEL,
         max_tokens=16000,
