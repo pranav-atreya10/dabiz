@@ -1,0 +1,57 @@
+<style>
+  :root {
+    --bg: #f5f5f5; --surface: #ffffff; --surface-2: #fafafa; --text: #242424; --muted: #616161;
+    --border: #e0e0e0; --accent: #0f6cbd; --accent-hover: #115ea3; --accent-soft: #ebf3fc;
+    --topbar: #1b1a19; --topbar-text: #ffffff; --danger: #c50f1f; --success: #107c10;
+    --shadow: 0 1px 2px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141414; --surface: #1f1f1f; --surface-2: #262626; --text: #f0f0f0; --muted: #adadad;
+      --border: #3a3a3a; --accent: #479ef5; --accent-hover: #62abf5; --accent-soft: #0e2a47;
+      --topbar: #0a0a0a; --danger: #f1707b; --success: #54b054; --shadow: 0 1px 2px rgba(0,0,0,.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 14px/1.5 "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .topbar {
+    height: 48px; background: var(--topbar); color: var(--topbar-text);
+    display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; letter-spacing: .1px; }
+  .brand svg { flex: none; }
+  .brand .divider { width: 1px; height: 18px; background: rgba(255,255,255,.3); }
+  .brand .product { font-weight: 400; opacity: .9; }
+  .topbar button {
+    background: transparent; color: var(--topbar-text); border: 1px solid rgba(255,255,255,.35);
+    border-radius: 4px; padding: 4px 12px; font: inherit; cursor: pointer;
+  }
+  .topbar button:hover { background: rgba(255,255,255,.1); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 16px;
+    font: inherit; font-weight: 600; border-radius: 4px; cursor: pointer; border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+  .btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border); }
+  .btn-secondary:hover:not(:disabled) { background: var(--surface-2); }
+  .btn:disabled { opacity: .55; cursor: not-allowed; }
+  .spinner {
+    width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.45); border-top-color: #fff;
+    border-radius: 50%; animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  input[type=password], textarea {
+    width: 100%; font: inherit; color: var(--text); background: var(--surface);
+    border: 1px solid var(--border); border-bottom: 1px solid var(--muted); border-radius: 4px; padding: 8px 10px;
+  }
+  input[type=password]:focus, textarea:focus { outline: none; border-bottom: 2px solid var(--accent); }
+  textarea { min-height: 72px; resize: vertical; }
+  .error { color: var(--danger); margin: 8px 0 0; min-height: 1em; }
+  .muted { color: var(--muted); }
+</style>

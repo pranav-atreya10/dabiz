@@ -3,61 +3,154 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Requirements Helper</title>
+  <title>Requirements Studio</title>
+  {% include "_styles.html" %}
   <style>
-    :root { --bg: #f7f7f5; --card: #fff; --text: #1d1d1b; --muted: #6b6b66; --accent: #2f5bd3; --border: #e2e2dc; }
-    @media (prefers-color-scheme: dark) {
-      :root { --bg: #161615; --card: #1f1f1d; --text: #ececea; --muted: #9a9a94; --accent: #7d9cf0; --border: #33332f; }
+    main { max-width: 880px; margin: 0 auto; padding: 28px 16px 48px; }
+    .page-head h1 { font-size: 24px; font-weight: 600; margin: 0 0 4px; }
+    .page-head p { margin: 0 0 24px; }
+
+    .stepper { display: flex; gap: 8px; margin-bottom: 20px; list-style: none; padding: 0; }
+    .stepper li {
+      flex: 1; display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--muted);
     }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, sans-serif; }
-    main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
-    h1 { margin: 0 0 4px; font-size: 1.6rem; }
-    .sub { color: var(--muted); margin: 0 0 24px; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-    label { display: block; font-weight: 600; margin: 14px 0 6px; }
-    textarea { width: 100%; min-height: 70px; padding: 10px; font: inherit; color: var(--text);
-               background: var(--bg); border: 1px solid var(--border); border-radius: 8px; resize: vertical; }
-    button { margin-top: 16px; padding: 10px 18px; font: inherit; font-weight: 600; border: 0; border-radius: 8px;
-             background: var(--accent); color: #fff; cursor: pointer; }
-    button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); margin-left: 8px; }
-    button:disabled { opacity: .5; cursor: wait; }
-    pre { white-space: pre-wrap; word-wrap: break-word; background: var(--bg); padding: 14px; border-radius: 8px;
-          border: 1px solid var(--border); font: 14px/1.5 ui-monospace, monospace; max-height: 520px; overflow: auto; }
-    .error { color: #c0392b; }
-    .hidden { display: none; }
+    .stepper .num {
+      flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+      font-weight: 600; font-size: 12px; border: 1px solid var(--border); background: var(--surface-2);
+    }
+    .stepper li.active { border-color: var(--accent); color: var(--text); }
+    .stepper li.active .num { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .stepper li.done .num { background: var(--success); border-color: var(--success); color: #fff; }
+    .stepper .label { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .panel {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      box-shadow: var(--shadow); margin-bottom: 16px;
+    }
+    .panel-head { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .panel-head h2 { font-size: 16px; font-weight: 600; margin: 0; }
+    .panel-head p { margin: 2px 0 0; }
+    .panel-body { padding: 20px; }
+    .panel-foot {
+      padding: 12px 20px; border-top: 1px solid var(--border); background: var(--surface-2);
+      border-radius: 0 0 8px 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    }
+    .field + .field { margin-top: 18px; }
+    .field label { display: block; font-weight: 600; margin-bottom: 6px; }
+    .field label .q { color: var(--muted); font-weight: 400; margin-right: 6px; }
+    .hidden { display: none !important; }
+
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); padding: 0 20px; }
+    .tab {
+      background: none; border: 0; padding: 12px 8px; margin-right: 12px; font: inherit; color: var(--muted);
+      cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .tab.active { color: var(--text); font-weight: 600; border-bottom-color: var(--accent); }
+
+    .doc { padding: 4px 28px 24px; max-height: 640px; overflow: auto; }
+    .doc h1 { font-size: 22px; margin: 20px 0 8px; }
+    .doc h2 { font-size: 17px; margin: 24px 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+    .doc h3 { font-size: 15px; margin: 18px 0 6px; }
+    .doc ul, .doc ol { padding-left: 22px; margin: 6px 0; }
+    .doc p { margin: 8px 0; }
+    .raw {
+      margin: 0; padding: 20px 28px; max-height: 640px; overflow: auto; white-space: pre-wrap; word-wrap: break-word;
+      font: 13px/1.55 "Cascadia Code", Consolas, ui-monospace, monospace;
+    }
+    .badge {
+      font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 10px;
+      background: var(--accent-soft); color: var(--accent);
+    }
+    .spacer { flex: 1; }
+    footer { text-align: center; font-size: 12px; margin-top: 24px; }
+
+    @media (max-width: 600px) {
+      .stepper .label { display: none; }
+      .stepper li { justify-content: center; }
+      .doc, .raw { padding-left: 16px; padding-right: 16px; }
+    }
   </style>
 </head>
 <body>
-<main>
-  <h1>Requirements Helper</h1>
-  <p class="sub">Describe your idea, answer a few questions, and get a requirements doc.</p>
+  <header class="topbar">
+    <div class="brand">{% include "_logo.html" %}<span>Requirements Studio</span></div>
+    <form method="post" action="{{ url_for('logout') }}"><button type="submit">Sign out</button></form>
+  </header>
 
-  <section class="card" id="step1">
-    <label for="idea">1. What's your main idea?</label>
-    <textarea id="idea" placeholder="e.g. An app that lets our HR team track new-hire onboarding tasks"></textarea>
-    <button id="getQuestions">Get questions</button>
-    <p class="error" id="err1"></p>
-  </section>
+  <main>
+    <div class="page-head">
+      <h1>New requirements document</h1>
+      <p class="muted">Describe a product idea, answer a few clarifying questions, and get a structured requirements document.</p>
+    </div>
 
-  <section class="card hidden" id="step2">
-    <strong>2. Answer these questions</strong>
-    <div id="questions"></div>
-    <button id="makeDoc">Make requirements doc</button>
-    <p class="error" id="err2"></p>
-  </section>
+    <ol class="stepper">
+      <li id="s1" class="active"><span class="num">1</span><span class="label">Describe idea</span></li>
+      <li id="s2"><span class="num">2</span><span class="label">Clarify details</span></li>
+      <li id="s3"><span class="num">3</span><span class="label">Review &amp; export</span></li>
+    </ol>
 
-  <section class="card hidden" id="step3">
-    <strong>3. Your requirements doc</strong>
-    <pre id="doc"></pre>
-    <button id="download">Download (.md)</button>
-    <button class="secondary" id="copy">Copy</button>
-  </section>
-</main>
+    <section class="panel" id="step1">
+      <div class="panel-head">
+        <h2>Describe your idea</h2>
+        <p class="muted">What should the product do, and who is it for?</p>
+      </div>
+      <div class="panel-body">
+        <div class="field">
+          <label for="idea">Product idea</label>
+          <textarea id="idea" rows="4" placeholder="e.g. A tool that lets our HR team track new-hire onboarding tasks across departments"></textarea>
+          <p class="error" id="err1"></p>
+        </div>
+      </div>
+      <div class="panel-foot">
+        <button class="btn btn-primary" id="getQuestions">Generate questions</button>
+      </div>
+    </section>
+
+    <section class="panel hidden" id="step2">
+      <div class="panel-head">
+        <h2>Clarify details</h2>
+        <p class="muted">Answer what you can. Leave a question blank if you're not sure; it will be listed as an open question.</p>
+      </div>
+      <div class="panel-body" id="questions"></div>
+      <div class="panel-foot">
+        <button class="btn btn-primary" id="makeDoc">Generate document</button>
+        <p class="error" id="err2" style="margin:0"></p>
+      </div>
+    </section>
+
+    <section class="panel hidden" id="step3">
+      <div class="panel-head">
+        <h2>Requirements document</h2>
+        <p class="muted">Review the draft before sharing it.</p>
+      </div>
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-view="preview" role="tab">Preview</button>
+        <button class="tab" data-view="markdown" role="tab">Markdown</button>
+      </div>
+      <div class="doc" id="preview"></div>
+      <pre class="raw hidden" id="markdown"></pre>
+      <div class="panel-foot">
+        <button class="btn btn-primary" id="download">Download .md</button>
+        <button class="btn btn-secondary" id="copy">Copy</button>
+        <span class="spacer"></span>
+        <button class="btn btn-secondary" disabled title="Coming soon">Send to Azure DevOps <span class="badge">Soon</span></button>
+      </div>
+    </section>
+
+    <footer class="muted">Content is AI-generated and may contain mistakes. Review before use.</footer>
+  </main>
 
 <script>
   const $ = (id) => document.getElementById(id);
   let questions = [];
+
+  function setStep(n) {
+    [1, 2, 3].forEach((i) => {
+      $("s" + i).classList.toggle("active", i === n);
+      $("s" + i).classList.toggle("done", i < n);
+    });
+  }
 
   async function post(url, body) {
     const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -67,37 +160,75 @@
   }
 
   async function withLoading(btn, label, fn, errEl) {
-    const old = btn.textContent;
-    btn.disabled = true; btn.textContent = label; errEl.textContent = "";
+    const old = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>' + label;
+    errEl.textContent = "";
     try { await fn(); } catch (e) { errEl.textContent = e.message; }
-    finally { btn.disabled = false; btn.textContent = old; }
+    finally { btn.disabled = false; btn.innerHTML = old; }
   }
 
-  $("getQuestions").onclick = () => withLoading($("getQuestions"), "Thinking…", async () => {
+  // Small Markdown renderer for the doc format we ask for. Escapes HTML first, so it's safe.
+  function renderMarkdown(md) {
+    const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const inline = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>");
+    let html = "", list = null;
+    const closeList = () => { if (list) { html += "</" + list + ">"; list = null; } };
+    for (const line of md.split("\n")) {
+      let m;
+      if ((m = line.match(/^(#{1,3})\s+(.*)/))) { closeList(); html += `<h${m[1].length}>${inline(m[2])}</h${m[1].length}>`; }
+      else if ((m = line.match(/^\s*[-*]\s+(.*)/))) { if (list !== "ul") { closeList(); html += "<ul>"; list = "ul"; } html += `<li>${inline(m[1])}</li>`; }
+      else if ((m = line.match(/^\s*\d+\.\s+(.*)/))) { if (list !== "ol") { closeList(); html += "<ol>"; list = "ol"; } html += `<li>${inline(m[1])}</li>`; }
+      else if (line.trim() === "") { closeList(); }
+      else { closeList(); html += `<p>${inline(line)}</p>`; }
+    }
+    closeList();
+    return html;
+  }
+
+  $("getQuestions").onclick = () => withLoading($("getQuestions"), "Generating…", async () => {
     const data = await post("/api/questions", { idea: $("idea").value });
     questions = data.questions;
     $("questions").innerHTML = "";
     questions.forEach((q, i) => {
+      const field = document.createElement("div");
+      field.className = "field";
       const label = document.createElement("label");
       label.htmlFor = "a" + i;
-      label.textContent = (i + 1) + ". " + q;
+      label.innerHTML = '<span class="q">Q' + (i + 1) + "</span>";
+      label.append(q);
       const box = document.createElement("textarea");
       box.id = "a" + i;
-      $("questions").append(label, box);
+      box.rows = 2;
+      field.append(label, box);
+      $("questions").append(field);
     });
     $("step2").classList.remove("hidden");
     $("step3").classList.add("hidden");
+    setStep(2);
+    $("step2").scrollIntoView({ behavior: "smooth" });
   }, $("err1"));
 
-  $("makeDoc").onclick = () => withLoading($("makeDoc"), "Writing doc…", async () => {
+  $("makeDoc").onclick = () => withLoading($("makeDoc"), "Writing document…", async () => {
     const answers = questions.map((q, i) => ({ question: q, answer: $("a" + i).value }));
     const data = await post("/api/requirements", { idea: $("idea").value, answers });
-    $("doc").textContent = data.document;
+    $("markdown").textContent = data.document;
+    $("preview").innerHTML = renderMarkdown(data.document);
     $("step3").classList.remove("hidden");
+    setStep(3);
+    $("step3").scrollIntoView({ behavior: "smooth" });
   }, $("err2"));
 
+  document.querySelectorAll(".tab").forEach((tab) => {
+    tab.onclick = () => {
+      document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t === tab));
+      $("preview").classList.toggle("hidden", tab.dataset.view !== "preview");
+      $("markdown").classList.toggle("hidden", tab.dataset.view !== "markdown");
+    };
+  });
+
   $("download").onclick = () => {
-    const blob = new Blob([$("doc").textContent], { type: "text/markdown" });
+    const blob = new Blob([$("markdown").textContent], { type: "text/markdown" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "requirements.md";
@@ -105,8 +236,8 @@
   };
 
   $("copy").onclick = async () => {
-    await navigator.clipboard.writeText($("doc").textContent);
-    $("copy").textContent = "Copied!";
+    await navigator.clipboard.writeText($("markdown").textContent);
+    $("copy").textContent = "Copied";
     setTimeout(() => ($("copy").textContent = "Copy"), 1500);
   };
 </script>

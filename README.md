@@ -1,4 +1,4 @@
-# Requirements Helper (MVP)
+# Requirements Studio (MVP)
 
 Type your product idea → the AI (OpenAI) asks workflow questions → you answer → it writes a requirements doc (epics, user stories, acceptance criteria) you can download as Markdown.
 
@@ -11,6 +11,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 export OPENAI_API_KEY=your-key-here   # get one at https://platform.openai.com/api-keys
+export APP_PASSWORD=pick-a-password    # everyone signs in with this
 python app.py
 ```
 

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · Requirements Studio</title>
+  {% include "_styles.html" %}
+  <style>
+    .wrap { min-height: calc(100vh - 48px); display: grid; place-items: center; padding: 24px 16px; }
+    .card {
+      width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; box-shadow: var(--shadow); padding: 32px 28px;
+    }
+    h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+    label { display: block; font-weight: 600; margin: 20px 0 6px; }
+    .btn { width: 100%; justify-content: center; margin-top: 16px; }
+    .note { margin-top: 20px; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">{% include "_logo.html" %}<span>Requirements Studio</span></div>
+  </header>
+  <main class="wrap">
+    <form class="card" method="post" action="{{ url_for('login') }}">
+      <h1>Sign in</h1>
+      <p class="muted" style="margin:0">Enter your team's access password to continue.</p>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" autofocus {% if locked %}disabled{% endif %}>
+      <p class="error">{{ error or "" }}</p>
+      <button class="btn btn-primary" type="submit" {% if locked %}disabled{% endif %}>Sign in</button>
+      <p class="note muted">Authorized users only.</p>
+    </form>
+  </main>
+</body>
+</html>

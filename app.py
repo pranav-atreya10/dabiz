@@ -4,16 +4,25 @@ Flow: person types their main idea -> the AI asks workflow/product-flow
 questions -> person answers -> the AI writes a requirements doc to download.
 """
 
+import hashlib
+import hmac
 import os
+from functools import wraps
 
 import openai
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from pydantic import BaseModel
 
 # Change the model without touching code by setting OPENAI_MODEL.
 MODEL = os.environ.get("OPENAI_MODEL", "gpt-5")
 
+# Everyone shares one password, set with APP_PASSWORD. If it isn't set, the site stays locked.
+APP_PASSWORD = os.environ.get("APP_PASSWORD", "")
+
 app = Flask(__name__)
+# Login cookies are signed with a key made from the password, so changing it logs everyone out.
+app.secret_key = hashlib.sha256(f"requirements-helper:{APP_PASSWORD}".encode()).digest()
+app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax")
 
 QUESTIONS_SYSTEM = """You help product teams turn a rough idea into clear product requirements.
 Given someone's main idea, ask the specific questions a product manager would need answered
@@ -51,12 +60,45 @@ def get_client():
     return openai.OpenAI()
 
 
+def login_required(view):
+    @wraps(view)
+    def wrapper(*args, **kwargs):
+        if APP_PASSWORD and session.get("signed_in"):
+            return view(*args, **kwargs)
+        if request.path.startswith("/api/"):
+            return jsonify(error="Your session has ended. Please refresh and sign in again."), 401
+        return redirect(url_for("login"))
+
+    return wrapper
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+    if not APP_PASSWORD:
+        error = "This site is locked. The owner needs to set APP_PASSWORD."
+    elif request.method == "POST":
+        if hmac.compare_digest(request.form.get("password", "").encode(), APP_PASSWORD.encode()):
+            session["signed_in"] = True
+            return redirect(url_for("index"))
+        error = "That password isn't right."
+    return render_template("login.html", error=error, locked=not APP_PASSWORD)
+
+
+@app.post("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+
 @app.get("/")
+@login_required
 def index():
     return render_template("index.html")
 
 
 @app.post("/api/questions")
+@login_required
 def questions():
     idea = (request.json or {}).get("idea", "").strip()
     if not idea:
@@ -76,6 +118,7 @@ def questions():
 
 
 @app.post("/api/requirements")
+@login_required
 def requirements():
     data = request.json or {}
     idea = data.get("idea", "").strip()
