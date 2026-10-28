@@ -45,12 +45,12 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  input[type=password], textarea {
+  input[type=password], input[type=text], input[type=url], select, textarea {
     width: 100%; font: inherit; color: var(--text); background: var(--surface-2);
     border: 1px solid var(--border-strong); border-radius: 14px; padding: 14px 16px;
     transition: border-color .15s;
   }
-  input[type=password]:focus, textarea:focus { outline: none; border-color: #8a8a8a; }
+  input[type=password]:focus, input[type=text]:focus, input[type=url]:focus, select:focus, textarea:focus { outline: none; border-color: #8a8a8a; }
   textarea { min-height: 88px; resize: vertical; }
   ::placeholder { color: var(--faint); }
   .error { color: var(--danger); margin: 10px 0 0; min-height: 1em; font-size: 14px; }

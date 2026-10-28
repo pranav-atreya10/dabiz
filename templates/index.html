@@ -83,6 +83,9 @@
     .items a { color: var(--text); text-decoration: underline; text-decoration-color: #555; text-underline-offset: 4px; }
     .items a:hover { text-decoration-color: var(--text); }
 
+    .who { display: flex; align-items: center; gap: 12px; }
+    .usage-link { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; }
+    .usage-link:hover { color: var(--text); }
     footer { text-align: center; font-size: 13px; color: var(--faint); margin-top: 40px; }
 
     @media (max-width: 640px) {
@@ -100,7 +103,10 @@
 <body>
   <header class="topbar">
     <a class="brand" href="{{ url_for('home') }}">{% include "_logo.html" %}<span>Requirements Studio</span></a>
-    <form method="post" action="{{ url_for('logout') }}"><button class="btn btn-outline btn-sm" type="submit">Sign out</button></form>
+    <div class="who">
+      <a class="usage-link" href="{{ url_for('usage_page') }}">Usage</a>
+      <form method="post" action="{{ url_for('logout') }}"><button class="btn btn-outline btn-sm" type="submit">Sign out</button></form>
+    </div>
   </header>
 
   <main>

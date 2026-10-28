@@ -13,7 +13,9 @@ import openai
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from pydantic import BaseModel
 
+import db
 import devops
+import usage
 
 # Change the model without touching code by setting OPENAI_MODEL.
 MODEL = os.environ.get("OPENAI_MODEL", "gpt-5")
@@ -25,6 +27,17 @@ app = Flask(__name__)
 # Login cookies are signed with a key made from the password, so changing it logs everyone out.
 app.secret_key = hashlib.sha256(f"requirements-helper:{APP_PASSWORD}".encode()).digest()
 app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax")
+
+_db_ready = False
+
+
+@app.before_request
+def setup_db():
+    """Create the tables the first time the app runs (when storage is available)."""
+    global _db_ready
+    if not _db_ready and db.available():
+        db.init()
+        _db_ready = True
 
 QUESTIONS_SYSTEM = """You help product teams turn a rough idea into clear product requirements.
 Given someone's main idea, ask the specific questions a product manager would need answered
@@ -141,6 +154,7 @@ def questions():
             input=f"Main idea:\n{idea}",
             text_format=Questions,
         )
+        usage.record(None, "questions", MODEL, response)
         if response.output_parsed is None:
             raise RuntimeError("The AI didn't return any questions. Try again.")
         return jsonify(questions=response.output_parsed.questions)
@@ -164,6 +178,7 @@ def requirements():
             instructions=DOC_SYSTEM,
             input=f"Main idea:\n{idea}\n\nQuestions and answers:\n{qa}",
         )
+        usage.record(None, "document", MODEL, response)
         return jsonify(document=response.output_text)
     except (openai.OpenAIError, RuntimeError) as e:
         return jsonify(error=str(e)), 502
@@ -191,11 +206,43 @@ def devops_send():
             input=document,
             text_format=Plan,
         )
+        usage.record(None, "devops", MODEL, response)
         if response.output_parsed is None or not response.output_parsed.epics:
             raise RuntimeError("Couldn't find any epics in the document to send.")
         return jsonify(items=devops.send_plan(response.output_parsed))
     except (openai.OpenAIError, RuntimeError) as e:
         return jsonify(error=str(e)), 502
+
+
+
+@app.get("/usage")
+@login_required
+def usage_page():
+    return render_template(
+        "usage.html", tracking=db.available(), scope="your team", show_orgs=False,
+        can_edit_prices=True, prices_url=url_for("usage_prices"), api_url=url_for("usage_data"),
+        nav=[("Tool", url_for("index"), False), ("Usage", url_for("usage_page"), True)],
+        signout_url=url_for("logout"),
+    )
+
+
+@app.get("/api/usage")
+@login_required
+def usage_data():
+    if not db.available():
+        return jsonify(error="Usage tracking needs a database (DATABASE_URL)."), 503
+    days = 90 if request.args.get("days") == "90" else 7 if request.args.get("days") == "7" else 30
+    return jsonify(usage.summary(None, days=days))
+
+
+@app.post("/usage/prices")
+@login_required
+def usage_prices():
+    try:
+        usage.set_prices(float(request.form.get("input") or 0), float(request.form.get("output") or 0))
+    except ValueError:
+        pass
+    return redirect(url_for("usage_page"))
 
 
 if __name__ == "__main__":

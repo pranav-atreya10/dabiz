@@ -29,3 +29,13 @@ Until these are set, the "Send to Azure DevOps" button stays off and the page sa
 | `AZDO_PROJECT` | Your project name |
 | `AZDO_PAT` | A Personal Access Token with **Work Items: Read & write** |
 | `AZDO_STORY_TYPE` | Optional. Default `User Story`. Scrum projects use `Product Backlog Item` |
+
+## Usage tracking
+
+Every AI call (questions, document, Azure DevOps send) records how many tokens it used. See it at
+`/usage`: totals, estimated cost, tokens per day (7/30/90 days, chart or table), and a split by
+feature. Type your model's prices (dollars per 1M input/output tokens) on that page to see costs.
+
+Tracking needs a database. Set `DATABASE_URL` to a Postgres connection string (for example a free
+Neon database from the Vercel Marketplace). Without it the app still works; on your own computer it
+uses a local `app.db` file, and on Vercel tracking is simply off.
