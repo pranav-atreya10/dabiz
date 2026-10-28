@@ -1,0 +1,146 @@
+"""Org storage. Uses Postgres when DATABASE_URL is set, otherwise a local SQLite file.
+
+SQLite is only for running on your own computer: on Vercel the file would be wiped
+between requests, so set DATABASE_URL there (for example a free Neon Postgres database).
+"""
+
+import base64
+import hashlib
+import os
+import secrets
+import sqlite3
+from contextlib import contextmanager
+
+from cryptography.fernet import Fernet, InvalidToken
+
+DATABASE_URL = os.environ.get("DATABASE_URL", "")
+SQLITE_PATH = os.environ.get("SQLITE_PATH", "orgs.db")
+
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS orgs (
+    id {id_type},
+    name TEXT NOT NULL,
+    code_hash TEXT NOT NULL UNIQUE,
+    code_version INTEGER NOT NULL DEFAULT 1,
+    azdo_org_url TEXT NOT NULL DEFAULT '',
+    azdo_project TEXT NOT NULL DEFAULT '',
+    azdo_pat_encrypted TEXT NOT NULL DEFAULT '',
+    azdo_story_type TEXT NOT NULL DEFAULT 'User Story',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+"""
+
+COLUMNS = "id, name, code_version, azdo_org_url, azdo_project, azdo_pat_encrypted, azdo_story_type, created_at"
+
+
+@contextmanager
+def connect():
+    if DATABASE_URL:
+        import psycopg
+        from psycopg.rows import dict_row
+
+        with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
+            yield conn, "%s"
+    else:
+        conn = sqlite3.connect(SQLITE_PATH)
+        conn.row_factory = sqlite3.Row
+        try:
+            yield conn, "?"
+            conn.commit()
+        finally:
+            conn.close()
+
+
+def query(sql, params=(), one=False):
+    """Run SQL written with ? placeholders on either database. Returns dict rows."""
+    with connect() as (conn, mark):
+        cur = conn.execute(sql.replace("?", mark), params)
+        rows = [dict(r) for r in cur.fetchall()] if cur.description else []
+    return (rows[0] if rows else None) if one else rows
+
+
+def init():
+    id_type = "SERIAL PRIMARY KEY" if DATABASE_URL else "INTEGER PRIMARY KEY AUTOINCREMENT"
+    query(SCHEMA.format(id_type=id_type))
+
+
+# ---------- Org codes ----------
+# Codes are random and long (about 60 bits), so a plain SHA-256 is enough to store them
+# safely and they can't realistically be guessed.
+
+CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"  # no 0/O or 1/I mix-ups
+
+
+def new_code():
+    raw = "".join(secrets.choice(CODE_ALPHABET) for _ in range(12))
+    return f"{raw[:4]}-{raw[4:8]}-{raw[8:]}"
+
+
+def hash_code(code):
+    cleaned = "".join(ch for ch in code.upper() if ch.isalnum())
+    return hashlib.sha256(cleaned.encode()).hexdigest()
+
+
+# ---------- Encrypting Azure DevOps tokens ----------
+
+def _fernet():
+    """Tokens are encrypted with a key made from SECRET_KEY, so a leaked database alone doesn't expose them."""
+    key = os.environ.get("SECRET_KEY", "")
+    if not key:
+        raise RuntimeError("SECRET_KEY isn't set.")
+    return Fernet(base64.urlsafe_b64encode(hashlib.sha256(f"azdo-pat:{key}".encode()).digest()))
+
+
+def encrypt(text):
+    return _fernet().encrypt(text.encode()).decode() if text else ""
+
+
+def decrypt(token):
+    if not token:
+        return ""
+    try:
+        return _fernet().decrypt(token.encode()).decode()
+    except InvalidToken:
+        return ""
+
+
+# ---------- Org operations ----------
+
+def list_orgs():
+    return query(f"SELECT {COLUMNS} FROM orgs ORDER BY name")
+
+
+def get_org(org_id):
+    return query(f"SELECT {COLUMNS} FROM orgs WHERE id = ?", (org_id,), one=True)
+
+
+def find_org_by_code(code):
+    return query(f"SELECT {COLUMNS} FROM orgs WHERE code_hash = ?", (hash_code(code),), one=True)
+
+
+def create_org(name):
+    """Create an org and return (org_id, code). The code is only ever shown this once."""
+    code = new_code()
+    row = query("INSERT INTO orgs (name, code_hash) VALUES (?, ?) RETURNING id",
+                (name, hash_code(code)), one=True)
+    return row["id"], code
+
+
+def regenerate_code(org_id):
+    """Replace an org's code. Everyone signed in with the old code gets signed out."""
+    code = new_code()
+    query("UPDATE orgs SET code_hash = ?, code_version = code_version + 1 WHERE id = ?",
+          (hash_code(code), org_id))
+    return code
+
+
+def update_devops(org_id, org_url, project, story_type, pat=None):
+    """Save an org's Azure DevOps settings. pat=None keeps the saved token; "" clears it."""
+    query("UPDATE orgs SET azdo_org_url = ?, azdo_project = ?, azdo_story_type = ? WHERE id = ?",
+          (org_url.strip().rstrip("/"), project.strip(), story_type.strip() or "User Story", org_id))
+    if pat is not None:
+        query("UPDATE orgs SET azdo_pat_encrypted = ? WHERE id = ?", (encrypt(pat.strip()), org_id))
+
+
+def delete_org(org_id):
+    query("DELETE FROM orgs WHERE id = ?", (org_id,))

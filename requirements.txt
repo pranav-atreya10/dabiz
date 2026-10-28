@@ -1,2 +1,4 @@
 openai>=2.0
 flask>=3.1
+psycopg[binary]>=3.2
+cryptography>=43

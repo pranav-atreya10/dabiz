@@ -4,27 +4,41 @@ Flow: person types their main idea -> the AI asks workflow/product-flow
 questions -> person answers -> the AI writes a requirements doc to download.
 """
 
-import hashlib
 import hmac
 import os
 from functools import wraps
 
 import openai
-from flask import Flask, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
 from pydantic import BaseModel
 
+import db
 import devops
 
 # Change the model without touching code by setting OPENAI_MODEL.
 MODEL = os.environ.get("OPENAI_MODEL", "gpt-5")
 
-# Everyone shares one password, set with APP_PASSWORD. If it isn't set, the site stays locked.
-APP_PASSWORD = os.environ.get("APP_PASSWORD", "")
+# Each org signs in with its own code (made on the admin page). SECRET_KEY signs login
+# cookies and encrypts saved Azure DevOps tokens; ADMIN_PASSWORD opens the admin page.
+# If either is missing, that part of the site stays locked.
+SECRET_KEY = os.environ.get("SECRET_KEY", "")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
 
 app = Flask(__name__)
-# Login cookies are signed with a key made from the password, so changing it logs everyone out.
-app.secret_key = hashlib.sha256(f"requirements-helper:{APP_PASSWORD}".encode()).digest()
+app.secret_key = SECRET_KEY or os.urandom(32)
 app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax")
+
+_db_ready = False
+
+
+@app.before_request
+def setup_db():
+    """Create the orgs table the first time the app runs."""
+    global _db_ready
+    if not _db_ready and SECRET_KEY:
+        db.init()
+        _db_ready = True
+
 
 QUESTIONS_SYSTEM = """You help product teams turn a rough idea into clear product requirements.
 Given someone's main idea, ask the specific questions a product manager would need answered
@@ -84,10 +98,23 @@ def get_client():
     return openai.OpenAI()
 
 
+def current_org():
+    """The signed-in org, or None. Signs out anyone whose org was deleted or whose code was changed."""
+    org_id = session.get("org_id")
+    if not SECRET_KEY or org_id is None:
+        return None
+    org = db.get_org(org_id)
+    if not org or org["code_version"] != session.get("code_version"):
+        session.pop("org_id", None)
+        return None
+    return org
+
+
 def login_required(view):
     @wraps(view)
     def wrapper(*args, **kwargs):
-        if APP_PASSWORD and session.get("signed_in"):
+        g.org = current_org()
+        if g.org:
             return view(*args, **kwargs)
         if request.path.startswith("/api/"):
             return jsonify(error="Your session has ended. Please refresh and sign in again."), 401
@@ -99,22 +126,112 @@ def login_required(view):
 @app.route("/login", methods=["GET", "POST"])
 def login():
     error = None
-    if not APP_PASSWORD:
-        error = "This site is locked. The owner needs to set APP_PASSWORD."
+    if not SECRET_KEY:
+        error = "This site is locked. The owner needs to set SECRET_KEY."
     elif request.method == "POST":
-        if hmac.compare_digest(request.form.get("password", "").encode(), APP_PASSWORD.encode()):
-            session["signed_in"] = True
+        org = db.find_org_by_code(request.form.get("code", ""))
+        if org:
+            session.update(org_id=org["id"], code_version=org["code_version"])
             return redirect(url_for("index"))
-        error = "That password isn't right."
-    elif session.get("signed_in"):
+        error = "That org code isn't right."
+    elif current_org():
         return redirect(url_for("index"))
-    return render_template("login.html", error=error, locked=not APP_PASSWORD)
+    return render_template("login.html", error=error, locked=not SECRET_KEY)
 
 
 @app.post("/logout")
 def logout():
-    session.clear()
+    session.pop("org_id", None)
+    session.pop("code_version", None)
     return redirect(url_for("login"))
+
+
+# ---------- Admin: create orgs, give out codes, set each org's Azure DevOps ----------
+
+def admin_token():
+    """Saved in the admin's cookie, so changing ADMIN_PASSWORD signs every admin out."""
+    return hmac.new(SECRET_KEY.encode(), ADMIN_PASSWORD.encode(), "sha256").hexdigest()
+
+
+def admin_required(view):
+    @wraps(view)
+    def wrapper(*args, **kwargs):
+        if SECRET_KEY and ADMIN_PASSWORD and hmac.compare_digest(session.get("admin", ""), admin_token()):
+            return view(*args, **kwargs)
+        return redirect(url_for("admin_login"))
+
+    return wrapper
+
+
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    error = None
+    locked = not (SECRET_KEY and ADMIN_PASSWORD)
+    if locked:
+        error = "The admin page is locked. The owner needs to set SECRET_KEY and ADMIN_PASSWORD."
+    elif request.method == "POST":
+        if hmac.compare_digest(request.form.get("password", "").encode(), ADMIN_PASSWORD.encode()):
+            session["admin"] = admin_token()
+            return redirect(url_for("admin"))
+        error = "That admin password isn't right."
+    return render_template("admin_login.html", error=error, locked=locked)
+
+
+@app.post("/admin/logout")
+def admin_logout():
+    session.pop("admin", None)
+    return redirect(url_for("admin_login"))
+
+
+@app.get("/admin")
+@admin_required
+def admin():
+    return render_template("admin.html", orgs=db.list_orgs())
+
+
+@app.post("/admin/orgs")
+@admin_required
+def admin_create_org():
+    name = request.form.get("name", "").strip()
+    if not name:
+        flash("Give the org a name.", "error")
+    else:
+        org_id, code = db.create_org(name)
+        flash(f"{name}|{code}", "code")
+    return redirect(url_for("admin"))
+
+
+@app.post("/admin/orgs/<int:org_id>/code")
+@admin_required
+def admin_new_code(org_id):
+    org = db.get_org(org_id)
+    if org:
+        flash(f"{org['name']}|{db.regenerate_code(org_id)}", "code")
+    return redirect(url_for("admin"))
+
+
+@app.post("/admin/orgs/<int:org_id>/devops")
+@admin_required
+def admin_devops(org_id):
+    f = request.form
+    pat = None
+    if f.get("clear_pat"):
+        pat = ""
+    elif f.get("pat", "").strip():
+        pat = f["pat"]
+    db.update_devops(org_id, f.get("org_url", ""), f.get("project", ""), f.get("story_type", ""), pat)
+    flash("Azure DevOps settings saved.", "ok")
+    return redirect(url_for("admin") + f"#org-{org_id}")
+
+
+@app.post("/admin/orgs/<int:org_id>/delete")
+@admin_required
+def admin_delete(org_id):
+    org = db.get_org(org_id)
+    if org:
+        db.delete_org(org_id)
+        flash(f"Deleted {org['name']}. Anyone signed in with its code is signed out.", "ok")
+    return redirect(url_for("admin"))
 
 
 @app.get("/")
@@ -125,7 +242,7 @@ def home():
 @app.get("/app")
 @login_required
 def index():
-    return render_template("index.html")
+    return render_template("index.html", org=g.org)
 
 
 @app.post("/api/questions")
@@ -169,11 +286,10 @@ def requirements():
         return jsonify(error=str(e)), 502
 
 
-
 @app.get("/api/devops/status")
 @login_required
 def devops_status():
-    return jsonify(configured=devops.is_configured(), project=devops.settings()["project"])
+    return jsonify(configured=devops.is_configured(g.org), project=g.org["azdo_project"])
 
 
 @app.post("/api/devops/send")
@@ -182,8 +298,8 @@ def devops_send():
     document = (request.json or {}).get("document", "").strip()
     if not document:
         return jsonify(error="There's no document to send."), 400
-    if not devops.is_configured():
-        return jsonify(error="Azure DevOps isn't set up yet."), 400
+    if not devops.is_configured(g.org):
+        return jsonify(error="Azure DevOps isn't set up for your org yet."), 400
     try:
         response = get_client().responses.parse(
             model=MODEL,
@@ -193,7 +309,7 @@ def devops_send():
         )
         if response.output_parsed is None or not response.output_parsed.epics:
             raise RuntimeError("Couldn't find any epics in the document to send.")
-        return jsonify(items=devops.send_plan(response.output_parsed))
+        return jsonify(items=devops.send_plan(response.output_parsed, g.org))
     except (openai.OpenAIError, RuntimeError) as e:
         return jsonify(error=str(e)), 502
 

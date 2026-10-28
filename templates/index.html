@@ -83,9 +83,16 @@
     .items a { color: var(--text); text-decoration: underline; text-decoration-color: #555; text-underline-offset: 4px; }
     .items a:hover { text-decoration-color: var(--text); }
 
+    .who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .org-name {
+      color: var(--muted); font-size: 14px; font-weight: 500; max-width: 40vw;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
     footer { text-align: center; font-size: 13px; color: var(--faint); margin-top: 40px; }
 
     @media (max-width: 640px) {
+      .topbar .brand span { display: none; }
+      .org-name { max-width: 55vw; }
       main { padding-top: 48px; }
       .stepper li { padding: 8px 12px; font-size: 14px; }
       .stepper .label { display: none; }
@@ -100,7 +107,10 @@
 <body>
   <header class="topbar">
     <a class="brand" href="{{ url_for('home') }}">{% include "_logo.html" %}<span>Requirements Studio</span></a>
-    <form method="post" action="{{ url_for('logout') }}"><button class="btn btn-outline btn-sm" type="submit">Sign out</button></form>
+    <div class="who">
+      <span class="org-name" title="Signed in as {{ org.name }}">{{ org.name }}</span>
+      <form method="post" action="{{ url_for('logout') }}"><button class="btn btn-outline btn-sm" type="submit">Sign out</button></form>
+    </div>
   </header>
 
   <main>
@@ -289,7 +299,7 @@
     devopsReady = d.configured;
     $("sendDevops").disabled = !devopsReady;
     if (devopsReady) setNote("Connected to Azure DevOps project \u201c" + d.project + "\u201d. Sending creates Epics with User Stories under them.");
-    else setNote("Azure DevOps isn't set up yet. Once an admin connects it, you'll be able to send this document as Epics and User Stories.", "warn");
+    else setNote("Azure DevOps isn't set up yet. Once your admin connects it, you'll be able to send this document as Epics and User Stories.", "warn");
   }).catch(() => setNote("Couldn't check the Azure DevOps connection.", "bad"));
 
   function itemLink(item, kind) {
