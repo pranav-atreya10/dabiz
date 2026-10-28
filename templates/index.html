@@ -99,7 +99,7 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">{% include "_logo.html" %}<span>Requirements Studio</span></div>
+    <a class="brand" href="{{ url_for('home') }}">{% include "_logo.html" %}<span>Requirements Studio</span></a>
     <form method="post" action="{{ url_for('logout') }}"><button class="btn btn-outline btn-sm" type="submit">Sign out</button></form>
   </header>
 

@@ -17,7 +17,7 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">{% include "_logo.html" %}<span>Requirements Studio</span></div>
+    <a class="brand" href="{{ url_for('home') }}">{% include "_logo.html" %}<span>Requirements Studio</span></a>
   </header>
   <main class="wrap">
     <form class="card login" method="post" action="{{ url_for('login') }}">

@@ -106,6 +106,8 @@ def login():
             session["signed_in"] = True
             return redirect(url_for("index"))
         error = "That password isn't right."
+    elif session.get("signed_in"):
+        return redirect(url_for("index"))
     return render_template("login.html", error=error, locked=not APP_PASSWORD)
 
 
@@ -116,6 +118,11 @@ def logout():
 
 
 @app.get("/")
+def home():
+    return render_template("home.html")
+
+
+@app.get("/app")
 @login_required
 def index():
     return render_template("index.html")

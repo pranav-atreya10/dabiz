@@ -15,7 +15,7 @@ export APP_PASSWORD=pick-a-password    # everyone signs in with this
 python app.py
 ```
 
-Then open http://localhost:5000
+Then open http://localhost:5000 (landing page). The tool itself is at /app, behind the password.
 
 Optional: set `OPENAI_MODEL` to use a different OpenAI model (default: `gpt-5`).
 

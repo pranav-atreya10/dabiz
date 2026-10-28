@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Requirements Studio</title>
+  <meta name="description" content="Turn a product idea into a clear requirements document, then send it to Azure DevOps.">
+  {% include "_styles.html" %}
+  <style>
+    main { overflow-x: clip; }
+    section { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+    /* ---------- Hero ---------- */
+    .hero { text-align: center; padding-top: 88px; }
+    .glow {
+      position: relative; display: inline-block; margin: 0; isolation: isolate;
+      font-size: clamp(56px, 13vw, 132px); font-weight: 600; letter-spacing: -.055em; line-height: .95;
+      color: #fff;
+    }
+    .glow::before {
+      content: attr(data-text); position: absolute; inset: 0; z-index: -1;
+      background: linear-gradient(90deg, #4f8bff, #39d98a, #ffd23f, #ff5fa2, #a66bff, #4f8bff);
+      background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+      filter: blur(18px); opacity: .9; animation: glowShift 8s linear infinite;
+    }
+    @keyframes glowShift { to { background-position: 200% 0; } }
+    .hero .sub {
+      font-size: clamp(18px, 2.6vw, 22px); line-height: 1.55; color: #c9c9c9;
+      max-width: 620px; margin: 28px auto 0;
+    }
+    .cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 36px; }
+    a.btn { text-decoration: none; }
+    .cta .btn { height: 52px; padding: 0 30px; font-size: 17px; text-decoration: none; }
+
+    /* ---------- Blob friends ---------- */
+    .crew {
+      display: flex; justify-content: center; align-items: flex-end; gap: 0;
+      margin: 56px auto 0; max-width: 760px; height: clamp(150px, 26vw, 230px);
+      border-bottom: 1px solid #1f1f1f; overflow: hidden;
+    }
+    .blob {
+      width: clamp(92px, 19vw, 180px); margin: 0 -10px; flex: none; cursor: pointer;
+      transform-origin: 50% 100%; animation: idle 4.5s ease-in-out infinite;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .blob:nth-child(2) { animation-delay: -1.1s; }
+    .blob:nth-child(3) { animation-delay: -2.3s; }
+    .blob:nth-child(4) { animation-delay: -3.4s; }
+    .blob svg { display: block; width: 100%; height: auto; overflow: visible; transition: transform .25s; }
+    .blob:hover svg { transform: translateY(-6px); }
+    .blob.jump svg { animation: jump .6s cubic-bezier(.3,1.6,.5,1); }
+    @keyframes idle { 0%,100% { transform: scale(1, 1); } 50% { transform: scale(1.03, .97); } }
+    @keyframes jump {
+      0% { transform: translateY(0) scale(1.08, .9); } 40% { transform: translateY(-34px) scale(.95, 1.06); }
+      70% { transform: translateY(0) scale(1.06, .94); } 100% { transform: translateY(0) scale(1); }
+    }
+    .eyes { transition: transform .12s ease-out; }
+    .lids { transform-box: fill-box; transform-origin: center; }
+    .blink .lids { animation: blink .18s ease-in-out; }
+    @keyframes blink { 50% { transform: scaleY(.1); } }
+    .hint { text-align: center; color: var(--faint); font-size: 13px; margin-top: 14px; }
+
+    /* ---------- Section headings ---------- */
+    .head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 120px 0 32px; }
+    .head h2 { font-size: clamp(30px, 5vw, 44px); font-weight: 500; letter-spacing: -.03em; margin: 0; }
+    .head a { color: var(--text); text-decoration: none; font-weight: 500; white-space: nowrap; }
+    .head a:hover { text-decoration: underline; text-underline-offset: 5px; }
+
+    /* ---------- How it works rows ---------- */
+    .row { display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: center; padding: 20px 0; }
+    .tile {
+      aspect-ratio: 1; border-radius: 18px; position: relative; overflow: hidden;
+      background-size: 220% 220%; animation: drift 14s ease-in-out infinite alternate;
+    }
+    @keyframes drift { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
+    .t1 { background-image: linear-gradient(135deg, #ff9ec7 0%, #c99bff 35%, #6f8dff 65%, #ffb3d1 100%); }
+    .t2 { background-image: linear-gradient(135deg, #8ef0c6 0%, #4fd1ff 40%, #c6ff6b 75%, #4fd1ff 100%); }
+    .t3 { background-image: linear-gradient(135deg, #ffb46b 0%, #ff6b3d 40%, #ff9ab0 80%, #ffcf8a 100%); }
+    .tile .mock { position: absolute; inset: 18%; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+    .pill-ui {
+      background: rgba(255,255,255,.88); color: #111; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 500;
+      box-shadow: 0 6px 20px rgba(0,0,0,.12); width: fit-content; max-width: 100%;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .pill-ui.right { align-self: flex-end; background: #111; color: #fff; }
+    .bar { height: 10px; border-radius: 6px; background: rgba(255,255,255,.85); }
+    .row h3 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 500; letter-spacing: -.02em; line-height: 1.2; margin: 0 0 14px; }
+    .meta { display: flex; gap: 18px; font-size: 16px; }
+    .meta b { font-weight: 500; }
+    .meta span { color: var(--muted); }
+    .row p { color: #bdbdbd; font-size: 17px; margin: 14px 0 0; max-width: 520px; }
+
+    /* ---------- Live demo ---------- */
+    .demo {
+      border-radius: 22px; padding: clamp(18px, 4vw, 40px);
+      background: linear-gradient(135deg, #7b5cff, #a66bff 45%, #ff7ab8);
+      background-size: 200% 200%; animation: drift 12s ease-in-out infinite alternate;
+    }
+    .window { background: #f7f7f7; color: #111; border-radius: 16px; padding: 18px; min-height: 380px; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+    .dots { display: flex; gap: 6px; margin-bottom: 18px; }
+    .dots i { width: 10px; height: 10px; border-radius: 50%; background: #d9d9d9; }
+    .chat { display: flex; flex-direction: column; gap: 12px; }
+    .bubble {
+      max-width: 82%; padding: 12px 16px; border-radius: 20px; font-size: 15px; line-height: 1.45;
+      opacity: 0; transform: translateY(10px); transition: opacity .4s, transform .4s;
+    }
+    .bubble.show { opacity: 1; transform: none; }
+    .bubble.me { align-self: flex-end; background: #e8e8e8; }
+    .bubble.ai { align-self: flex-start; background: #fff; border: 1px solid #e6e6e6; }
+    .bubble.ai ol { margin: 6px 0 0; padding-left: 20px; }
+    .docmock { background: #fff; border: 1px solid #e6e6e6; border-radius: 14px; padding: 16px; width: min(100%, 420px); }
+    .docmock .l { height: 9px; border-radius: 5px; background: #ececec; margin: 9px 0; width: 0; transition: width .7s ease-out; }
+    .docmock .l.t { height: 14px; background: #d6d6d6; }
+    .docmock.show .l { width: var(--w); }
+    .sent { align-self: flex-start; background: #111; color: #fff; }
+    .caret::after { content: "▍"; animation: caret 1s steps(1) infinite; margin-left: 1px; }
+    @keyframes caret { 50% { opacity: 0; } }
+
+    /* ---------- Final CTA ---------- */
+    .final { text-align: center; padding: 120px 20px 40px; }
+    .final h2 { font-size: clamp(36px, 7vw, 64px); font-weight: 500; letter-spacing: -.04em; line-height: 1.05; margin: 0 0 12px; }
+    .final p { color: #c4c4c4; font-size: 19px; margin: 0; }
+    footer { text-align: center; color: var(--faint); font-size: 13px; padding: 40px 20px 56px; }
+
+
+    /* ---------- Scroll reveal ---------- */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+
+    @media (max-width: 720px) {
+      .hero { padding-top: 56px; }
+      .row { grid-template-columns: 120px 1fr; gap: 18px; }
+      .tile .mock { display: none; }
+      .row p { display: none; }
+      .meta { font-size: 14px; gap: 12px; }
+      .head { margin-top: 88px; }
+      .window { min-height: 420px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before { animation: none !important; transition: none !important; }
+      .reveal, .bubble { opacity: 1; transform: none; }
+      .docmock .l { width: var(--w); }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('home') }}">{% include "_logo.html" %}<span>Requirements Studio</span></a>
+    <a class="btn btn-primary btn-sm" href="{{ url_for('login') }}">Sign in</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1 class="glow" data-text="Ideas in. Specs out.">Ideas in. Specs out.</h1>
+      <p class="sub">Describe what you want to build. Answer a few smart questions. Get a requirements document your team can ship from, and send it straight to Azure DevOps.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="{{ url_for('login') }}">Get started <span class="arrow">→</span></a>
+        <a class="btn btn-secondary" href="#how">See how it works</a>
+      </div>
+
+      <div class="crew" id="crew" aria-hidden="true">
+        <!-- Blue: round and calm -->
+        <div class="blob"><svg viewBox="0 0 160 150">
+          <defs><radialGradient id="gb" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#7fb2ff"/><stop offset=".6" stop-color="#3d7bff"/><stop offset="1" stop-color="#2452d6"/></radialGradient></defs>
+          <path d="M14 150 C8 80 38 34 80 34 C122 34 152 80 146 150 Z" fill="url(#gb)"/>
+          <g class="lids"><g class="eyes"><ellipse cx="62" cy="92" rx="7" ry="11" fill="#0d0d0d"/><ellipse cx="98" cy="92" rx="7" ry="11" fill="#0d0d0d"/></g></g>
+        </svg></div>
+        <!-- Green: sprout on top, big eyes -->
+        <div class="blob"><svg viewBox="0 0 160 150">
+          <defs><radialGradient id="gg" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#b9f56b"/><stop offset=".6" stop-color="#6fd43a"/><stop offset="1" stop-color="#3fa61e"/></radialGradient></defs>
+          <path d="M80 30 C80 18 86 10 96 6" stroke="#3fa61e" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <ellipse cx="100" cy="8" rx="12" ry="6" fill="#8fe04f" transform="rotate(-20 100 8)"/>
+          <rect x="22" y="30" width="116" height="140" rx="52" fill="url(#gg)"/>
+          <g class="lids">
+            <circle cx="60" cy="76" r="17" fill="#fff"/><circle cx="100" cy="76" r="17" fill="#fff"/>
+            <g class="eyes"><circle cx="60" cy="78" r="8" fill="#0d0d0d"/><circle cx="100" cy="78" r="8" fill="#0d0d0d"/>
+              <circle cx="63" cy="75" r="2.5" fill="#fff"/><circle cx="103" cy="75" r="2.5" fill="#fff"/></g>
+          </g>
+          <path d="M70 108 Q80 116 90 108" stroke="#1d5c0c" stroke-width="4" fill="none" stroke-linecap="round"/>
+        </svg></div>
+        <!-- Orange: tall, one big curious eye -->
+        <div class="blob"><svg viewBox="0 0 160 150">
+          <defs><radialGradient id="go" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#ffd27a"/><stop offset=".6" stop-color="#ff9a3d"/><stop offset="1" stop-color="#e86a12"/></radialGradient></defs>
+          <path d="M26 150 C22 66 52 14 80 14 C108 14 138 66 134 150 Z" fill="url(#go)"/>
+          <g class="lids">
+            <circle cx="80" cy="74" r="24" fill="#fff"/>
+            <g class="eyes"><circle cx="80" cy="76" r="11" fill="#0d0d0d"/><circle cx="84" cy="71" r="3.5" fill="#fff"/></g>
+          </g>
+          <ellipse cx="80" cy="116" rx="9" ry="6" fill="#7a2e00"/>
+        </svg></div>
+        <!-- Pink: sleepy, blushing -->
+        <div class="blob"><svg viewBox="0 0 160 150">
+          <defs><radialGradient id="gp" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#ff9bd2"/><stop offset=".6" stop-color="#ff4fa8"/><stop offset="1" stop-color="#d81f7e"/></radialGradient></defs>
+          <circle cx="80" cy="112" r="68" fill="url(#gp)"/>
+          <g class="lids"><g class="eyes">
+            <path d="M52 96 Q60 88 68 96" stroke="#0d0d0d" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <path d="M92 96 Q100 88 108 96" stroke="#0d0d0d" stroke-width="5" fill="none" stroke-linecap="round"/>
+          </g></g>
+          <ellipse cx="46" cy="112" rx="10" ry="6" fill="#ffc2e0" opacity=".8"/>
+          <ellipse cx="114" cy="112" rx="10" ry="6" fill="#ffc2e0" opacity=".8"/>
+        </svg></div>
+      </div>
+      <p class="hint">Psst, tap one.</p>
+    </section>
+
+    <section id="how">
+      <div class="head reveal"><h2>How it works</h2><a href="{{ url_for('login') }}">Try it →</a></div>
+
+      <div class="row reveal">
+        <div class="tile t1"><div class="mock">
+          <div class="pill-ui right">An app for HR onboarding</div>
+          <div class="pill-ui">Got it! A few questions…</div>
+        </div></div>
+        <div>
+          <h3>Describe your idea in plain words</h3>
+          <div class="meta"><b>Step 1</b><span>About 1 min</span></div>
+          <p>No templates, no jargon. Just say what you want to build and who it's for.</p>
+        </div>
+      </div>
+
+      <div class="row reveal">
+        <div class="tile t2"><div class="mock">
+          <div class="pill-ui">Who uses it day to day?</div>
+          <div class="pill-ui">What happens first?</div>
+          <div class="pill-ui">How do you know it's done?</div>
+        </div></div>
+        <div>
+          <h3>Answer focused questions about how it should work</h3>
+          <div class="meta"><b>Step 2</b><span>About 3 min</span></div>
+          <p>The AI asks about workflows and product flow, not tech details, so anyone on the team can answer.</p>
+        </div>
+      </div>
+
+      <div class="row reveal">
+        <div class="tile t3"><div class="mock">
+          <div class="bar" style="width:70%;height:14px"></div>
+          <div class="bar" style="width:95%"></div>
+          <div class="bar" style="width:80%"></div>
+          <div class="pill-ui right">Sent to Azure DevOps ✓</div>
+        </div></div>
+        <div>
+          <h3>Get a full spec, then send it to your backlog</h3>
+          <div class="meta"><b>Step 3</b><span>Instant</span></div>
+          <p>Epics, user stories and acceptance criteria. Download it, or push it to Azure DevOps in one click.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="head reveal"><h2>See it in action</h2></div>
+      <div class="demo reveal">
+        <div class="window">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <div class="chat" id="chat">
+            <div class="bubble me" id="b1"><span id="typed"></span></div>
+            <div class="bubble ai" id="b2">A few questions first:
+              <ol><li>Who adds a new hire?</li><li>Which teams get tasks?</li><li>When is onboarding finished?</li></ol>
+            </div>
+            <div class="bubble ai docmock" id="b3">
+              <div class="l t" style="--w:55%"></div>
+              <div class="l" style="--w:92%"></div><div class="l" style="--w:78%"></div>
+              <div class="l t" style="--w:40%"></div>
+              <div class="l" style="--w:88%"></div><div class="l" style="--w:64%"></div>
+            </div>
+            <div class="bubble sent" id="b4">✓ 2 epics, 6 stories sent to Azure DevOps</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final reveal">
+      <h2>Ready to write your first spec?</h2>
+      <p>It takes about five minutes.</p>
+      <div class="cta"><a class="btn btn-primary" href="{{ url_for('login') }}">Get started <span class="arrow">→</span></a></div>
+    </section>
+  </main>
+
+  <footer>Requirements Studio · AI-generated content may contain mistakes.</footer>
+
+<script>
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const blobs = [...document.querySelectorAll(".blob")];
+
+  // Eyes follow the mouse or finger.
+  function look(x, y) {
+    blobs.forEach((b) => {
+      const r = b.getBoundingClientRect();
+      const dx = x - (r.left + r.width / 2), dy = y - (r.top + r.height / 2);
+      const d = Math.hypot(dx, dy) || 1, m = Math.min(5, d / 40);
+      b.querySelector(".eyes").style.transform = `translate(${(dx / d) * m}px, ${(dy / d) * m}px)`;
+    });
+  }
+  if (!reduce) {
+    addEventListener("pointermove", (e) => look(e.clientX, e.clientY));
+    addEventListener("touchstart", (e) => look(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+  }
+
+  // Tap a blob to make it jump.
+  blobs.forEach((b) => b.addEventListener("click", () => {
+    b.classList.remove("jump"); void b.offsetWidth; b.classList.add("jump");
+  }));
+
+  // Random blinking.
+  if (!reduce) setInterval(() => {
+    const b = blobs[Math.floor(Math.random() * blobs.length)];
+    b.classList.add("blink"); setTimeout(() => b.classList.remove("blink"), 200);
+  }, 1400);
+
+  // Fade sections in as you scroll.
+  const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+    if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+  }), { threshold: 0.15 });
+  document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+  // Demo: type the idea, show questions, build the doc, send it. Loops while visible.
+  const idea = "An app that helps our HR team track new-hire onboarding";
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const show = (id) => document.getElementById(id).classList.add("show");
+  let running = false, visible = false;
+  async function playDemo() {
+    if (running) return; running = true;
+    while (visible) {
+      ["b1", "b2", "b3", "b4"].forEach((id) => document.getElementById(id).classList.remove("show"));
+      const typed = document.getElementById("typed");
+      typed.textContent = ""; typed.classList.add("caret");
+      show("b1");
+      for (const ch of idea) { typed.textContent += ch; await wait(reduce ? 0 : 38); }
+      typed.classList.remove("caret");
+      await wait(600); show("b2");
+      await wait(1600); show("b3");
+      await wait(1400); show("b4");
+      await wait(3500);
+    }
+    running = false;
+  }
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) playDemo(); }, { threshold: 0.3 })
+    .observe(document.getElementById("chat"));
+</script>
+</body>
+</html>
