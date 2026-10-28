@@ -2,7 +2,7 @@
 
 Type your product idea → the AI (OpenAI) asks workflow questions → you answer → it writes a requirements doc (epics, user stories, acceptance criteria) you can download as Markdown.
 
-Later this doc will be sent straight to Azure DevOps. For now it's download/copy only.
+You can download or copy the doc, or send it to Azure DevOps as Epics with User Stories under them.
 
 ## Run it
 
@@ -18,3 +18,14 @@ python app.py
 Then open http://localhost:5000
 
 Optional: set `OPENAI_MODEL` to use a different OpenAI model (default: `gpt-5`).
+
+## Connect Azure DevOps (optional)
+
+Until these are set, the "Send to Azure DevOps" button stays off and the page says it isn't set up yet.
+
+| Setting | What to put |
+|---|---|
+| `AZDO_ORG_URL` | `https://dev.azure.com/your-org` |
+| `AZDO_PROJECT` | Your project name |
+| `AZDO_PAT` | A Personal Access Token with **Work Items: Read & write** |
+| `AZDO_STORY_TYPE` | Optional. Default `User Story`. Scrum projects use `Product Backlog Item` |

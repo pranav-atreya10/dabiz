@@ -33,8 +33,7 @@
     .panel-head p { margin: 2px 0 0; }
     .panel-body { padding: 20px; }
     .panel-foot {
-      padding: 12px 20px; border-top: 1px solid var(--border); background: var(--surface-2);
-      border-radius: 0 0 8px 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      padding: 12px 20px; border-top: 1px solid var(--border); background: var(--surface-2); display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
     }
     .field + .field { margin-top: 18px; }
     .field label { display: block; font-weight: 600; margin-bottom: 6px; }
@@ -63,6 +62,23 @@
       background: var(--accent-soft); color: var(--accent);
     }
     .spacer { flex: 1; }
+    .devops-note {
+      padding: 10px 20px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted);
+      border-radius: 0 0 8px 8px;
+    }
+    .devops-note.warn { background: #fff4ce; color: #5c4400; }
+    .devops-note.bad { color: var(--danger); }
+    .devops-note.good { color: var(--success); }
+    @media (prefers-color-scheme: dark) { .devops-note.warn { background: #3d3000; color: #ffe08a; } }
+    .items, .items ul { list-style: none; margin: 0; padding: 0; }
+    .items ul { padding-left: 24px; }
+    .items li { padding: 4px 0; }
+    .items .type { font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; margin-right: 6px; }
+    .items .type.epic { background: #fde7f0; color: #8a1946; }
+    .items .type.story { background: var(--accent-soft); color: var(--accent); }
+    @media (prefers-color-scheme: dark) { .items .type.epic { background: #4a1028; color: #f6a6c6; } }
+    .items a { color: var(--accent); text-decoration: none; }
+    .items a:hover { text-decoration: underline; }
     footer { text-align: center; font-size: 12px; margin-top: 24px; }
 
     @media (max-width: 600px) {
@@ -134,8 +150,17 @@
         <button class="btn btn-primary" id="download">Download .md</button>
         <button class="btn btn-secondary" id="copy">Copy</button>
         <span class="spacer"></span>
-        <button class="btn btn-secondary" disabled title="Coming soon">Send to Azure DevOps <span class="badge">Soon</span></button>
+        <button class="btn btn-secondary" id="sendDevops" disabled>Send to Azure DevOps</button>
       </div>
+      <div class="devops-note" id="devopsNote">Checking Azure DevOps connection…</div>
+    </section>
+
+    <section class="panel hidden" id="devopsResult">
+      <div class="panel-head">
+        <h2>Created in Azure DevOps</h2>
+        <p class="muted" id="devopsSummary"></p>
+      </div>
+      <div class="panel-body"><ul class="items" id="devopsItems"></ul></div>
     </section>
 
     <footer class="muted">Content is AI-generated and may contain mistakes. Review before use.</footer>
@@ -215,6 +240,7 @@
     $("markdown").textContent = data.document;
     $("preview").innerHTML = renderMarkdown(data.document);
     $("step3").classList.remove("hidden");
+    $("devopsResult").classList.add("hidden");
     setStep(3);
     $("step3").scrollIntoView({ behavior: "smooth" });
   }, $("err2"));
@@ -234,6 +260,48 @@
     a.download = "requirements.md";
     a.click();
   };
+
+  // Azure DevOps: only usable once the site owner has set it up.
+  let devopsReady = false;
+  function setNote(text, kind) {
+    $("devopsNote").textContent = text;
+    $("devopsNote").className = "devops-note" + (kind ? " " + kind : "");
+  }
+  fetch("/api/devops/status").then((r) => r.json()).then((d) => {
+    devopsReady = d.configured;
+    $("sendDevops").disabled = !devopsReady;
+    if (devopsReady) setNote("Connected to Azure DevOps project \u201c" + d.project + "\u201d. Sending creates Epics with User Stories under them.");
+    else setNote("Azure DevOps isn't set up yet. Once an admin connects it, you'll be able to send this document as Epics and User Stories.", "warn");
+  }).catch(() => setNote("Couldn't check the Azure DevOps connection.", "bad"));
+
+  function itemLink(item, kind) {
+    const li = document.createElement("li");
+    const tag = document.createElement("span");
+    tag.className = "type " + kind;
+    tag.textContent = item.type;
+    const link = document.createElement(item.web_url ? "a" : "span");
+    if (item.web_url) { link.href = item.web_url; link.target = "_blank"; link.rel = "noopener"; }
+    link.textContent = "#" + item.id + " " + item.title;
+    li.append(tag, link);
+    return li;
+  }
+
+  $("sendDevops").onclick = () => withLoading($("sendDevops"), "Sending…", async () => {
+    const data = await post("/api/devops/send", { document: $("markdown").textContent });
+    $("devopsItems").innerHTML = "";
+    let stories = 0;
+    data.items.forEach((epic) => {
+      const li = itemLink(epic, "epic");
+      const ul = document.createElement("ul");
+      epic.children.forEach((s) => { ul.append(itemLink(s, "story")); stories++; });
+      li.append(ul);
+      $("devopsItems").append(li);
+    });
+    $("devopsSummary").textContent = data.items.length + " epics and " + stories + " stories were created.";
+    $("devopsResult").classList.remove("hidden");
+    setNote("Sent to Azure DevOps.", "good");
+    $("devopsResult").scrollIntoView({ behavior: "smooth" });
+  }, { set textContent(msg) { if (msg) setNote(msg, "bad"); } });
 
   $("copy").onclick = async () => {
     await navigator.clipboard.writeText($("markdown").textContent);

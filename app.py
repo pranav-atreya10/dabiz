@@ -13,6 +13,8 @@ import openai
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from pydantic import BaseModel
 
+import devops
+
 # Change the model without touching code by setting OPENAI_MODEL.
 MODEL = os.environ.get("OPENAI_MODEL", "gpt-5")
 
@@ -51,6 +53,28 @@ put it under Open questions instead of making it up."""
 
 class Questions(BaseModel):
     questions: list[str]
+
+
+class Story(BaseModel):
+    title: str
+    description: str
+    acceptance_criteria: list[str]
+
+
+class Epic(BaseModel):
+    title: str
+    description: str
+    stories: list[Story]
+
+
+class Plan(BaseModel):
+    epics: list[Epic]
+
+
+PLAN_SYSTEM = """Turn this requirements document into work items. Make one epic for each epic in
+the document, with its user stories under it. Story titles should be short (under 80 characters);
+put the full "As a ..., I want ..., so that ..." sentence in the story description. Copy the
+acceptance criteria as a list. Don't add epics or stories that aren't in the document."""
 
 
 def get_client():
@@ -134,6 +158,35 @@ def requirements():
             input=f"Main idea:\n{idea}\n\nQuestions and answers:\n{qa}",
         )
         return jsonify(document=response.output_text)
+    except (openai.OpenAIError, RuntimeError) as e:
+        return jsonify(error=str(e)), 502
+
+
+
+@app.get("/api/devops/status")
+@login_required
+def devops_status():
+    return jsonify(configured=devops.is_configured(), project=devops.settings()["project"])
+
+
+@app.post("/api/devops/send")
+@login_required
+def devops_send():
+    document = (request.json or {}).get("document", "").strip()
+    if not document:
+        return jsonify(error="There's no document to send."), 400
+    if not devops.is_configured():
+        return jsonify(error="Azure DevOps isn't set up yet."), 400
+    try:
+        response = get_client().responses.parse(
+            model=MODEL,
+            instructions=PLAN_SYSTEM,
+            input=document,
+            text_format=Plan,
+        )
+        if response.output_parsed is None or not response.output_parsed.epics:
+            raise RuntimeError("Couldn't find any epics in the document to send.")
+        return jsonify(items=devops.send_plan(response.output_parsed))
     except (openai.OpenAIError, RuntimeError) as e:
         return jsonify(error=str(e)), 502
 
