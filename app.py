@@ -1,19 +1,19 @@
 """Requirements helper MVP.
 
-Flow: person types their main idea -> Claude asks workflow/product-flow
-questions -> person answers -> Claude writes a requirements doc to download.
+Flow: person types their main idea -> the AI asks workflow/product-flow
+questions -> person answers -> the AI writes a requirements doc to download.
 """
 
-import json
 import os
 
-import anthropic
+import openai
 from flask import Flask, jsonify, render_template, request
+from pydantic import BaseModel
 
-MODEL = "claude-opus-5-5"
+# Change the model without touching code by setting OPENAI_MODEL.
+MODEL = os.environ.get("OPENAI_MODEL", "gpt-5")
 
 app = Flask(__name__)
-client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from the environment
 
 QUESTIONS_SYSTEM = """You help product teams turn a rough idea into clear product requirements.
 Given someone's main idea, ask the specific questions a product manager would need answered
@@ -39,32 +39,16 @@ For each epic: a "### Epic: <name>" heading, then user stories written as
 Only use what the person said or what clearly follows from it. If something is unknown,
 put it under Open questions instead of making it up."""
 
-QUESTIONS_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "questions": {"type": "array", "items": {"type": "string"}},
-    },
-    "required": ["questions"],
-    "additionalProperties": False,
-}
+
+class Questions(BaseModel):
+    questions: list[str]
 
 
-def ask_claude(system, user_text, output_config=None):
-    """Send one request to Claude and return the text of the reply."""
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        raise RuntimeError("The server has no Claude API key set (ANTHROPIC_API_KEY).")
-    response = client.beta.messages.create(
-        model=MODEL,
-        max_tokens=16000,
-        betas=["server-side-fallback-2026-07-01"],
-        fallbacks="default",  # if this model declines, the API retries on a fallback model
-        system=system,
-        messages=[{"role": "user", "content": user_text}],
-        output_config=output_config or {"effort": "medium"},
-    )
-    if response.stop_reason == "refusal":
-        raise RuntimeError("Claude declined this request. Try rewording your idea.")
-    return "".join(block.text for block in response.content if block.type == "text")
+def get_client():
+    """Make the OpenAI client, with a clear error if the key isn't set."""
+    if not os.environ.get("OPENAI_API_KEY"):
+        raise RuntimeError("The server has no OpenAI API key set (OPENAI_API_KEY).")
+    return openai.OpenAI()
 
 
 @app.get("/")
@@ -78,13 +62,16 @@ def questions():
     if not idea:
         return jsonify(error="Please type your idea first."), 400
     try:
-        text = ask_claude(
-            QUESTIONS_SYSTEM,
-            f"Main idea:\n{idea}",
-            {"effort": "medium", "format": {"type": "json_schema", "schema": QUESTIONS_SCHEMA}},
+        response = get_client().responses.parse(
+            model=MODEL,
+            instructions=QUESTIONS_SYSTEM,
+            input=f"Main idea:\n{idea}",
+            text_format=Questions,
         )
-        return jsonify(questions=json.loads(text)["questions"])
-    except (anthropic.APIError, RuntimeError, ValueError, KeyError) as e:
+        if response.output_parsed is None:
+            raise RuntimeError("The AI didn't return any questions. Try again.")
+        return jsonify(questions=response.output_parsed.questions)
+    except (openai.OpenAIError, RuntimeError) as e:
         return jsonify(error=str(e)), 502
 
 
@@ -98,9 +85,13 @@ def requirements():
         for a in answers
     )
     try:
-        doc = ask_claude(DOC_SYSTEM, f"Main idea:\n{idea}\n\nQuestions and answers:\n{qa}")
-        return jsonify(document=doc)
-    except (anthropic.APIError, RuntimeError) as e:
+        response = get_client().responses.create(
+            model=MODEL,
+            instructions=DOC_SYSTEM,
+            input=f"Main idea:\n{idea}\n\nQuestions and answers:\n{qa}",
+        )
+        return jsonify(document=response.output_text)
+    except (openai.OpenAIError, RuntimeError) as e:
         return jsonify(error=str(e)), 502
 
 

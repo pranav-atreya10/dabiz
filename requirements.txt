@@ -1,2 +1,2 @@
-anthropic>=2.3.0
+openai>=2.0
 flask>=3.1
