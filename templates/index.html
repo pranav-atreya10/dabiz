@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Requirements Helper</title>
+  <style>
+    :root { --bg: #f7f7f5; --card: #fff; --text: #1d1d1b; --muted: #6b6b66; --accent: #2f5bd3; --border: #e2e2dc; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #161615; --card: #1f1f1d; --text: #ececea; --muted: #9a9a94; --accent: #7d9cf0; --border: #33332f; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, sans-serif; }
+    main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+    h1 { margin: 0 0 4px; font-size: 1.6rem; }
+    .sub { color: var(--muted); margin: 0 0 24px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    label { display: block; font-weight: 600; margin: 14px 0 6px; }
+    textarea { width: 100%; min-height: 70px; padding: 10px; font: inherit; color: var(--text);
+               background: var(--bg); border: 1px solid var(--border); border-radius: 8px; resize: vertical; }
+    button { margin-top: 16px; padding: 10px 18px; font: inherit; font-weight: 600; border: 0; border-radius: 8px;
+             background: var(--accent); color: #fff; cursor: pointer; }
+    button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); margin-left: 8px; }
+    button:disabled { opacity: .5; cursor: wait; }
+    pre { white-space: pre-wrap; word-wrap: break-word; background: var(--bg); padding: 14px; border-radius: 8px;
+          border: 1px solid var(--border); font: 14px/1.5 ui-monospace, monospace; max-height: 520px; overflow: auto; }
+    .error { color: #c0392b; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Requirements Helper</h1>
+  <p class="sub">Describe your idea, answer a few questions, and get a requirements doc.</p>
+
+  <section class="card" id="step1">
+    <label for="idea">1. What's your main idea?</label>
+    <textarea id="idea" placeholder="e.g. An app that lets our HR team track new-hire onboarding tasks"></textarea>
+    <button id="getQuestions">Get questions</button>
+    <p class="error" id="err1"></p>
+  </section>
+
+  <section class="card hidden" id="step2">
+    <strong>2. Answer these questions</strong>
+    <div id="questions"></div>
+    <button id="makeDoc">Make requirements doc</button>
+    <p class="error" id="err2"></p>
+  </section>
+
+  <section class="card hidden" id="step3">
+    <strong>3. Your requirements doc</strong>
+    <pre id="doc"></pre>
+    <button id="download">Download (.md)</button>
+    <button class="secondary" id="copy">Copy</button>
+  </section>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  let questions = [];
+
+  async function post(url, body) {
+    const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Something went wrong.");
+    return data;
+  }
+
+  async function withLoading(btn, label, fn, errEl) {
+    const old = btn.textContent;
+    btn.disabled = true; btn.textContent = label; errEl.textContent = "";
+    try { await fn(); } catch (e) { errEl.textContent = e.message; }
+    finally { btn.disabled = false; btn.textContent = old; }
+  }
+
+  $("getQuestions").onclick = () => withLoading($("getQuestions"), "Thinking…", async () => {
+    const data = await post("/api/questions", { idea: $("idea").value });
+    questions = data.questions;
+    $("questions").innerHTML = "";
+    questions.forEach((q, i) => {
+      const label = document.createElement("label");
+      label.htmlFor = "a" + i;
+      label.textContent = (i + 1) + ". " + q;
+      const box = document.createElement("textarea");
+      box.id = "a" + i;
+      $("questions").append(label, box);
+    });
+    $("step2").classList.remove("hidden");
+    $("step3").classList.add("hidden");
+  }, $("err1"));
+
+  $("makeDoc").onclick = () => withLoading($("makeDoc"), "Writing doc…", async () => {
+    const answers = questions.map((q, i) => ({ question: q, answer: $("a" + i).value }));
+    const data = await post("/api/requirements", { idea: $("idea").value, answers });
+    $("doc").textContent = data.document;
+    $("step3").classList.remove("hidden");
+  }, $("err2"));
+
+  $("download").onclick = () => {
+    const blob = new Blob([$("doc").textContent], { type: "text/markdown" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "requirements.md";
+    a.click();
+  };
+
+  $("copy").onclick = async () => {
+    await navigator.clipboard.writeText($("doc").textContent);
+    $("copy").textContent = "Copied!";
+    setTimeout(() => ($("copy").textContent = "Copy"), 1500);
+  };
+</script>
+</body>
+</html>
