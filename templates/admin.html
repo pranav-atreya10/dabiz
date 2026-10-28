@@ -71,7 +71,7 @@
 
     {% for kind, message in get_flashed_messages(with_categories=true) %}
       {% if kind == "code" %}
-        {% set name, code = message.split("|", 1) %}
+        {% set name, code = message.rsplit("|", 1) %}
         <div class="newcode">
           <div class="muted">Sign-in code for <strong style="color:var(--text)">{{ name }}</strong></div>
           <div class="code" id="newCode">{{ code }}</div>

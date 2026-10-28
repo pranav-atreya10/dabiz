@@ -7,6 +7,7 @@ questions -> person answers -> the AI writes a requirements doc to download.
 import hmac
 import os
 from functools import wraps
+from urllib.parse import urlparse
 
 import openai
 from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
@@ -30,6 +31,22 @@ app.secret_key = SECRET_KEY or os.urandom(32)
 app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax")
 
 _db_ready = False
+
+
+@app.before_request
+def same_site_posts_only():
+    """Block form posts that come from other websites (cross-site request forgery).
+
+    Without this, another site could post an attacker's org code to /login and silently
+    sign a visitor into the attacker's org. Browsers always send Origin (or at least
+    Referer) on form posts, so a post without either is refused too.
+    """
+    if request.method != "POST":
+        return None
+    source = request.headers.get("Origin") or request.headers.get("Referer") or ""
+    if urlparse(source).netloc != request.host:
+        return jsonify(error="That request came from another site, so it was blocked."), 403
+    return None
 
 
 @app.before_request
