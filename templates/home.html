@@ -32,16 +32,47 @@
     a.btn { text-decoration: none; }
     .cta .btn { height: 52px; padding: 0 30px; font-size: 17px; text-decoration: none; }
 
-    /* ---------- Gradient panel under the hero ---------- */
-    .band {
-      position: relative; overflow: hidden; isolation: isolate;
-      margin: 64px auto 0; max-width: 1000px; height: clamp(180px, 30vw, 320px); border-radius: 28px;
+    /* ---------- Hero visual: idea -> questions -> requirements -> spec & backlog ---------- */
+    .flow {
+      position: relative; overflow: hidden; isolation: isolate; text-align: left;
+      margin: 64px auto 0; max-width: 1040px; border-radius: 28px; padding: clamp(16px, 3vw, 32px);
       background: #8f7dff; --blobs:
         radial-gradient(circle at 12% 30%, #ff9ec7 0, transparent 60%),
         radial-gradient(circle at 45% 80%, #6f8dff 0, transparent 60%),
         radial-gradient(circle at 70% 20%, #ffcf8a 0, transparent 60%),
         radial-gradient(circle at 92% 75%, #4fd1ff 0, transparent 60%);
     }
+    .stages { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; position: relative; }
+    .stage {
+      background: rgba(255,255,255,.9); color: #111; border-radius: 18px; padding: 16px;
+      min-height: 230px; display: flex; flex-direction: column; gap: 8px; cursor: pointer;
+      box-shadow: 0 10px 30px rgba(0,0,0,.12); transition: transform .45s ease, opacity .45s ease, box-shadow .45s;
+      opacity: .55; transform: scale(.97); -webkit-tap-highlight-color: transparent;
+    }
+    .stage.on { opacity: 1; transform: scale(1); box-shadow: 0 16px 44px rgba(0,0,0,.22); }
+    .stage .tag { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: .06em; }
+    .stage .tag i {
+      font-style: normal; width: 22px; height: 22px; border-radius: 50%; background: #111; color: #fff;
+      display: grid; place-items: center; font-size: 12px; letter-spacing: 0;
+    }
+    .stage h4 { margin: 2px 0 4px; font-size: 17px; font-weight: 600; letter-spacing: -.01em; }
+    .note-card {
+      background: #fff6c8; border-radius: 10px; padding: 12px; font-size: 14px; line-height: 1.4;
+      transform: rotate(-1.5deg); box-shadow: 0 4px 10px rgba(0,0,0,.08);
+    }
+    .chip { background: #f1f1f1; border-radius: 999px; padding: 6px 11px; font-size: 13px; width: fit-content; max-width: 100%; }
+    .chip.ans { background: #111; color: #fff; align-self: flex-end; }
+    .mini { font-size: 13px; line-height: 1.45; }
+    .mini b { display: block; font-size: 13px; }
+    .mini .story { display: flex; gap: 6px; align-items: flex-start; margin-top: 4px; }
+    .mini .story::before { content: ""; flex: none; width: 10px; height: 10px; margin-top: 4px; border-radius: 3px; border: 1.5px solid #888; }
+    .out { display: flex; align-items: center; gap: 8px; background: #f1f1f1; border-radius: 12px; padding: 9px 11px; font-size: 13px; }
+    .out .ok { margin-left: auto; color: #0a7d3b; font-weight: 700; }
+    .out.code { background: #111; color: #fff; font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 12px; }
+    .out.code .ok { color: #7ee2a8; }
+    .progress { height: 4px; border-radius: 2px; background: rgba(255,255,255,.35); margin-top: 18px; overflow: hidden; }
+    .progress span { display: block; height: 100%; width: 0; background: #fff; border-radius: 2px; transition: width .6s ease; }
+    .flow-caption { color: rgba(255,255,255,.95); font-size: 14px; font-weight: 500; margin-top: 12px; text-align: center; text-shadow: 0 1px 8px rgba(0,0,0,.15); }
 
     /* ---------- Section headings ---------- */
     .head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 120px 0 32px; }
@@ -53,7 +84,7 @@
     .row { display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: center; padding: 20px 0; }
     .tile { aspect-ratio: 1; border-radius: 18px; position: relative; overflow: hidden; isolation: isolate; }
     /* Soft circles of color (about 60% of the tile) that slowly float around. */
-    .tile::before, .demo::before, .band::before {
+    .tile::before, .demo::before, .flow::before {
       content: ""; position: absolute; inset: -25%; z-index: -1;
       background: var(--blobs); animation: float 16s ease-in-out infinite alternate;
     }
@@ -70,6 +101,10 @@
       radial-gradient(circle at 30% 25%, #c6ff6b 0, transparent 60%),
       radial-gradient(circle at 80% 60%, #4fd1ff 0, transparent 60%),
       radial-gradient(circle at 25% 80%, #8ef0c6 0, transparent 60%); }
+    .t4 { background: #6f8dff; --blobs:
+      radial-gradient(circle at 25% 25%, #4fd1ff 0, transparent 60%),
+      radial-gradient(circle at 80% 40%, #a66bff 0, transparent 60%),
+      radial-gradient(circle at 40% 85%, #8ef0c6 0, transparent 60%); }
     .t3 { background: #ff8a5c; --blobs:
       radial-gradient(circle at 30% 30%, #ffcf8a 0, transparent 60%),
       radial-gradient(circle at 75% 35%, #ff5a36 0, transparent 60%),
@@ -128,6 +163,16 @@
     .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
     .reveal.in { opacity: 1; transform: none; }
 
+    @media (max-width: 860px) {
+      .stages { grid-template-columns: 1fr 1fr; }
+      .stage { min-height: 200px; }
+    }
+    @media (max-width: 480px) {
+      .stage { padding: 12px; min-height: 0; gap: 6px; }
+      .stage h4 { font-size: 15px; }
+      .note-card, .chip, .mini, .out { font-size: 12px; }
+      .stage .extra { display: none; }
+    }
     @media (max-width: 720px) {
       .hero { padding-top: 56px; }
       .row { grid-template-columns: 120px 1fr; gap: 18px; }
@@ -141,6 +186,7 @@
       *, *::before { animation: none !important; transition: none !important; }
       .reveal, .bubble { opacity: 1; transform: none; }
       .docmock .l { width: var(--w); }
+      .stage { opacity: 1; transform: none; }
     }
   </style>
 </head>
@@ -153,13 +199,44 @@
   <main>
     <section class="hero">
       <h1 class="glow" data-text="Ideas in. Specs out.">Ideas in. Specs out.</h1>
-      <p class="sub">Describe what you want to build. Answer a few smart questions. Get a requirements document your team can ship from, and send it straight to Azure DevOps.</p>
+      <p class="sub">Describe what you want to build. Answer a few smart questions. Get requirements and a technical spec your team, or an AI coding tool, can build from. Send it straight to Azure DevOps.</p>
       <div class="cta">
         <a class="btn btn-primary" href="{{ url_for('login') }}">Get started <span class="arrow">→</span></a>
         <a class="btn btn-secondary" href="#how">See how it works</a>
       </div>
 
-      <div class="band" aria-hidden="true"></div>
+      <div class="flow" id="flow">
+        <div class="stages" role="list" aria-label="How an idea becomes a spec">
+          <div class="stage" role="listitem" data-i="0">
+            <div class="tag"><i>1</i>Idea</div>
+            <h4>Say it in plain words</h4>
+            <div class="note-card">"An app that helps HR track new-hire onboarding across teams."</div>
+          </div>
+          <div class="stage" role="listitem" data-i="1">
+            <div class="tag"><i>2</i>Questions</div>
+            <h4>AI asks what matters</h4>
+            <div class="chip">Who adds a new hire?</div>
+            <div class="chip ans">HR managers</div>
+            <div class="chip extra">When is onboarding done?</div>
+          </div>
+          <div class="stage" role="listitem" data-i="2">
+            <div class="tag"><i>3</i>Requirements</div>
+            <h4>A clear document</h4>
+            <div class="mini"><b>Epic: New hire setup</b>
+              <div class="story">As HR, I add a new hire so tasks start</div>
+              <div class="story extra">As a lead, I see my team's tasks</div>
+            </div>
+          </div>
+          <div class="stage" role="listitem" data-i="3">
+            <div class="tag"><i>4</i>Spec &amp; backlog</div>
+            <h4>Ready to build</h4>
+            <div class="out">Azure DevOps · 6 stories <span class="ok">✓</span></div>
+            <div class="out code">spec → coding AI <span class="ok">✓</span></div>
+          </div>
+        </div>
+        <div class="progress" aria-hidden="true"><span id="flowBar"></span></div>
+        <div class="flow-caption">From a one-line idea to a buildable spec in about 5 minutes.</div>
+      </div>
     </section>
 
     <section id="how">
@@ -198,9 +275,23 @@
           <div class="pill-ui right">Sent to Azure DevOps ✓</div>
         </div></div>
         <div>
-          <h3>Get a full spec, then send it to your backlog</h3>
+          <h3>Get a requirements document, then send it to your backlog</h3>
           <div class="meta"><b>Step 3</b><span>Instant</span></div>
-          <p>Epics, user stories and acceptance criteria. Download it, or push it to Azure DevOps in one click.</p>
+          <p>Epics, user stories and acceptance criteria. Edit it, download it, or push it to Azure DevOps in one click.</p>
+        </div>
+      </div>
+
+      <div class="row reveal">
+        <div class="tile t4"><div class="mock">
+          <div class="pill-ui">Web or mobile?</div>
+          <div class="bar" style="width:85%;height:14px"></div>
+          <div class="bar" style="width:65%"></div>
+          <div class="pill-ui right">Copied for coding AI ✓</div>
+        </div></div>
+        <div>
+          <h3>Turn it into a technical spec an AI can build from</h3>
+          <div class="meta"><b>Step 4</b><span>About 2 min</span></div>
+          <p>A few technical questions, then a full spec with a build plan and tests. Copy it straight into GitHub Copilot, Codex, Claude Code or Cursor.</p>
         </div>
       </div>
     </section>
@@ -238,6 +329,27 @@
 
 <script>
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Hero flow: highlight stages one after another. Hover or tap one to hold it there.
+  const stages = [...document.querySelectorAll(".stage")];
+  let held = false;
+  function lightStage(i) {
+    stages.forEach((st, j) => st.classList.toggle("on", reduce || j <= i));
+    document.getElementById("flowBar").style.width = ((i + 1) / stages.length * 100) + "%";
+  }
+  lightStage(reduce ? stages.length - 1 : 0);
+  // Each tick moves one stage forward; the last stage stays lit for an extra tick before restarting.
+  let tick = 0;
+  if (!reduce) setInterval(() => {
+    if (held) return;
+    tick = (tick + 1) % (stages.length + 1);
+    lightStage(Math.min(tick, stages.length - 1));
+  }, 1800);
+  stages.forEach((st, i) => {
+    st.addEventListener("pointerenter", () => { held = true; tick = i; lightStage(i); });
+    st.addEventListener("pointerleave", () => { held = false; });
+    st.addEventListener("click", () => { held = !held; tick = i; lightStage(i); });
+  });
 
   // Fade sections in as you scroll.
   const io = new IntersectionObserver((entries) => entries.forEach((e) => {
