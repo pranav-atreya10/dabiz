@@ -61,3 +61,14 @@ org made it.
 - `/privacy` explains in plain words what's stored and who it's shared with. Review it before
   real customers use the app.
 - Deleting an org also deletes its documents and feedback.
+
+## Technical spec and AI coding tools
+
+After a requirements document, **Create technical spec** asks 4 to 6 technical questions ("not sure"
+is fine) and writes a spec: architecture, data model, screens and API, integrations, security,
+edge cases, a test plan, and an implementation plan broken into small tasks. It's saved with the
+document, and can be edited, downloaded or copied.
+
+**Copy for coding AI** builds one ready-to-paste prompt (the spec plus the requirements, with
+instructions to work task by task, write tests, and ask about open questions) for tools like
+GitHub Copilot, Codex, Claude Code or Cursor.

@@ -89,6 +89,42 @@ You already asked some questions, and the person answered. Ask 3 to 5 NEW questi
 the biggest remaining gaps, based on their answers. Don't repeat or rephrase earlier questions."""
 
 
+SPEC_QUESTIONS_SYSTEM = """You are a senior software architect. You'll get a product requirements document.
+Ask 4 to 6 short technical questions you need answered to write an implementation spec, such as:
+what it runs on (web, mobile, desktop), existing systems or tools it must connect to, where the
+data lives and how sensitive it is, how people sign in and what roles exist, expected number of
+users, and any required languages, frameworks or hosting. Skip anything the document already
+answers. Phrase each question so a non-expert can answer it, or say "not sure"."""
+
+SPEC_SYSTEM = """You are a senior software architect. Turn a product requirements document, plus answers
+to technical questions, into a technical specification that an engineer or an AI coding tool can
+build from. Write Markdown with these sections:
+
+# <Product name>: Technical specification
+## Overview
+## Assumptions
+(Where an answer was missing or "not sure", choose a sensible default and list it here.)
+## Architecture
+(The main components and how they talk to each other.)
+## Data model
+(Each entity with its fields and types.)
+## Screens and API
+(Each screen, and each API endpoint with method, path, request and response.)
+## Integrations
+## Security and permissions
+## Non-functional requirements
+(Performance, scale, reliability, accessibility.)
+## Edge cases and error handling
+## Test plan
+(Tests that prove each user story's acceptance criteria.)
+## Implementation plan
+(Numbered tasks in build order, each small enough for one pull request.)
+## Open questions
+
+Be concrete and consistent with the requirements. Don't invent business rules: if something
+isn't decided, put it under Open questions."""
+
+
 class Questions(BaseModel):
     questions: list[str]
 
@@ -356,7 +392,8 @@ def get_document(doc_id):
     if not doc:
         return jsonify(error="That document doesn't exist."), 404
     return jsonify(id=doc["id"], title=doc["title"], idea=doc["idea"], qa=json.loads(doc["qa"] or "[]"),
-                   document=doc["content"], rating=doc["rating"], feedback=doc["feedback"])
+                   document=doc["content"], spec=doc["spec"], spec_qa=json.loads(doc["spec_qa"] or "[]"),
+                   rating=doc["rating"], feedback=doc["feedback"])
 
 
 @app.put("/api/documents/<int:doc_id>")
@@ -388,6 +425,62 @@ def document_feedback(doc_id):
     if not db.get_document(g.org["id"], doc_id):
         return jsonify(error="That document doesn't exist."), 404
     db.set_feedback(g.org["id"], doc_id, rating, str(data.get("comment", "")).strip()[:2000])
+    return jsonify(ok=True)
+
+
+# ---------- Technical spec ----------
+
+@app.post("/api/documents/<int:doc_id>/spec/questions")
+@login_required
+def spec_questions(doc_id):
+    doc = db.get_document(g.org["id"], doc_id)
+    if not doc:
+        return jsonify(error="That document doesn't exist."), 404
+    try:
+        response = get_client().responses.parse(
+            model=MODEL,
+            instructions=SPEC_QUESTIONS_SYSTEM,
+            input=doc["content"],
+            text_format=Questions,
+        )
+        usage.record(g.org["id"], "spec_questions", MODEL, response)
+        if response.output_parsed is None:
+            raise RuntimeError("The AI didn't return any questions. Try again.")
+        return jsonify(questions=response.output_parsed.questions)
+    except (openai.OpenAIError, RuntimeError) as e:
+        return jsonify(error=str(e)), 502
+
+
+@app.post("/api/documents/<int:doc_id>/spec")
+@login_required
+def write_spec(doc_id):
+    doc = db.get_document(g.org["id"], doc_id)
+    if not doc:
+        return jsonify(error="That document doesn't exist."), 404
+    answers = [a for a in (request.json or {}).get("answers", []) if isinstance(a, dict)]
+    try:
+        response = get_client().responses.create(
+            model=MODEL,
+            instructions=SPEC_SYSTEM,
+            input=f"Requirements document:\n{doc['content']}\n\nTechnical questions and answers:\n{_qa_text(answers)}",
+        )
+        usage.record(g.org["id"], "spec", MODEL, response)
+        spec = response.output_text
+        db.save_spec(g.org["id"], doc_id, spec, json.dumps(answers))
+        return jsonify(spec=spec)
+    except (openai.OpenAIError, RuntimeError) as e:
+        return jsonify(error=str(e)), 502
+
+
+@app.put("/api/documents/<int:doc_id>/spec")
+@login_required
+def save_spec(doc_id):
+    spec = str((request.json or {}).get("spec", ""))
+    if not spec.strip():
+        return jsonify(error="The spec can't be empty."), 400
+    if not db.get_document(g.org["id"], doc_id):
+        return jsonify(error="That document doesn't exist."), 404
+    db.save_spec(g.org["id"], doc_id, spec)
     return jsonify(ok=True)
 
 

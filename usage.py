@@ -12,6 +12,8 @@ FEATURES = {
     "questions": "Generate questions",
     "document": "Write document",
     "devops": "Send to Azure DevOps",
+    "spec_questions": "Spec questions",
+    "spec": "Write technical spec",
 }
 
 

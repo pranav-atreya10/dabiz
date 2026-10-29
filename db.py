@@ -46,6 +46,8 @@ SCHEMA = [
         idea TEXT NOT NULL,
         qa TEXT NOT NULL DEFAULT '[]',
         content TEXT NOT NULL,
+        spec TEXT NOT NULL DEFAULT '',
+        spec_qa TEXT NOT NULL DEFAULT '[]',
         rating INTEGER,
         feedback TEXT NOT NULL DEFAULT '',
         feedback_at TIMESTAMP,
@@ -93,10 +95,23 @@ def query(sql, params=(), one=False):
     return (rows[0] if rows else None) if one else rows
 
 
+# Columns added after a table was first created. Adding one that already exists fails,
+# which is fine: it means the database is already up to date.
+MIGRATIONS = [
+    "ALTER TABLE documents ADD COLUMN spec TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE documents ADD COLUMN spec_qa TEXT NOT NULL DEFAULT '[]'",
+]
+
+
 def init():
     id_type = "SERIAL PRIMARY KEY" if DATABASE_URL else "INTEGER PRIMARY KEY AUTOINCREMENT"
     for statement in SCHEMA:
         query(statement.format(id_type=id_type))
+    for statement in MIGRATIONS:
+        try:
+            query(statement)
+        except Exception:
+            pass
 
 
 def get_setting(key, default=""):
@@ -227,6 +242,15 @@ def get_document(org_id, doc_id):
 def update_document(org_id, doc_id, content):
     query("UPDATE documents SET content = ?, title = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND org_id = ?",
           (content, title_from(content), doc_id, org_id))
+
+
+def save_spec(org_id, doc_id, spec, spec_qa_json=None):
+    if spec_qa_json is None:
+        query("UPDATE documents SET spec = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND org_id = ?",
+              (spec, doc_id, org_id))
+    else:
+        query("UPDATE documents SET spec = ?, spec_qa = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND org_id = ?",
+              (spec, spec_qa_json, doc_id, org_id))
 
 
 def delete_document(org_id, doc_id):

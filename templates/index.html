@@ -96,6 +96,13 @@
     .save-status.bad { color: var(--danger); }
     .hint-note { font-size: 13px; color: var(--faint); margin: 10px 0 0; }
     .hint-note a, footer a { color: inherit; }
+    .next-cta, .coding-ai {
+      margin-top: 20px; padding: 18px 20px; border-radius: 16px; background: var(--surface-2);
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    }
+    .next-cta b, .coding-ai b { display: block; font-weight: 600; margin-bottom: 2px; }
+    .next-cta span, .coding-ai span { color: var(--muted); font-size: 15px; }
+    .coding-ai { display: block; }
     .feedback { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
     .fb-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: #d6d6d6; }
     .fb-btn {
@@ -143,6 +150,7 @@
       <li id="s1" class="active"><span class="num">1</span><span class="label">Describe</span></li>
       <li id="s2"><span class="num">2</span><span class="label">Clarify</span></li>
       <li id="s3"><span class="num">3</span><span class="label">Review &amp; export</span></li>
+      <li id="s4"><span class="num">4</span><span class="label">Tech spec</span></li>
     </ol>
 
     <section class="card step" id="step1">
@@ -207,6 +215,15 @@
       </div>
       <div class="devops-note" id="devopsNote">Checking Azure DevOps connection…</div>
 
+      <div class="next-cta">
+        <div>
+          <b>Next: technical spec</b>
+          <span>Turn these requirements into a spec that engineers and AI coding tools can build from.</span>
+        </div>
+        <button class="btn btn-primary" id="startSpec">Create technical spec <span class="arrow">→</span></button>
+      </div>
+      <p class="error" id="err3"></p>
+
       <div class="feedback" id="feedback">
         <div class="fb-row">
           <span>Was this document useful?</span>
@@ -218,6 +235,48 @@
           <div class="save-row">
             <button class="btn btn-secondary btn-sm" id="fbSend">Send feedback</button>
             <span class="save-status" id="fbStatus"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card step hidden" id="step4">
+      <div class="icon-tile">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M8 6l-6 6 6 6M16 6l6 6-6 6M14 4l-4 16"/>
+        </svg>
+      </div>
+      <h2>Technical specification</h2>
+      <p class="desc">A few technical questions first. "Not sure" is a fine answer: the spec will list what it assumed.</p>
+      <div id="specQs"></div>
+      <p class="error" id="err4"></p>
+      <div class="actions">
+        <button class="btn btn-primary" id="writeSpec">Write spec <span class="arrow">→</span></button>
+      </div>
+
+      <div class="hidden" id="specOut">
+        <div class="seg spec-tabs" role="tablist" style="margin-top:28px">
+          <button class="tab active" data-view="preview" role="tab">Preview</button>
+          <button class="tab" data-view="edit" role="tab">Edit</button>
+        </div>
+        <div class="doc" id="specPreview"></div>
+        <div class="hidden" id="specEditWrap">
+          <textarea class="raw editor" id="specText" spellcheck="true" aria-label="Edit technical spec (Markdown)"></textarea>
+          <div class="save-row">
+            <button class="btn btn-secondary btn-sm" id="saveSpec">Save changes</button>
+            <span class="save-status" id="specSaveStatus"></span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="downloadSpec">Download spec .md</button>
+          <button class="btn btn-secondary" id="copySpec">Copy</button>
+        </div>
+        <div class="coding-ai">
+          <b>Build it with an AI coding tool</b>
+          <span>Get one ready-to-paste prompt with the spec and the requirements, for tools like GitHub Copilot, Codex, Claude Code or Cursor.</span>
+          <div class="actions" style="margin-top:14px">
+            <button class="btn btn-secondary" id="copyPrompt">Copy for coding AI</button>
+            <button class="btn btn-outline" id="downloadPrompt">Download prompt .md</button>
           </div>
         </div>
       </div>
@@ -243,7 +302,7 @@
   let docId = null;
 
   function setStep(n) {
-    [1, 2, 3].forEach((i) => {
+    [1, 2, 3, 4].forEach((i) => {
       $("s" + i).classList.toggle("active", i === n);
       $("s" + i).classList.toggle("done", i < n);
     });
@@ -331,6 +390,8 @@
     resetFeedback();
     $("step3").classList.remove("hidden");
     $("devopsResult").classList.add("hidden");
+    $("step4").classList.add("hidden");
+    $("err3").textContent = "";
     setStep(3);
   }
 
@@ -341,9 +402,9 @@
     $("step3").scrollIntoView({ behavior: "smooth" });
   }, $("err2"));
 
-  document.querySelectorAll(".tab").forEach((tab) => {
+  document.querySelectorAll("#step3 .tab").forEach((tab) => {
     tab.onclick = () => {
-      document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t === tab));
+      document.querySelectorAll("#step3 .tab").forEach((t) => t.classList.toggle("active", t === tab));
       if (tab.dataset.view === "preview") $("preview").innerHTML = renderMarkdown($("markdown").value);
       $("preview").classList.toggle("hidden", tab.dataset.view !== "preview");
       $("editWrap").classList.toggle("hidden", tab.dataset.view !== "markdown");
@@ -415,7 +476,7 @@
   $("saveDoc").onclick = () => withLoading($("saveDoc"), "Saving…", saveDoc, {
     set textContent(msg) { $("saveStatus").textContent = msg; $("saveStatus").className = "save-status" + (msg ? " bad" : ""); },
   });
-  addEventListener("beforeunload", (e) => { if (dirty) e.preventDefault(); });
+  addEventListener("beforeunload", (e) => { if (dirty || specDirty) e.preventDefault(); });
 
   // Feedback
   let rating = null;
@@ -438,6 +499,104 @@
     $("fbStatus").textContent = "Thanks for your feedback!";
   }, $("fbStatus"));
 
+  // Technical spec
+  let specQuestions = [], specDirty = false;
+  function addSpecQuestions(list, answers) {
+    $("specQs").innerHTML = "";
+    specQuestions = list;
+    list.forEach((q, i) => {
+      const field = document.createElement("div");
+      field.className = "field";
+      const label = document.createElement("label");
+      label.htmlFor = "sq" + i;
+      label.innerHTML = '<span class="q">T' + (i + 1) + "</span>";
+      label.append(q);
+      const box = document.createElement("textarea");
+      box.id = "sq" + i;
+      box.rows = 2;
+      box.placeholder = "Your answer, or \u201cnot sure\u201d";
+      if (answers) box.value = answers[i] || "";
+      field.append(label, box);
+      $("specQs").append(field);
+    });
+  }
+  function showSpec(text) {
+    $("specText").value = text;
+    $("specPreview").innerHTML = renderMarkdown(text);
+    $("specSaveStatus").textContent = "";
+    specDirty = false;
+    $("specOut").classList.remove("hidden");
+    $("step4").classList.remove("hidden");
+    setStep(4);
+  }
+  $("startSpec").onclick = () => withLoading($("startSpec"), "Thinking…", async () => {
+    if (dirty) await saveDoc();
+    const data = await post("/api/documents/" + docId + "/spec/questions", {});
+    addSpecQuestions(data.questions);
+    $("specOut").classList.add("hidden");
+    $("step4").classList.remove("hidden");
+    setStep(4);
+    $("step4").scrollIntoView({ behavior: "smooth" });
+  }, $("err3"));
+  $("writeSpec").onclick = () => withLoading($("writeSpec"), "Writing spec…", async () => {
+    const answers = specQuestions.map((q, i) => ({ question: q, answer: $("sq" + i).value }));
+    const data = await post("/api/documents/" + docId + "/spec", { answers });
+    showSpec(data.spec);
+    $("specOut").scrollIntoView({ behavior: "smooth" });
+  }, $("err4"));
+  document.querySelectorAll(".spec-tabs .tab").forEach((tab) => {
+    tab.onclick = () => {
+      document.querySelectorAll(".spec-tabs .tab").forEach((t) => t.classList.toggle("active", t === tab));
+      if (tab.dataset.view === "preview") $("specPreview").innerHTML = renderMarkdown($("specText").value);
+      $("specPreview").classList.toggle("hidden", tab.dataset.view !== "preview");
+      $("specEditWrap").classList.toggle("hidden", tab.dataset.view !== "edit");
+    };
+  });
+  $("specText").addEventListener("input", () => { specDirty = true; $("specSaveStatus").textContent = "Unsaved changes"; $("specSaveStatus").className = "save-status"; });
+  $("saveSpec").onclick = () => withLoading($("saveSpec"), "Saving…", async () => {
+    const res = await fetch("/api/documents/" + docId + "/spec", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ spec: $("specText").value }) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || "Couldn't save.");
+    specDirty = false;
+    $("specSaveStatus").className = "save-status";
+    $("specSaveStatus").textContent = "Saved";
+  }, { set textContent(msg) { $("specSaveStatus").textContent = msg; $("specSaveStatus").className = "save-status" + (msg ? " bad" : ""); } });
+
+  function saveFile(name, text) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text], { type: "text/markdown" }));
+    a.download = name;
+    a.click();
+  }
+  async function copyText(btn, text, label) {
+    await navigator.clipboard.writeText(text);
+    btn.textContent = "Copied";
+    setTimeout(() => (btn.textContent = label), 1500);
+  }
+  function codingPrompt() {
+    return [
+      "You are building the product described below. Follow the technical specification, and use the requirements for intent.",
+      "",
+      "- Work through the Implementation plan in order, one task at a time.",
+      "- Write tests that prove each user story's acceptance criteria.",
+      "- If something is unclear, or listed under Open questions, ask me before guessing.",
+      "- Keep each change small, and tell me what you changed and how to check it.",
+      "",
+      "---",
+      "",
+      $("specText").value.trim(),
+      "",
+      "---",
+      "",
+      $("markdown").value.trim(),
+      "",
+    ].join("\n");
+  }
+  $("downloadSpec").onclick = () => saveFile("technical-spec.md", $("specText").value);
+  $("copySpec").onclick = () => copyText($("copySpec"), $("specText").value, "Copy");
+  $("copyPrompt").onclick = () => copyText($("copyPrompt"), codingPrompt(), "Copy for coding AI");
+  $("downloadPrompt").onclick = () => saveFile("coding-ai-prompt.md", codingPrompt());
+
   // Opening a saved document (from My documents)
   const openId = new URLSearchParams(location.search).get("doc");
   if (openId) fetch("/api/documents/" + encodeURIComponent(openId)).then((r) => r.json()).then((d) => {
@@ -449,6 +608,10 @@
     if (d.qa.length) $("step2").classList.remove("hidden");
     showDoc(d.id, d.document);
     resetFeedback(d.rating, d.feedback);
+    if (d.spec) {
+      addSpecQuestions(d.spec_qa.map((x) => x.question), d.spec_qa.map((x) => x.answer));
+      showSpec(d.spec);
+    }
     $("step3").scrollIntoView();
   });
 
