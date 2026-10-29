@@ -49,3 +49,15 @@ org made it.
   (dollars per 1M input/output tokens) so the pages can show estimated cost.
 - Charts show tokens per day for 7, 30 or 90 days, with hover details and a table view, plus a
   split by feature.
+
+## Documents, feedback and privacy
+
+- Every document is saved automatically. **My documents** (`/docs`) lists an org's documents;
+  open one to read, edit (Edit tab, then Save changes), download, copy or send it again. Docs can be
+  deleted there too. Orgs only ever see their own documents.
+- On the questions step, **Ask more questions** adds 3 to 5 follow-up questions based on the answers so far.
+- Under each document, people can rate it 👍/👎 and leave a comment. The admin sees all feedback at
+  `/admin/feedback`, and can open the document it was left on.
+- `/privacy` explains in plain words what's stored and who it's shared with. Review it before
+  real customers use the app.
+- Deleting an org also deletes its documents and feedback.

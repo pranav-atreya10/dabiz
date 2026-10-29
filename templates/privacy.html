@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy · Requirements Studio</title>
+  {% include "_styles.html" %}
+  <style>
+    main { max-width: 720px; margin: 0 auto; padding: 64px 20px 72px; }
+    h1 { font-size: clamp(40px, 7vw, 60px); font-weight: 500; letter-spacing: -.04em; line-height: 1.05; margin: 0 0 12px; }
+    .lead { font-size: 18px; color: #c9c9c9; margin: 0 0 40px; }
+    h2 { font-size: 22px; font-weight: 500; letter-spacing: -.02em; margin: 36px 0 10px; }
+    p, li { color: #d0d0d0; font-size: 16px; }
+    ul { padding-left: 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--text); }
+    .updated { color: var(--faint); font-size: 14px; margin-top: 48px; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('home') }}">{% include "_logo.html" %}<span>Requirements Studio</span></a>
+  </header>
+  <main>
+    <h1>Privacy</h1>
+    <p class="lead">What happens to the information you put into Requirements Studio, in plain words.</p>
+
+    <h2>What we store</h2>
+    <ul>
+      <li><b>Your organization's name</b>, and a scrambled (hashed) version of its sign-in code. We can't read the code itself.</li>
+      <li><b>Your documents</b>: the idea you typed, your answers to the questions, and the document that was written.</li>
+      <li><b>Feedback</b> you give on a document (thumbs up or down, and any comment).</li>
+      <li><b>Usage counts</b>: how many AI tokens each request used, and when. Not the text itself.</li>
+      <li><b>Azure DevOps settings</b>, if your admin connected them. The access token is stored encrypted.</li>
+    </ul>
+
+    <h2>Who it's shared with</h2>
+    <ul>
+      <li><b>OpenAI</b>: your idea, answers and document are sent to OpenAI's API to write questions and documents. See <a href="https://openai.com/policies/" rel="noopener">OpenAI's policies</a> for how they handle API data.</li>
+      <li><b>Azure DevOps</b>: only when you press "Send to Azure DevOps", the document is sent to your organization's own Azure DevOps project.</li>
+      <li><b>Our hosting and database providers</b> (Vercel and the database host) store the data above so the app can work.</li>
+    </ul>
+    <p>We don't sell your data or use it for ads.</p>
+
+    <h2>Who can see it</h2>
+    <ul>
+      <li>Anyone with your organization's code can see your organization's documents. Other organizations can't.</li>
+      <li>The site admin can see feedback and the documents it was left on, to improve the product.</li>
+    </ul>
+
+    <h2>Please don't include</h2>
+    <p>Passwords, personal details about people (like health or financial information), or anything your company isn't allowed to share with outside services.</p>
+
+    <h2>Deleting your data</h2>
+    <ul>
+      <li>You can delete any document yourself from <b>My documents</b>.</li>
+      <li>To delete everything for your organization, ask your admin. Deleting an organization deletes its documents and settings. Its usage counts are kept without its name.</li>
+    </ul>
+
+    <p class="updated">Last updated October 2026. This is a plain-language summary for an early version of the product, not a legal agreement.</p>
+  </main>
+</body>
+</html>

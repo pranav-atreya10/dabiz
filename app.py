@@ -5,6 +5,7 @@ questions -> person answers -> the AI writes a requirements doc to download.
 """
 
 import hmac
+import json
 import os
 from functools import wraps
 from urllib.parse import urlparse
@@ -35,13 +36,13 @@ _db_ready = False
 
 @app.before_request
 def same_site_posts_only():
-    """Block form posts that come from other websites (cross-site request forgery).
+    """Block posts and other changes that come from other websites (cross-site request forgery).
 
     Without this, another site could post an attacker's org code to /login and silently
     sign a visitor into the attacker's org. Browsers always send Origin (or at least
     Referer) on form posts, so a post without either is refused too.
     """
-    if request.method != "POST":
+    if request.method in ("GET", "HEAD", "OPTIONS"):
         return None
     source = request.headers.get("Origin") or request.headers.get("Referer") or ""
     if urlparse(source).netloc != request.host:
@@ -81,6 +82,11 @@ For each epic: a "### Epic: <name>" heading, then user stories written as
 
 Only use what the person said or what clearly follows from it. If something is unknown,
 put it under Open questions instead of making it up."""
+
+
+MORE_QUESTIONS_SYSTEM = QUESTIONS_SYSTEM + """
+You already asked some questions, and the person answered. Ask 3 to 5 NEW questions that fill
+the biggest remaining gaps, based on their answers. Don't repeat or rephrase earlier questions."""
 
 
 class Questions(BaseModel):
@@ -243,13 +249,30 @@ def admin_devops(org_id):
     return redirect(url_for("admin") + f"#org-{org_id}")
 
 
+@app.get("/admin/feedback")
+@admin_required
+def admin_feedback():
+    items = db.all_feedback()
+    ups = sum(1 for i in items if i["rating"] == 1)
+    return render_template("admin_feedback.html", items=items, ups=ups, downs=len(items) - ups)
+
+
+@app.get("/admin/documents/<int:doc_id>")
+@admin_required
+def admin_document(doc_id):
+    doc = db.get_document_any_org(doc_id)
+    if not doc:
+        return redirect(url_for("admin_feedback"))
+    return render_template("admin_document.html", doc=doc)
+
+
 @app.post("/admin/orgs/<int:org_id>/delete")
 @admin_required
 def admin_delete(org_id):
     org = db.get_org(org_id)
     if org:
         db.delete_org(org_id)
-        flash(f"Deleted {org['name']}. Anyone signed in with its code is signed out.", "ok")
+        flash(f"Deleted {org['name']} and its documents. Anyone signed in with its code is signed out.", "ok")
     return redirect(url_for("admin"))
 
 
@@ -264,17 +287,30 @@ def index():
     return render_template("index.html", org=g.org)
 
 
+def _qa_text(qa):
+    return "\n\n".join(
+        f"Q: {str(a.get('question', ''))}\nA: {str(a.get('answer', '')).strip() or '(no answer)'}" for a in qa
+    )
+
+
 @app.post("/api/questions")
 @login_required
 def questions():
-    idea = (request.json or {}).get("idea", "").strip()
+    data = request.json or {}
+    idea = str(data.get("idea", "")).strip()
+    previous = data.get("previous") or []
     if not idea:
         return jsonify(error="Please type your idea first."), 400
     try:
+        if previous:
+            instructions = MORE_QUESTIONS_SYSTEM
+            prompt = f"Main idea:\n{idea}\n\nQuestions asked so far, with answers:\n{_qa_text(previous)}"
+        else:
+            instructions, prompt = QUESTIONS_SYSTEM, f"Main idea:\n{idea}"
         response = get_client().responses.parse(
             model=MODEL,
-            instructions=QUESTIONS_SYSTEM,
-            input=f"Main idea:\n{idea}",
+            instructions=instructions,
+            input=prompt,
             text_format=Questions,
         )
         usage.record(g.org["id"], "questions", MODEL, response)
@@ -289,22 +325,75 @@ def questions():
 @login_required
 def requirements():
     data = request.json or {}
-    idea = data.get("idea", "").strip()
-    answers = data.get("answers", [])
-    qa = "\n\n".join(
-        f"Q: {a.get('question', '')}\nA: {a.get('answer', '').strip() or '(no answer)'}"
-        for a in answers
-    )
+    idea = str(data.get("idea", "")).strip()
+    answers = [a for a in data.get("answers", []) if isinstance(a, dict)]
     try:
         response = get_client().responses.create(
             model=MODEL,
             instructions=DOC_SYSTEM,
-            input=f"Main idea:\n{idea}\n\nQuestions and answers:\n{qa}",
+            input=f"Main idea:\n{idea}\n\nQuestions and answers:\n{_qa_text(answers)}",
         )
         usage.record(g.org["id"], "document", MODEL, response)
-        return jsonify(document=response.output_text)
+        content = response.output_text
+        doc_id = db.create_document(g.org["id"], idea, json.dumps(answers), content)
+        return jsonify(document=content, id=doc_id, title=db.title_from(content))
     except (openai.OpenAIError, RuntimeError) as e:
         return jsonify(error=str(e)), 502
+
+
+# ---------- Saved documents ----------
+
+@app.get("/docs")
+@login_required
+def docs_page():
+    return render_template("docs.html", org=g.org, docs=db.list_documents(g.org["id"]))
+
+
+@app.get("/api/documents/<int:doc_id>")
+@login_required
+def get_document(doc_id):
+    doc = db.get_document(g.org["id"], doc_id)
+    if not doc:
+        return jsonify(error="That document doesn't exist."), 404
+    return jsonify(id=doc["id"], title=doc["title"], idea=doc["idea"], qa=json.loads(doc["qa"] or "[]"),
+                   document=doc["content"], rating=doc["rating"], feedback=doc["feedback"])
+
+
+@app.put("/api/documents/<int:doc_id>")
+@login_required
+def save_document(doc_id):
+    content = str((request.json or {}).get("document", ""))
+    if not content.strip():
+        return jsonify(error="The document can't be empty."), 400
+    if not db.get_document(g.org["id"], doc_id):
+        return jsonify(error="That document doesn't exist."), 404
+    db.update_document(g.org["id"], doc_id, content)
+    return jsonify(ok=True, title=db.title_from(content))
+
+
+@app.delete("/api/documents/<int:doc_id>")
+@login_required
+def delete_document(doc_id):
+    db.delete_document(g.org["id"], doc_id)
+    return jsonify(ok=True)
+
+
+@app.post("/api/documents/<int:doc_id>/feedback")
+@login_required
+def document_feedback(doc_id):
+    data = request.json or {}
+    rating = data.get("rating")
+    if rating not in (1, -1):
+        return jsonify(error="Pick thumbs up or thumbs down."), 400
+    if not db.get_document(g.org["id"], doc_id):
+        return jsonify(error="That document doesn't exist."), 404
+    db.set_feedback(g.org["id"], doc_id, rating, str(data.get("comment", "")).strip()[:2000])
+    return jsonify(ok=True)
+
+
+@app.get("/privacy")
+def privacy():
+    return render_template("privacy.html")
 
 
 @app.get("/api/devops/status")
@@ -336,7 +425,6 @@ def devops_send():
         return jsonify(error=str(e)), 502
 
 
-
 def _days():
     return {"7": 7, "90": 90}.get(request.args.get("days"), 30)
 
@@ -347,7 +435,8 @@ def usage_page():
     return render_template(
         "usage.html", tracking=True, scope=g.org["name"], show_orgs=False,
         can_edit_prices=False, api_url=url_for("usage_data"),
-        nav=[("Tool", url_for("index"), False), ("Usage", url_for("usage_page"), True)],
+        nav=[("Tool", url_for("index"), False), ("Documents", url_for("docs_page"), False),
+             ("Usage", url_for("usage_page"), True)],
         signout_url=url_for("logout"),
     )
 
@@ -364,7 +453,8 @@ def admin_usage():
     return render_template(
         "usage.html", tracking=True, scope="all orgs", show_orgs=True,
         can_edit_prices=True, prices_url=url_for("admin_prices"), api_url=url_for("admin_usage_data"),
-        nav=[("Orgs", url_for("admin"), False), ("Usage", url_for("admin_usage"), True)],
+        nav=[("Orgs", url_for("admin"), False), ("Usage", url_for("admin_usage"), True),
+             ("Feedback", url_for("admin_feedback"), False)],
         signout_url=url_for("admin_logout"),
     )
 

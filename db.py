@@ -39,6 +39,20 @@ SCHEMA = [
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )""",
     "CREATE INDEX IF NOT EXISTS usage_org_time ON usage (org_id, created_at)",
+    """CREATE TABLE IF NOT EXISTS documents (
+        id {id_type},
+        org_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        idea TEXT NOT NULL,
+        qa TEXT NOT NULL DEFAULT '[]',
+        content TEXT NOT NULL,
+        rating INTEGER,
+        feedback TEXT NOT NULL DEFAULT '',
+        feedback_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )""",
+    "CREATE INDEX IF NOT EXISTS documents_org ON documents (org_id, updated_at)",
     """CREATE TABLE IF NOT EXISTS settings (
         key TEXT PRIMARY KEY,
         value TEXT NOT NULL
@@ -174,5 +188,66 @@ def update_devops(org_id, org_url, project, story_type, pat=None):
 
 
 def delete_org(org_id):
-    """Delete an org. Its usage history is kept (it shows up as a deleted org)."""
+    """Delete an org and its documents. Its usage history is kept (it shows up as a deleted org)."""
+    query("DELETE FROM documents WHERE org_id = ?", (org_id,))
     query("DELETE FROM orgs WHERE id = ?", (org_id,))
+
+
+# ---------- Documents ----------
+# Every document belongs to one org, and every lookup checks the org, so orgs can't see
+# each other's documents.
+
+DOC_LIST_COLUMNS = "id, title, rating, created_at, updated_at"
+
+
+def title_from(content, fallback="Untitled document"):
+    for line in content.splitlines():
+        if line.startswith("# "):
+            return line[2:].strip()[:200] or fallback
+    return fallback
+
+
+def create_document(org_id, idea, qa_json, content):
+    row = query(
+        "INSERT INTO documents (org_id, title, idea, qa, content) VALUES (?, ?, ?, ?, ?) RETURNING id",
+        (org_id, title_from(content), idea, qa_json, content), one=True,
+    )
+    return row["id"]
+
+
+def list_documents(org_id):
+    return query(f"SELECT {DOC_LIST_COLUMNS} FROM documents WHERE org_id = ? ORDER BY updated_at DESC, id DESC",
+                 (org_id,))
+
+
+def get_document(org_id, doc_id):
+    return query("SELECT * FROM documents WHERE id = ? AND org_id = ?", (doc_id, org_id), one=True)
+
+
+def update_document(org_id, doc_id, content):
+    query("UPDATE documents SET content = ?, title = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND org_id = ?",
+          (content, title_from(content), doc_id, org_id))
+
+
+def delete_document(org_id, doc_id):
+    query("DELETE FROM documents WHERE id = ? AND org_id = ?", (doc_id, org_id))
+
+
+def set_feedback(org_id, doc_id, rating, comment):
+    query("UPDATE documents SET rating = ?, feedback = ?, feedback_at = CURRENT_TIMESTAMP WHERE id = ? AND org_id = ?",
+          (rating, comment, doc_id, org_id))
+
+
+def all_feedback():
+    """Every rated document, newest first, with its org's name (for the admin)."""
+    return query(
+        "SELECT d.id, d.title, d.rating, d.feedback, d.feedback_at, o.name AS org_name "
+        "FROM documents d LEFT JOIN orgs o ON o.id = d.org_id "
+        "WHERE d.rating IS NOT NULL ORDER BY d.feedback_at DESC"
+    )
+
+
+def get_document_any_org(doc_id):
+    """For the admin only."""
+    return query("SELECT d.*, o.name AS org_name FROM documents d LEFT JOIN orgs o ON o.id = d.org_id WHERE d.id = ?",
+                 (doc_id,), one=True)

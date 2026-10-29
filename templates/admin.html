@@ -49,6 +49,7 @@
 
     @media (max-width: 640px) {
       .topbar .brand span { display: none; }
+      .tag { display: none; }
       .grid { grid-template-columns: 1fr; }
       .card, .newcode { padding: 22px 18px; }
       .row-actions .btn, .inline .btn { flex: 1 1 auto; }
@@ -60,6 +61,7 @@
     <a class="brand" href="{{ url_for('home') }}">{% include "_logo.html" %}<span>Requirements Studio</span></a>
     <div class="who">
       <a class="navlink" href="{{ url_for('admin_usage') }}">Usage</a>
+      <a class="navlink" href="{{ url_for('admin_feedback') }}">Feedback</a>
       <span class="tag">Admin</span>
       <form method="post" action="{{ url_for('admin_logout') }}"><button class="btn btn-outline btn-sm" type="submit">Sign out</button></form>
     </div>

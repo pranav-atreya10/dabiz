@@ -32,7 +32,7 @@
       <input id="code" name="code" type="password" placeholder="XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" autofocus {% if locked %}disabled{% endif %}>
       <p class="error">{{ error or "" }}</p>
       <button class="btn btn-primary" type="submit" {% if locked %}disabled{% endif %}>Continue <span class="arrow">→</span></button>
-      <p class="note">Don't have a code? Ask your admin.</p>
+      <p class="note">Don't have a code? Ask your admin. · <a href="{{ url_for('privacy') }}" style="color:inherit">Privacy</a></p>
     </form>
   </main>
 </body>
