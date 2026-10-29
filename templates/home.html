@@ -32,33 +32,16 @@
     a.btn { text-decoration: none; }
     .cta .btn { height: 52px; padding: 0 30px; font-size: 17px; text-decoration: none; }
 
-    /* ---------- Blob friends ---------- */
-    .crew {
-      display: flex; justify-content: center; align-items: flex-end; gap: 0;
-      margin: 56px auto 0; max-width: 760px; height: clamp(150px, 26vw, 230px);
-      border-bottom: 1px solid #1f1f1f; overflow: hidden;
+    /* ---------- Gradient panel under the hero ---------- */
+    .band {
+      position: relative; overflow: hidden; isolation: isolate;
+      margin: 64px auto 0; max-width: 1000px; height: clamp(180px, 30vw, 320px); border-radius: 28px;
+      background: #8f7dff; --blobs:
+        radial-gradient(circle at 12% 30%, #ff9ec7 0, transparent 60%),
+        radial-gradient(circle at 45% 80%, #6f8dff 0, transparent 60%),
+        radial-gradient(circle at 70% 20%, #ffcf8a 0, transparent 60%),
+        radial-gradient(circle at 92% 75%, #4fd1ff 0, transparent 60%);
     }
-    .blob {
-      width: clamp(92px, 19vw, 180px); margin: 0 -10px; flex: none; cursor: pointer;
-      transform-origin: 50% 100%; animation: idle 4.5s ease-in-out infinite;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .blob:nth-child(2) { animation-delay: -1.1s; }
-    .blob:nth-child(3) { animation-delay: -2.3s; }
-    .blob:nth-child(4) { animation-delay: -3.4s; }
-    .blob svg { display: block; width: 100%; height: auto; overflow: visible; transition: transform .25s; }
-    .blob:hover svg { transform: translateY(-6px); }
-    .blob.jump svg { animation: jump .6s cubic-bezier(.3,1.6,.5,1); }
-    @keyframes idle { 0%,100% { transform: scale(1, 1); } 50% { transform: scale(1.03, .97); } }
-    @keyframes jump {
-      0% { transform: translateY(0) scale(1.08, .9); } 40% { transform: translateY(-34px) scale(.95, 1.06); }
-      70% { transform: translateY(0) scale(1.06, .94); } 100% { transform: translateY(0) scale(1); }
-    }
-    .eyes { transition: transform .12s ease-out; }
-    .lids { transform-box: fill-box; transform-origin: center; }
-    .blink .lids { animation: blink .18s ease-in-out; }
-    @keyframes blink { 50% { transform: scaleY(.1); } }
-    .hint { text-align: center; color: var(--faint); font-size: 13px; margin-top: 14px; }
 
     /* ---------- Section headings ---------- */
     .head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 120px 0 32px; }
@@ -70,7 +53,7 @@
     .row { display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: center; padding: 20px 0; }
     .tile { aspect-ratio: 1; border-radius: 18px; position: relative; overflow: hidden; isolation: isolate; }
     /* Soft circles of color (about 60% of the tile) that slowly float around. */
-    .tile::before, .demo::before {
+    .tile::before, .demo::before, .band::before {
       content: ""; position: absolute; inset: -25%; z-index: -1;
       background: var(--blobs); animation: float 16s ease-in-out infinite alternate;
     }
@@ -176,49 +159,7 @@
         <a class="btn btn-secondary" href="#how">See how it works</a>
       </div>
 
-      <div class="crew" id="crew" aria-hidden="true">
-        <!-- Blue: round and calm -->
-        <div class="blob"><svg viewBox="0 0 160 150">
-          <defs><radialGradient id="gb" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#7fb2ff"/><stop offset=".6" stop-color="#3d7bff"/><stop offset="1" stop-color="#2452d6"/></radialGradient></defs>
-          <path d="M14 150 C8 80 38 34 80 34 C122 34 152 80 146 150 Z" fill="url(#gb)"/>
-          <g class="lids"><g class="eyes"><ellipse cx="62" cy="92" rx="7" ry="11" fill="#0d0d0d"/><ellipse cx="98" cy="92" rx="7" ry="11" fill="#0d0d0d"/></g></g>
-        </svg></div>
-        <!-- Green: sprout on top, big eyes -->
-        <div class="blob"><svg viewBox="0 0 160 150">
-          <defs><radialGradient id="gg" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#b9f56b"/><stop offset=".6" stop-color="#6fd43a"/><stop offset="1" stop-color="#3fa61e"/></radialGradient></defs>
-          <path d="M80 30 C80 18 86 10 96 6" stroke="#3fa61e" stroke-width="5" fill="none" stroke-linecap="round"/>
-          <ellipse cx="100" cy="8" rx="12" ry="6" fill="#8fe04f" transform="rotate(-20 100 8)"/>
-          <rect x="22" y="30" width="116" height="140" rx="52" fill="url(#gg)"/>
-          <g class="lids">
-            <circle cx="60" cy="76" r="17" fill="#fff"/><circle cx="100" cy="76" r="17" fill="#fff"/>
-            <g class="eyes"><circle cx="60" cy="78" r="8" fill="#0d0d0d"/><circle cx="100" cy="78" r="8" fill="#0d0d0d"/>
-              <circle cx="63" cy="75" r="2.5" fill="#fff"/><circle cx="103" cy="75" r="2.5" fill="#fff"/></g>
-          </g>
-          <path d="M70 108 Q80 116 90 108" stroke="#1d5c0c" stroke-width="4" fill="none" stroke-linecap="round"/>
-        </svg></div>
-        <!-- Orange: tall, one big curious eye -->
-        <div class="blob"><svg viewBox="0 0 160 150">
-          <defs><radialGradient id="go" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#ffd27a"/><stop offset=".6" stop-color="#ff9a3d"/><stop offset="1" stop-color="#e86a12"/></radialGradient></defs>
-          <path d="M26 150 C22 66 52 14 80 14 C108 14 138 66 134 150 Z" fill="url(#go)"/>
-          <g class="lids">
-            <circle cx="80" cy="74" r="24" fill="#fff"/>
-            <g class="eyes"><circle cx="80" cy="76" r="11" fill="#0d0d0d"/><circle cx="84" cy="71" r="3.5" fill="#fff"/></g>
-          </g>
-          <ellipse cx="80" cy="116" rx="9" ry="6" fill="#7a2e00"/>
-        </svg></div>
-        <!-- Pink: sleepy, blushing -->
-        <div class="blob"><svg viewBox="0 0 160 150">
-          <defs><radialGradient id="gp" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#ff9bd2"/><stop offset=".6" stop-color="#ff4fa8"/><stop offset="1" stop-color="#d81f7e"/></radialGradient></defs>
-          <circle cx="80" cy="112" r="68" fill="url(#gp)"/>
-          <g class="lids"><g class="eyes">
-            <path d="M52 96 Q60 88 68 96" stroke="#0d0d0d" stroke-width="5" fill="none" stroke-linecap="round"/>
-            <path d="M92 96 Q100 88 108 96" stroke="#0d0d0d" stroke-width="5" fill="none" stroke-linecap="round"/>
-          </g></g>
-          <ellipse cx="46" cy="112" rx="10" ry="6" fill="#ffc2e0" opacity=".8"/>
-          <ellipse cx="114" cy="112" rx="10" ry="6" fill="#ffc2e0" opacity=".8"/>
-        </svg></div>
-      </div>
-      <p class="hint">Psst, tap one.</p>
+      <div class="band" aria-hidden="true"></div>
     </section>
 
     <section id="how">
@@ -297,32 +238,6 @@
 
 <script>
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const blobs = [...document.querySelectorAll(".blob")];
-
-  // Eyes follow the mouse or finger.
-  function look(x, y) {
-    blobs.forEach((b) => {
-      const r = b.getBoundingClientRect();
-      const dx = x - (r.left + r.width / 2), dy = y - (r.top + r.height / 2);
-      const d = Math.hypot(dx, dy) || 1, m = Math.min(5, d / 40);
-      b.querySelector(".eyes").style.transform = `translate(${(dx / d) * m}px, ${(dy / d) * m}px)`;
-    });
-  }
-  if (!reduce) {
-    addEventListener("pointermove", (e) => look(e.clientX, e.clientY));
-    addEventListener("touchstart", (e) => look(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
-  }
-
-  // Tap a blob to make it jump.
-  blobs.forEach((b) => b.addEventListener("click", () => {
-    b.classList.remove("jump"); void b.offsetWidth; b.classList.add("jump");
-  }));
-
-  // Random blinking.
-  if (!reduce) setInterval(() => {
-    const b = blobs[Math.floor(Math.random() * blobs.length)];
-    b.classList.add("blink"); setTimeout(() => b.classList.remove("blink"), 200);
-  }, 1400);
 
   // Fade sections in as you scroll.
   const io = new IntersectionObserver((entries) => entries.forEach((e) => {
