@@ -65,7 +65,11 @@ to write good requirements. Focus on workflows and product flow: who the users a
 do step by step, what triggers each step, what happens on success and failure, what data moves
 between screens or tools, and what "done" looks like. Do NOT ask about technical architecture,
 databases, hosting, or programming languages.
-Ask 6 to 8 short, concrete questions a non-technical person can answer."""
+Ask 6 to 8 short, concrete questions a non-technical person can answer.""" + """
+
+For each question, also give 2 to 4 likely answers as options: a short label (2 to 6 words)
+and a one-sentence description of what that choice means. Make the options different from each
+other and realistic for this idea. Don't add an "Other" option; the app adds one."""
 
 DOC_SYSTEM = """You write clear product requirements documents from an idea plus answers to
 follow-up questions. Write in Markdown with these sections:
@@ -94,7 +98,11 @@ Ask 4 to 6 short technical questions you need answered to write an implementatio
 what it runs on (web, mobile, desktop), existing systems or tools it must connect to, where the
 data lives and how sensitive it is, how people sign in and what roles exist, expected number of
 users, and any required languages, frameworks or hosting. Skip anything the document already
-answers. Phrase each question so a non-expert can answer it, or say "not sure"."""
+answers. Phrase each question so a non-expert can answer it, or say "not sure".
+
+For each question, also give 2 to 4 likely answers as options: a short label (2 to 6 words)
+and a one-sentence description of what that choice means for the build. Don't add an "Other"
+or "Not sure" option; the app handles those."""
 
 SPEC_SYSTEM = """You are a senior software architect. Turn a product requirements document, plus answers
 to technical questions, into a technical specification that an engineer or an AI coding tool can
@@ -125,8 +133,18 @@ Be concrete and consistent with the requirements. Don't invent business rules: i
 isn't decided, put it under Open questions."""
 
 
+class Option(BaseModel):
+    label: str
+    description: str
+
+
+class Question(BaseModel):
+    question: str
+    options: list[Option]
+
+
 class Questions(BaseModel):
-    questions: list[str]
+    questions: list[Question]
 
 
 class Story(BaseModel):
@@ -352,7 +370,7 @@ def questions():
         usage.record(g.org["id"], "questions", MODEL, response)
         if response.output_parsed is None:
             raise RuntimeError("The AI didn't return any questions. Try again.")
-        return jsonify(questions=response.output_parsed.questions)
+        return jsonify(questions=[q.model_dump() for q in response.output_parsed.questions])
     except (openai.OpenAIError, RuntimeError) as e:
         return jsonify(error=str(e)), 502
 
@@ -446,7 +464,7 @@ def spec_questions(doc_id):
         usage.record(g.org["id"], "spec_questions", MODEL, response)
         if response.output_parsed is None:
             raise RuntimeError("The AI didn't return any questions. Try again.")
-        return jsonify(questions=response.output_parsed.questions)
+        return jsonify(questions=[q.model_dump() for q in response.output_parsed.questions])
     except (openai.OpenAIError, RuntimeError) as e:
         return jsonify(error=str(e)), 502
 
