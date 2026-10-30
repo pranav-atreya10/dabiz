@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin · Requirements Studio</title>
+  {% include "_styles.html" %}
+  <style>
+    main { max-width: 860px; margin: 0 auto; padding: 56px 20px 64px; }
+    h1 { font-size: clamp(40px, 7vw, 60px); font-weight: 500; letter-spacing: -.04em; line-height: 1.05; margin: 0 0 12px; }
+    .lead { font-size: 18px; color: #c9c9c9; margin: 0 0 36px; }
+    .who { display: flex; align-items: center; gap: 12px; }
+    .navlink { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; }
+    .navlink:hover { color: var(--text); }
+    .tag { font-size: 13px; color: var(--muted); border: 1px solid var(--border-strong); border-radius: 999px; padding: 4px 12px; }
+
+    .card { padding: 28px; margin-bottom: 16px; }
+    h2 { font-size: 22px; font-weight: 500; letter-spacing: -.02em; margin: 0 0 6px; }
+    label { display: block; font-size: 14px; font-weight: 500; margin: 16px 0 8px; }
+    .inline { display: flex; gap: 12px; flex-wrap: wrap; }
+    .inline input { flex: 1 1 240px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+    .hintline { font-size: 13px; color: var(--faint); margin: 6px 0 0; }
+
+    .flash { padding: 14px 18px; border-radius: 14px; margin-bottom: 16px; font-size: 15px; }
+    .flash.ok { background: #10251a; color: var(--success); }
+    .flash.error { background: #2a1414; color: var(--danger); }
+    .newcode { background: var(--surface); border: 1px solid #3d3d3d; border-radius: 22px; padding: 28px; margin-bottom: 16px; }
+    .newcode .code {
+      font: 600 clamp(26px, 6vw, 40px)/1.2 ui-monospace, "SF Mono", Consolas, monospace; letter-spacing: .06em;
+      margin: 14px 0; word-break: break-all;
+    }
+    .newcode .warn { color: var(--warn-text); font-size: 14px; margin: 12px 0 0; }
+
+    .org-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+    .status { font-size: 13px; padding: 3px 12px; border-radius: 999px; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
+    .status.on { color: var(--success); }
+    details { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px; }
+    summary { cursor: pointer; font-weight: 500; color: var(--muted); list-style: none; }
+    summary::-webkit-details-marker { display: none; }
+    summary::before { content: "+ "; }
+    details[open] summary::before { content: "– "; }
+    .row-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+    .btn-danger { background: transparent; color: var(--danger); border-color: #4a2424; }
+    .btn-danger:hover:not(:disabled) { background: #1f1010; }
+    .check { display: flex; align-items: center; gap: 8px; font-weight: 400; color: var(--muted); }
+    .empty { color: var(--muted); text-align: center; padding: 40px 20px; }
+    form.inline-form { display: inline; }
+
+    @media (max-width: 640px) {
+      .topbar .brand span { display: none; }
+      .tag { display: none; }
+      .grid { grid-template-columns: 1fr; }
+      .card, .newcode { padding: 22px 18px; }
+      .row-actions .btn, .inline .btn { flex: 1 1 auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('home') }}">{% include "_logo.html" %}<span>Requirements Studio</span></a>
+    <div class="who">
+      <a class="navlink" href="{{ url_for('admin_usage') }}">Usage</a>
+      <a class="navlink" href="{{ url_for('admin_feedback') }}">Feedback</a>
+      <span class="tag">Admin</span>
+      <form method="post" action="{{ url_for('admin_logout') }}"><button class="btn btn-outline btn-sm" type="submit">Sign out</button></form>
+    </div>
+  </header>
+
+  <main>
+    <h1>Organizations</h1>
+    <p class="lead">Each org signs in with its own code and sends to its own Azure DevOps.</p>
+
+    {% for kind, message in get_flashed_messages(with_categories=true) %}
+      {% if kind == "code" %}
+        {% set name, code = message.rsplit("|", 1) %}
+        <div class="newcode">
+          <div class="muted">Sign-in code for <strong style="color:var(--text)">{{ name }}</strong></div>
+          <div class="code" id="newCode">{{ code }}</div>
+          <button class="btn btn-primary btn-sm" type="button" id="copyCode">Copy code</button>
+          <p class="warn">Save it now. For safety, it's only shown this once. You can always make a new one.</p>
+        </div>
+      {% else %}
+        <div class="flash {{ kind }}">{{ message }}</div>
+      {% endif %}
+    {% endfor %}
+
+    <form class="card" method="post" action="{{ url_for('admin_create_org') }}">
+      <h2>Add an org</h2>
+      <p class="muted" style="margin:0">You'll get a sign-in code to give to that org.</p>
+      <label for="name">Org name</label>
+      <div class="inline">
+        <input id="name" name="name" type="text" placeholder="e.g. Contoso" maxlength="120" required>
+        <button class="btn btn-primary" type="submit">Create org <span class="arrow">→</span></button>
+      </div>
+    </form>
+
+    {% for org in orgs %}
+      {% set connected = org.azdo_org_url and org.azdo_project and org.azdo_pat_encrypted %}
+      <section class="card" id="org-{{ org.id }}">
+        <div class="org-head">
+          <h2>{{ org.name }}</h2>
+          <span class="status {{ 'on' if connected }}">{{ "Azure DevOps connected" if connected else "Azure DevOps not set up" }}</span>
+        </div>
+
+        <details>
+          <summary>Azure DevOps settings</summary>
+          <form method="post" action="{{ url_for('admin_devops', org_id=org.id) }}">
+            <div class="grid">
+              <div>
+                <label for="url-{{ org.id }}">Org URL</label>
+                <input id="url-{{ org.id }}" name="org_url" type="url" placeholder="https://dev.azure.com/their-org" value="{{ org.azdo_org_url }}">
+              </div>
+              <div>
+                <label for="proj-{{ org.id }}">Project</label>
+                <input id="proj-{{ org.id }}" name="project" type="text" placeholder="Project name" value="{{ org.azdo_project }}">
+              </div>
+            </div>
+            <label for="type-{{ org.id }}">Story type</label>
+            <select id="type-{{ org.id }}" name="story_type">
+              {% for t in ["User Story", "Product Backlog Item", "Issue", "Requirement"] %}
+                <option {% if org.azdo_story_type == t %}selected{% endif %}>{{ t }}</option>
+              {% endfor %}
+            </select>
+            <p class="hintline">Agile projects use User Story, Scrum uses Product Backlog Item, Basic uses Issue, CMMI uses Requirement.</p>
+            <label for="pat-{{ org.id }}">Access token</label>
+            <input id="pat-{{ org.id }}" name="pat" type="password" autocomplete="new-password"
+                   placeholder="{{ 'Saved. Leave blank to keep it' if org.azdo_pat_encrypted else 'Personal Access Token with Work Items: Read & write' }}">
+            {% if org.azdo_pat_encrypted %}
+              <label class="check"><input type="checkbox" name="clear_pat" value="1"> Remove the saved token</label>
+            {% endif %}
+            <p class="hintline">Tokens are stored encrypted and never shown again.</p>
+            <div class="row-actions"><button class="btn btn-secondary btn-sm" type="submit">Save settings</button></div>
+          </form>
+        </details>
+
+        <div class="row-actions">
+          <form class="inline-form" method="post" action="{{ url_for('admin_new_code', org_id=org.id) }}"
+                onsubmit='return confirm({{ ("Make a new code for " ~ org.name ~ "? The old code stops working and everyone using it is signed out.")|tojson }})'>
+            <button class="btn btn-outline btn-sm" type="submit">New sign-in code</button>
+          </form>
+          <form class="inline-form" method="post" action="{{ url_for('admin_delete', org_id=org.id) }}"
+                onsubmit='return confirm({{ ("Delete " ~ org.name ~ "? This cannot be undone.")|tojson }})'>
+            <button class="btn btn-danger btn-sm" type="submit">Delete org</button>
+          </form>
+        </div>
+      </section>
+    {% else %}
+      <div class="card empty">No orgs yet. Add one above to get its sign-in code.</div>
+    {% endfor %}
+  </main>
+
+<script>
+  const copy = document.getElementById("copyCode");
+  if (copy) copy.onclick = async () => {
+    await navigator.clipboard.writeText(document.getElementById("newCode").textContent.trim());
+    copy.textContent = "Copied";
+    setTimeout(() => (copy.textContent = "Copy code"), 1500);
+  };
+</script>
+</body>
+</html>

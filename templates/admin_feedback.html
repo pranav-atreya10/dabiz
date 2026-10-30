@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Feedback · Requirements Studio</title>
+  {% include "_styles.html" %}
+  <style>
+    main { max-width: 860px; margin: 0 auto; padding: 56px 20px 64px; }
+    .nav { display: flex; align-items: center; gap: 8px; }
+    .nav a.link { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; padding: 6px 12px; border-radius: 999px; }
+    .nav a.link:hover { color: var(--text); }
+    .nav a.link.here { color: var(--text); background: var(--raised); }
+    h1 { font-size: clamp(40px, 7vw, 60px); font-weight: 500; letter-spacing: -.04em; line-height: 1.05; margin: 0 0 12px; }
+    .lead { font-size: 18px; color: #c9c9c9; margin: 0 0 28px; }
+    .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+    .tile { padding: 24px; }
+    .tile .label { color: var(--muted); font-size: 14px; }
+    .tile .value { font-size: clamp(32px, 5vw, 44px); font-weight: 600; letter-spacing: -.03em; line-height: 1.15; margin-top: 6px; }
+    .item { padding: 22px 24px; border-top: 1px solid var(--border); }
+    .item:first-child { border-top: 0; }
+    .item-head { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+    .item-head .r { font-size: 20px; }
+    .item-head a { color: var(--text); font-weight: 500; text-decoration: none; }
+    .item-head a:hover { text-decoration: underline; text-underline-offset: 4px; }
+    .meta { color: var(--muted); font-size: 14px; }
+    .comment { margin: 10px 0 0; color: #d6d6d6; white-space: pre-wrap; }
+    .nocomment { margin: 10px 0 0; color: var(--faint); font-size: 14px; }
+    .empty { text-align: center; padding: 48px 24px; color: var(--muted); }
+    @media (max-width: 640px) {
+      .tiles { grid-template-columns: 1fr; }
+      .topbar .brand span { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('home') }}">{% include "_logo.html" %}<span>Requirements Studio</span></a>
+    <nav class="nav">
+      <a class="link" href="{{ url_for('admin') }}">Orgs</a>
+      <a class="link" href="{{ url_for('admin_usage') }}">Usage</a>
+      <a class="link here" href="{{ url_for('admin_feedback') }}">Feedback</a>
+      <form method="post" action="{{ url_for('admin_logout') }}"><button class="btn btn-outline btn-sm" type="submit">Sign out</button></form>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Feedback</h1>
+    <p class="lead">What people said about their documents, newest first.</p>
+
+    <div class="tiles">
+      <div class="card tile"><div class="label">Ratings</div><div class="value">{{ ups + downs }}</div></div>
+      <div class="card tile"><div class="label">👍 Useful</div><div class="value">{{ ups }}{% if ups + downs %}<span class="muted" style="font-size:18px;font-weight:500"> · {{ (100 * ups / (ups + downs))|round|int }}%</span>{% endif %}</div></div>
+      <div class="card tile"><div class="label">👎 Not useful</div><div class="value">{{ downs }}</div></div>
+    </div>
+
+    <div class="card">
+      {% for i in items %}
+        <div class="item">
+          <div class="item-head">
+            <span class="r" aria-label="{{ 'Useful' if i.rating == 1 else 'Not useful' }}">{{ "👍" if i.rating == 1 else "👎" }}</span>
+            <a href="{{ url_for('admin_document', doc_id=i.id) }}">{{ i.title }}</a>
+            <span class="meta">{{ i.org_name or "Deleted org" }} · {{ i.feedback_at|string|truncate(16, True, "") }}</span>
+          </div>
+          {% if i.feedback %}<p class="comment">{{ i.feedback }}</p>{% else %}<p class="nocomment">No comment.</p>{% endif %}
+        </div>
+      {% else %}
+        <div class="empty">No feedback yet. It shows up here when someone rates a document.</div>
+      {% endfor %}
+    </div>
+  </main>
+</body>
+</html>

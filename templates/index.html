@@ -83,12 +83,74 @@
     .items a { color: var(--text); text-decoration: underline; text-decoration-color: #555; text-underline-offset: 4px; }
     .items a:hover { text-decoration-color: var(--text); }
 
-    .who { display: flex; align-items: center; gap: 12px; }
+    .who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .org-name {
+      color: var(--muted); font-size: 14px; font-weight: 500; max-width: 40vw;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
     .usage-link { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; }
     .usage-link:hover { color: var(--text); }
+    .editor { width: 100%; min-height: 460px; resize: vertical; border: 1px solid var(--border); border-radius: 16px; }
+    .save-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+    .save-status { font-size: 14px; color: var(--muted); }
+    .save-status.bad { color: var(--danger); }
+    .hint-note { font-size: 13px; color: var(--faint); margin: 10px 0 0; }
+    .hint-note a, footer a { color: inherit; }
+    /* One question at a time, with answer choices */
+    .qcard { border: 1px solid var(--border-strong); border-radius: 18px; overflow: hidden; background: #161616; }
+    .qhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; background: #232323; }
+    .qtitle { font-size: 18px; font-weight: 500; line-height: 1.35; }
+    .qpager { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .qpager button { background: none; border: 0; color: var(--muted); font-size: 20px; line-height: 1; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; }
+    .qpager button:hover:not(:disabled) { background: var(--raised); color: var(--text); }
+    .qpager button:disabled { opacity: .3; cursor: default; }
+    .qopt { display: flex; gap: 16px; padding: 16px 20px; border-top: 1px solid var(--border); cursor: pointer; align-items: flex-start; }
+    .qopt:hover { background: #1c1c1c; }
+    .qopt input { position: absolute; opacity: 0; pointer-events: none; }
+    .qopt .dot { flex: none; width: 22px; height: 22px; margin-top: 2px; border-radius: 50%; border: 1.5px solid #6b6b6b; display: grid; place-items: center; }
+    .qopt input:checked + .dot { background: #3987e5; border-color: #3987e5; }
+    .qopt input:checked + .dot::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+    .qopt input:focus-visible + .dot { outline: 2px solid #8ab8f5; outline-offset: 2px; }
+    .qtext b { display: block; font-weight: 500; font-size: 17px; color: var(--text); }
+    .qtext span { display: block; color: var(--muted); font-size: 15px; margin-top: 4px; }
+    .qother { padding: 0 20px 16px 58px; }
+    .qother textarea { min-height: 64px; }
+    .qfoot { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--border); }
+    .qdots { display: flex; gap: 6px; flex-wrap: wrap; margin-right: auto; }
+    .qdots i { width: 8px; height: 8px; border-radius: 50%; border: 1px solid #6b6b6b; cursor: pointer; }
+    .qdots i.done { background: #9a9a9a; border-color: #9a9a9a; }
+    .qdots i.skip { border-style: dashed; }
+    .qdots i.cur { background: var(--text); border-color: var(--text); transform: scale(1.25); }
+    .qkey { font-size: 12px; color: var(--faint); border: 1px solid var(--border-strong); border-radius: 6px; padding: 1px 6px; margin-left: 4px; }
+    @media (max-width: 640px) {
+      .qhead { flex-direction: column; align-items: flex-start; padding: 14px 16px; }
+      .qopt { padding: 14px 16px; gap: 12px; }
+      .qother { padding: 0 16px 14px 50px; }
+      .qfoot { padding: 12px 16px; }
+      .qkey { display: none; }
+    }
+    .next-cta, .coding-ai {
+      margin-top: 20px; padding: 18px 20px; border-radius: 16px; background: var(--surface-2);
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    }
+    .next-cta b, .coding-ai b { display: block; font-weight: 600; margin-bottom: 2px; }
+    .next-cta span, .coding-ai span { color: var(--muted); font-size: 15px; }
+    .coding-ai { display: block; }
+    .feedback { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .fb-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: #d6d6d6; }
+    .fb-btn {
+      width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--border-strong);
+      background: transparent; font-size: 20px; cursor: pointer;
+    }
+    .fb-btn:hover { background: var(--raised); }
+    .fb-btn.picked { background: var(--text); border-color: var(--text); }
+    .fb-more { margin-top: 14px; }
     footer { text-align: center; font-size: 13px; color: var(--faint); margin-top: 40px; }
 
     @media (max-width: 640px) {
+      .topbar .brand span { display: none; }
+      .org-name { display: none; }
+      .usage-link { white-space: nowrap; font-size: 14px; }
       main { padding-top: 48px; }
       .stepper li { padding: 8px 12px; font-size: 14px; }
       .stepper .label { display: none; }
@@ -104,6 +166,8 @@
   <header class="topbar">
     <a class="brand" href="{{ url_for('home') }}">{% include "_logo.html" %}<span>Requirements Studio</span></a>
     <div class="who">
+      <span class="org-name" title="Signed in as {{ org.name }}">{{ org.name }}</span>
+      <a class="usage-link" href="{{ url_for('docs_page') }}">My documents</a>
       <a class="usage-link" href="{{ url_for('usage_page') }}">Usage</a>
       <form method="post" action="{{ url_for('logout') }}"><button class="btn btn-outline btn-sm" type="submit">Sign out</button></form>
     </div>
@@ -119,6 +183,7 @@
       <li id="s1" class="active"><span class="num">1</span><span class="label">Describe</span></li>
       <li id="s2"><span class="num">2</span><span class="label">Clarify</span></li>
       <li id="s3"><span class="num">3</span><span class="label">Review &amp; export</span></li>
+      <li id="s4"><span class="num">4</span><span class="label">Tech spec</span></li>
     </ol>
 
     <section class="card step" id="step1">
@@ -131,6 +196,7 @@
       <p class="desc">What should the product do, and who is it for?</p>
       <div class="field">
         <textarea id="idea" rows="4" aria-label="Product idea" placeholder="e.g. A tool that lets our HR team track new-hire onboarding tasks across departments"></textarea>
+        <p class="hint-note">Your idea and answers are sent to OpenAI to write the document. Don't include passwords or personal details. <a href="{{ url_for('privacy') }}">Privacy</a></p>
         <p class="error" id="err1"></p>
       </div>
       <div class="actions">
@@ -145,11 +211,11 @@
         </svg>
       </div>
       <h2>Clarify details</h2>
-      <p class="desc">Answer what you can. Anything left blank becomes an open question.</p>
+      <p class="desc">Pick an answer, write your own with "Other", or skip. Skipped questions become open questions.</p>
       <div id="questions"></div>
       <p class="error" id="err2"></p>
       <div class="actions">
-        <button class="btn btn-primary" id="makeDoc">Generate document <span class="arrow">→</span></button>
+        <button class="btn btn-secondary btn-sm" id="moreQs">Ask more questions</button>
       </div>
     </section>
 
@@ -160,13 +226,19 @@
         </svg>
       </div>
       <h2>Requirements document</h2>
-      <p class="desc">Review the draft, then download it or send it to your backlog.</p>
+      <p class="desc">Review and edit the draft, then download it or send it to your backlog. It's saved in <a href="{{ url_for('docs_page') }}" style="color:inherit">My documents</a>.</p>
       <div class="seg" role="tablist">
         <button class="tab active" data-view="preview" role="tab">Preview</button>
-        <button class="tab" data-view="markdown" role="tab">Markdown</button>
+        <button class="tab" data-view="markdown" role="tab">Edit</button>
       </div>
       <div class="doc" id="preview"></div>
-      <pre class="raw hidden" id="markdown"></pre>
+      <div class="hidden" id="editWrap">
+        <textarea class="raw editor" id="markdown" spellcheck="true" aria-label="Edit document (Markdown)"></textarea>
+        <div class="save-row">
+          <button class="btn btn-secondary btn-sm" id="saveDoc">Save changes</button>
+          <span class="save-status" id="saveStatus"></span>
+        </div>
+      </div>
       <div class="actions">
         <button class="btn btn-primary" id="download">Download .md</button>
         <button class="btn btn-secondary" id="copy">Copy</button>
@@ -174,6 +246,69 @@
         <button class="btn btn-outline" id="sendDevops" disabled>Send to Azure DevOps <span class="arrow">→</span></button>
       </div>
       <div class="devops-note" id="devopsNote">Checking Azure DevOps connection…</div>
+
+      <div class="next-cta">
+        <div>
+          <b>Next: technical spec</b>
+          <span>Turn these requirements into a spec that engineers and AI coding tools can build from.</span>
+        </div>
+        <button class="btn btn-primary" id="startSpec">Create technical spec <span class="arrow">→</span></button>
+      </div>
+      <p class="error" id="err3"></p>
+
+      <div class="feedback" id="feedback">
+        <div class="fb-row">
+          <span>Was this document useful?</span>
+          <button class="fb-btn" data-rating="1" aria-label="Yes, useful">👍</button>
+          <button class="fb-btn" data-rating="-1" aria-label="No, not useful">👎</button>
+        </div>
+        <div class="fb-more hidden" id="fbMore">
+          <textarea id="fbComment" rows="2" placeholder="What would have made it better? (optional)"></textarea>
+          <div class="save-row">
+            <button class="btn btn-secondary btn-sm" id="fbSend">Send feedback</button>
+            <span class="save-status" id="fbStatus"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card step hidden" id="step4">
+      <div class="icon-tile">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M8 6l-6 6 6 6M16 6l6 6-6 6M14 4l-4 16"/>
+        </svg>
+      </div>
+      <h2>Technical specification</h2>
+      <p class="desc">A few technical questions first. Not sure? Skip it: the spec will list what it assumed.</p>
+      <div id="specQs"></div>
+      <p class="error" id="err4"></p>
+
+      <div class="hidden" id="specOut">
+        <div class="seg spec-tabs" role="tablist" style="margin-top:28px">
+          <button class="tab active" data-view="preview" role="tab">Preview</button>
+          <button class="tab" data-view="edit" role="tab">Edit</button>
+        </div>
+        <div class="doc" id="specPreview"></div>
+        <div class="hidden" id="specEditWrap">
+          <textarea class="raw editor" id="specText" spellcheck="true" aria-label="Edit technical spec (Markdown)"></textarea>
+          <div class="save-row">
+            <button class="btn btn-secondary btn-sm" id="saveSpec">Save changes</button>
+            <span class="save-status" id="specSaveStatus"></span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="downloadSpec">Download spec .md</button>
+          <button class="btn btn-secondary" id="copySpec">Copy</button>
+        </div>
+        <div class="coding-ai">
+          <b>Build it with an AI coding tool</b>
+          <span>Get one ready-to-paste prompt with the spec and the requirements, for tools like GitHub Copilot, Codex, Claude Code or Cursor.</span>
+          <div class="actions" style="margin-top:14px">
+            <button class="btn btn-secondary" id="copyPrompt">Copy for coding AI</button>
+            <button class="btn btn-outline" id="downloadPrompt">Download prompt .md</button>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="card step hidden" id="devopsResult">
@@ -187,15 +322,15 @@
       <ul class="items" id="devopsItems"></ul>
     </section>
 
-    <footer>Content is AI-generated and may contain mistakes. Review before use.</footer>
+    <footer>Content is AI-generated and may contain mistakes. Review before use. · <a href="{{ url_for('privacy') }}">Privacy</a></footer>
   </main>
 
 <script>
   const $ = (id) => document.getElementById(id);
-  let questions = [];
+  let docId = null;
 
   function setStep(n) {
-    [1, 2, 3].forEach((i) => {
+    [1, 2, 3, 4].forEach((i) => {
       $("s" + i).classList.toggle("active", i === n);
       $("s" + i).classList.toggle("done", i < n);
     });
@@ -235,50 +370,157 @@
     return html;
   }
 
+  // A deck of questions shown one at a time, each with answer choices plus "Other".
+  // Items look like {question, options: [{label, description}], choice, other, skipped}.
+  class QuestionDeck {
+    constructor(root, { name, submitLabel, onSubmit }) {
+      Object.assign(this, { root, name, submitLabel, onSubmit, items: [], at: 0 });
+      root.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); this.root.querySelector(".qnext")?.click(); }
+      });
+    }
+    normalize(q) {
+      if (typeof q === "string") return { question: q, options: [], choice: null, other: "", skipped: false };
+      const item = { question: q.question, options: q.options || [], choice: q.choice ?? null, other: q.other || "", skipped: !!q.skipped };
+      // Documents saved before answer choices existed only have a free-text answer.
+      if (item.choice === null && !item.other && q.answer && !q.options) item.other = q.answer, item.choice = "other";
+      return item;
+    }
+    set(list) { this.items = list.map((q) => this.normalize(q)); this.at = 0; this.render(); }
+    add(list) { const first = this.items.length; this.items.push(...list.map((q) => this.normalize(q))); this.at = first; this.render(); }
+    answerText(it) {
+      if (it.choice === "other") return it.other.trim();
+      if (it.choice === null) return "";
+      const o = it.options[it.choice];
+      return o ? o.label + " (" + o.description + ")" : "";
+    }
+    answers() {
+      return this.items.map((it) => ({ question: it.question, options: it.options, choice: it.choice, other: it.other, skipped: it.skipped, answer: this.answerText(it) }));
+    }
+    go(i) { this.at = Math.max(0, Math.min(this.items.length - 1, i)); this.render(); this.root.querySelector(".qopt input")?.focus({ preventScroll: true }); }
+    render() {
+      const it = this.items[this.at], n = this.items.length, last = this.at === n - 1;
+      const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+      const card = el("div", "qcard");
+      const head = el("div", "qhead");
+      const title = el("div", "qtitle", it.question);
+      title.id = this.name + "-title";
+      const pager = el("div", "qpager");
+      const prev = el("button", null, "‹"); prev.type = "button"; prev.setAttribute("aria-label", "Previous question"); prev.disabled = this.at === 0;
+      const next = el("button", null, "›"); next.type = "button"; next.setAttribute("aria-label", "Next question"); next.disabled = last;
+      prev.onclick = () => this.go(this.at - 1);
+      next.onclick = () => this.go(this.at + 1);
+      pager.append(prev, el("span", null, (this.at + 1) + " of " + n), next);
+      head.append(title, pager);
+      const group = el("div");
+      group.setAttribute("role", "radiogroup");
+      group.setAttribute("aria-labelledby", title.id);
+      const choices = [...it.options.map((o, k) => ({ value: k, label: o.label, description: o.description })),
+        { value: "other", label: "Other", description: it.options.length ? "Write your own answer" : "Write your answer" }];
+      const otherWrap = el("div", "qother" + (it.choice === "other" ? "" : " hidden"));
+      const otherBox = el("textarea");
+      otherBox.rows = 2;
+      otherBox.placeholder = "Type your answer";
+      otherBox.value = it.other;
+      otherBox.setAttribute("aria-label", "Your answer");
+      otherBox.oninput = () => { it.other = otherBox.value; it.skipped = false; this.paintDots(); };
+      otherWrap.append(otherBox);
+      choices.forEach((c) => {
+        const row = el("label", "qopt");
+        const input = el("input");
+        input.type = "radio";
+        input.name = this.name + "-" + this.at;
+        input.checked = it.choice === c.value;
+        input.onchange = () => {
+          it.choice = c.value; it.skipped = false;
+          otherWrap.classList.toggle("hidden", c.value !== "other");
+          if (c.value === "other") otherBox.focus();
+          this.paintDots();
+        };
+        const text = el("span", "qtext");
+        text.append(el("b", null, c.label), el("span", null, c.description));
+        row.append(input, el("span", "dot"), text);
+        group.append(row);
+      });
+      group.append(otherWrap);
+      const foot = el("div", "qfoot");
+      this.dots = el("div", "qdots");
+      this.dots.setAttribute("aria-hidden", "true");
+      const skip = el("button", "btn btn-secondary btn-sm", "Skip"); skip.type = "button";
+      skip.onclick = () => { it.choice = null; it.other = ""; it.skipped = true; last ? this.finish(go) : this.go(this.at + 1); };
+      const go = el("button", "btn btn-primary btn-sm qnext"); go.type = "button";
+      go.innerHTML = last ? this.submitLabel + ' <span class="arrow">→</span>' : 'Next <span class="arrow">→</span>';
+      if (last) go.insertAdjacentHTML("beforeend", '<span class="qkey">Ctrl ⏎</span>');
+      go.onclick = () => last ? this.finish(go) : this.go(this.at + 1);
+      foot.append(this.dots, skip, go);
+      card.append(head, group, foot);
+      this.root.replaceChildren(card);
+      this.paintDots();
+    }
+    paintDots() {
+      this.dots.replaceChildren(...this.items.map((it, i) => {
+        const d = document.createElement("i");
+        const answered = it.choice !== null && (it.choice !== "other" || it.other.trim());
+        d.className = (answered ? "done" : it.skipped ? "skip" : "") + (i === this.at ? " cur" : "");
+        d.title = "Question " + (i + 1);
+        d.onclick = () => this.go(i);
+        return d;
+      }));
+    }
+    finish(btn) { this.onSubmit(btn); }
+  }
+
+  const deck = new QuestionDeck($("questions"), {
+    name: "rq", submitLabel: "Generate document",
+    onSubmit: (btn) => generateDoc(btn),
+  });
+
   $("getQuestions").onclick = () => withLoading($("getQuestions"), "Generating…", async () => {
     const data = await post("/api/questions", { idea: $("idea").value });
-    questions = data.questions;
-    $("questions").innerHTML = "";
-    questions.forEach((q, i) => {
-      const field = document.createElement("div");
-      field.className = "field";
-      const label = document.createElement("label");
-      label.htmlFor = "a" + i;
-      label.innerHTML = '<span class="q">Q' + (i + 1) + "</span>";
-      label.append(q);
-      const box = document.createElement("textarea");
-      box.id = "a" + i;
-      box.rows = 2;
-      field.append(label, box);
-      $("questions").append(field);
-    });
+    deck.set(data.questions);
     $("step2").classList.remove("hidden");
     $("step3").classList.add("hidden");
     setStep(2);
     $("step2").scrollIntoView({ behavior: "smooth" });
   }, $("err1"));
 
-  $("makeDoc").onclick = () => withLoading($("makeDoc"), "Writing document…", async () => {
-    const answers = questions.map((q, i) => ({ question: q, answer: $("a" + i).value }));
-    const data = await post("/api/requirements", { idea: $("idea").value, answers });
-    $("markdown").textContent = data.document;
-    $("preview").innerHTML = renderMarkdown(data.document);
+  $("moreQs").onclick = () => withLoading($("moreQs"), "Thinking…", async () => {
+    const data = await post("/api/questions", { idea: $("idea").value, previous: deck.answers() });
+    deck.add(data.questions);
+  }, $("err2"));
+
+  function showDoc(id, text) {
+    docId = id;
+    $("markdown").value = text;
+    $("preview").innerHTML = renderMarkdown(text);
+    $("saveStatus").textContent = "";
+    dirty = false;
+    resetFeedback();
     $("step3").classList.remove("hidden");
     $("devopsResult").classList.add("hidden");
+    $("step4").classList.add("hidden");
+    $("err3").textContent = "";
     setStep(3);
+  }
+
+  const generateDoc = (btn) => withLoading(btn, "Writing document…", async () => {
+    const data = await post("/api/requirements", { idea: $("idea").value, answers: deck.answers() });
+    showDoc(data.id, data.document);
+    history.replaceState(null, "", "?doc=" + data.id);
     $("step3").scrollIntoView({ behavior: "smooth" });
   }, $("err2"));
 
-  document.querySelectorAll(".tab").forEach((tab) => {
+  document.querySelectorAll("#step3 .tab").forEach((tab) => {
     tab.onclick = () => {
-      document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t === tab));
+      document.querySelectorAll("#step3 .tab").forEach((t) => t.classList.toggle("active", t === tab));
+      if (tab.dataset.view === "preview") $("preview").innerHTML = renderMarkdown($("markdown").value);
       $("preview").classList.toggle("hidden", tab.dataset.view !== "preview");
-      $("markdown").classList.toggle("hidden", tab.dataset.view !== "markdown");
+      $("editWrap").classList.toggle("hidden", tab.dataset.view !== "markdown");
     };
   });
 
   $("download").onclick = () => {
-    const blob = new Blob([$("markdown").textContent], { type: "text/markdown" });
+    const blob = new Blob([$("markdown").value], { type: "text/markdown" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "requirements.md";
@@ -295,7 +537,7 @@
     devopsReady = d.configured;
     $("sendDevops").disabled = !devopsReady;
     if (devopsReady) setNote("Connected to Azure DevOps project \u201c" + d.project + "\u201d. Sending creates Epics with User Stories under them.");
-    else setNote("Azure DevOps isn't set up yet. Once an admin connects it, you'll be able to send this document as Epics and User Stories.", "warn");
+    else setNote("Azure DevOps isn't set up yet. Once your admin connects it, you'll be able to send this document as Epics and User Stories.", "warn");
   }).catch(() => setNote("Couldn't check the Azure DevOps connection.", "bad"));
 
   function itemLink(item, kind) {
@@ -311,7 +553,7 @@
   }
 
   $("sendDevops").onclick = () => withLoading($("sendDevops"), "Sending…", async () => {
-    const data = await post("/api/devops/send", { document: $("markdown").textContent });
+    const data = await post("/api/devops/send", { document: $("markdown").value });
     $("devopsItems").innerHTML = "";
     let stories = 0;
     data.items.forEach((epic) => {
@@ -327,8 +569,143 @@
     $("devopsResult").scrollIntoView({ behavior: "smooth" });
   }, { set textContent(msg) { if (msg) setNote(msg, "bad"); } });
 
+  // Saving edits
+  let dirty = false;
+  $("markdown").addEventListener("input", () => { dirty = true; $("saveStatus").textContent = "Unsaved changes"; $("saveStatus").className = "save-status"; });
+  async function saveDoc() {
+    if (!docId) return;
+    const res = await fetch("/api/documents/" + docId, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ document: $("markdown").value }) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || "Couldn't save.");
+    dirty = false;
+    $("saveStatus").className = "save-status";
+    $("saveStatus").textContent = "Saved";
+  }
+  $("saveDoc").onclick = () => withLoading($("saveDoc"), "Saving…", saveDoc, {
+    set textContent(msg) { $("saveStatus").textContent = msg; $("saveStatus").className = "save-status" + (msg ? " bad" : ""); },
+  });
+  addEventListener("beforeunload", (e) => { if (dirty || specDirty) e.preventDefault(); });
+
+  // Feedback
+  let rating = null;
+  function resetFeedback(r = null, comment = "") {
+    rating = r;
+    document.querySelectorAll(".fb-btn").forEach((b) => b.classList.toggle("picked", +b.dataset.rating === r));
+    $("fbComment").value = comment || "";
+    $("fbMore").classList.toggle("hidden", r === null);
+    $("fbStatus").textContent = r === null ? "" : "Thanks for your feedback!";
+  }
+  document.querySelectorAll(".fb-btn").forEach((b) => b.onclick = () => {
+    rating = +b.dataset.rating;
+    document.querySelectorAll(".fb-btn").forEach((x) => x.classList.toggle("picked", x === b));
+    $("fbMore").classList.remove("hidden");
+    $("fbStatus").textContent = "";
+    $("fbComment").focus();
+  });
+  $("fbSend").onclick = () => withLoading($("fbSend"), "Sending…", async () => {
+    await post("/api/documents/" + docId + "/feedback", { rating, comment: $("fbComment").value });
+    $("fbStatus").textContent = "Thanks for your feedback!";
+  }, $("fbStatus"));
+
+  // Technical spec
+  let specDirty = false;
+  const specDeck = new QuestionDeck($("specQs"), {
+    name: "sq", submitLabel: "Write spec",
+    onSubmit: (btn) => writeSpec(btn),
+  });
+  function showSpec(text) {
+    $("specText").value = text;
+    $("specPreview").innerHTML = renderMarkdown(text);
+    $("specSaveStatus").textContent = "";
+    specDirty = false;
+    $("specOut").classList.remove("hidden");
+    $("step4").classList.remove("hidden");
+    setStep(4);
+  }
+  $("startSpec").onclick = () => withLoading($("startSpec"), "Thinking…", async () => {
+    if (dirty) await saveDoc();
+    const data = await post("/api/documents/" + docId + "/spec/questions", {});
+    specDeck.set(data.questions);
+    $("specOut").classList.add("hidden");
+    $("step4").classList.remove("hidden");
+    setStep(4);
+    $("step4").scrollIntoView({ behavior: "smooth" });
+  }, $("err3"));
+  const writeSpec = (btn) => withLoading(btn, "Writing spec…", async () => {
+    const data = await post("/api/documents/" + docId + "/spec", { answers: specDeck.answers() });
+    showSpec(data.spec);
+    $("specOut").scrollIntoView({ behavior: "smooth" });
+  }, $("err4"));
+  document.querySelectorAll(".spec-tabs .tab").forEach((tab) => {
+    tab.onclick = () => {
+      document.querySelectorAll(".spec-tabs .tab").forEach((t) => t.classList.toggle("active", t === tab));
+      if (tab.dataset.view === "preview") $("specPreview").innerHTML = renderMarkdown($("specText").value);
+      $("specPreview").classList.toggle("hidden", tab.dataset.view !== "preview");
+      $("specEditWrap").classList.toggle("hidden", tab.dataset.view !== "edit");
+    };
+  });
+  $("specText").addEventListener("input", () => { specDirty = true; $("specSaveStatus").textContent = "Unsaved changes"; $("specSaveStatus").className = "save-status"; });
+  $("saveSpec").onclick = () => withLoading($("saveSpec"), "Saving…", async () => {
+    const res = await fetch("/api/documents/" + docId + "/spec", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ spec: $("specText").value }) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || "Couldn't save.");
+    specDirty = false;
+    $("specSaveStatus").className = "save-status";
+    $("specSaveStatus").textContent = "Saved";
+  }, { set textContent(msg) { $("specSaveStatus").textContent = msg; $("specSaveStatus").className = "save-status" + (msg ? " bad" : ""); } });
+
+  function saveFile(name, text) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text], { type: "text/markdown" }));
+    a.download = name;
+    a.click();
+  }
+  async function copyText(btn, text, label) {
+    await navigator.clipboard.writeText(text);
+    btn.textContent = "Copied";
+    setTimeout(() => (btn.textContent = label), 1500);
+  }
+  function codingPrompt() {
+    return [
+      "You are building the product described below. Follow the technical specification, and use the requirements for intent.",
+      "",
+      "- Work through the Implementation plan in order, one task at a time.",
+      "- Write tests that prove each user story's acceptance criteria.",
+      "- If something is unclear, or listed under Open questions, ask me before guessing.",
+      "- Keep each change small, and tell me what you changed and how to check it.",
+      "",
+      "---",
+      "",
+      $("specText").value.trim(),
+      "",
+      "---",
+      "",
+      $("markdown").value.trim(),
+      "",
+    ].join("\n");
+  }
+  $("downloadSpec").onclick = () => saveFile("technical-spec.md", $("specText").value);
+  $("copySpec").onclick = () => copyText($("copySpec"), $("specText").value, "Copy");
+  $("copyPrompt").onclick = () => copyText($("copyPrompt"), codingPrompt(), "Copy for coding AI");
+  $("downloadPrompt").onclick = () => saveFile("coding-ai-prompt.md", codingPrompt());
+
+  // Opening a saved document (from My documents)
+  const openId = new URLSearchParams(location.search).get("doc");
+  if (openId) fetch("/api/documents/" + encodeURIComponent(openId)).then((r) => r.json()).then((d) => {
+    if (d.error) { $("err1").textContent = d.error; return; }
+    $("idea").value = d.idea;
+    if (d.qa.length) { deck.set(d.qa); $("step2").classList.remove("hidden"); }
+    showDoc(d.id, d.document);
+    resetFeedback(d.rating, d.feedback);
+    if (d.spec) {
+      if (d.spec_qa.length) specDeck.set(d.spec_qa);
+      showSpec(d.spec);
+    }
+    $("step3").scrollIntoView();
+  });
+
   $("copy").onclick = async () => {
-    await navigator.clipboard.writeText($("markdown").textContent);
+    await navigator.clipboard.writeText($("markdown").value);
     $("copy").textContent = "Copied";
     setTimeout(() => ($("copy").textContent = "Copy"), 1500);
   };
