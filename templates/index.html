@@ -9,8 +9,8 @@
     main { max-width: 860px; margin: 0 auto; padding: 72px 20px 64px; }
 
     .hero { margin-bottom: 40px; }
-    .hero h1 { font-size: clamp(44px, 8vw, 72px); font-weight: 500; letter-spacing: -.04em; line-height: 1.02; margin: 0 0 20px; }
-    .hero p { font-size: clamp(18px, 2.6vw, 22px); line-height: 1.5; color: #cfcfcf; margin: 0; max-width: 640px; }
+    .hero h1 { font-size: clamp(44px, 8vw, 72px); font-weight: 700; letter-spacing: -.045em; line-height: 1.02; margin: 0 0 20px; }
+    .hero p { font-size: clamp(18px, 2.6vw, 22px); line-height: 1.5; color: var(--text-2); margin: 0; max-width: 640px; }
 
     .stepper {
       display: flex; list-style: none; margin: 0 0 32px; padding: 6px; gap: 4px;
@@ -25,13 +25,13 @@
       display: grid; place-items: center; font-size: 12px;
     }
     .stepper li.active { background: var(--raised); color: var(--text); }
-    .stepper li.active .num { background: var(--text); color: #000; border-color: var(--text); }
-    .stepper li.done { color: #d6d6d6; }
+    .stepper li.active .num { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .stepper li.done { color: var(--text-3); }
     .stepper li.done .num { border-color: var(--success); color: var(--success); }
 
     .step { padding: 32px; margin-bottom: 20px; }
-    .step h2 { font-size: 28px; font-weight: 500; letter-spacing: -.02em; line-height: 1.2; margin: 28px 0 8px; }
-    .step .desc { font-size: 17px; color: #c4c4c4; margin: 0 0 24px; }
+    .step h2 { font-size: 28px; font-weight: 600; letter-spacing: -.02em; line-height: 1.2; margin: 28px 0 8px; }
+    .step .desc { font-size: 17px; color: var(--text-2); margin: 0 0 24px; }
     .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 24px; }
     .actions .spacer { flex: 1; }
 
@@ -57,11 +57,11 @@
     .doc h1 { font-size: 30px; font-weight: 500; letter-spacing: -.02em; margin: 22px 0 8px; }
     .doc h2 { font-size: 20px; font-weight: 500; margin: 28px 0 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
     .doc h3 { font-size: 16px; font-weight: 600; margin: 20px 0 6px; }
-    .doc p { margin: 8px 0; color: #dcdcdc; }
-    .doc ul, .doc ol { padding-left: 22px; margin: 6px 0; color: #dcdcdc; }
+    .doc p { margin: 8px 0; color: var(--text-3); }
+    .doc ul, .doc ol { padding-left: 22px; margin: 6px 0; color: var(--text-3); }
     .doc strong { color: var(--text); }
     .raw {
-      margin: 0; padding: 20px 24px; white-space: pre-wrap; word-wrap: break-word; color: #dcdcdc;
+      margin: 0; padding: 20px 24px; white-space: pre-wrap; word-wrap: break-word; color: var(--text-3);
       font: 13px/1.6 ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
     }
 
@@ -80,7 +80,7 @@
       border: 1px solid var(--border-strong); color: var(--muted);
     }
     .items .type.epic { color: var(--text); background: var(--raised); border-color: var(--raised); }
-    .items a { color: var(--text); text-decoration: underline; text-decoration-color: #555; text-underline-offset: 4px; }
+    .items a { color: var(--text); text-decoration: underline; text-decoration-color: var(--faint); text-underline-offset: 4px; }
     .items a:hover { text-decoration-color: var(--text); }
 
     .who { display: flex; align-items: center; gap: 12px; min-width: 0; }
@@ -97,28 +97,28 @@
     .hint-note { font-size: 13px; color: var(--faint); margin: 10px 0 0; }
     .hint-note a, footer a { color: inherit; }
     /* One question at a time, with answer choices */
-    .qcard { border: 1px solid var(--border-strong); border-radius: 18px; overflow: hidden; background: #161616; }
-    .qhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; background: #232323; }
+    .qcard { border: 1px solid var(--border-strong); border-radius: 18px; overflow: hidden; background: var(--q-body); }
+    .qhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; background: var(--q-head); }
     .qtitle { font-size: 18px; font-weight: 500; line-height: 1.35; }
     .qpager { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; }
     .qpager button { background: none; border: 0; color: var(--muted); font-size: 20px; line-height: 1; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; }
     .qpager button:hover:not(:disabled) { background: var(--raised); color: var(--text); }
     .qpager button:disabled { opacity: .3; cursor: default; }
     .qopt { display: flex; gap: 16px; padding: 16px 20px; border-top: 1px solid var(--border); cursor: pointer; align-items: flex-start; }
-    .qopt:hover { background: #1c1c1c; }
+    .qopt:hover { background: var(--hover); }
     .qopt input { position: absolute; opacity: 0; pointer-events: none; }
-    .qopt .dot { flex: none; width: 22px; height: 22px; margin-top: 2px; border-radius: 50%; border: 1.5px solid #6b6b6b; display: grid; place-items: center; }
-    .qopt input:checked + .dot { background: #3987e5; border-color: #3987e5; }
+    .qopt .dot { flex: none; width: 22px; height: 22px; margin-top: 2px; border-radius: 50%; border: 1.5px solid var(--q-radio); display: grid; place-items: center; }
+    .qopt input:checked + .dot { background: var(--accent); border-color: var(--accent); }
     .qopt input:checked + .dot::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
-    .qopt input:focus-visible + .dot { outline: 2px solid #8ab8f5; outline-offset: 2px; }
+    .qopt input:focus-visible + .dot { outline: 2px solid var(--accent-line); outline-offset: 2px; }
     .qtext b { display: block; font-weight: 500; font-size: 17px; color: var(--text); }
     .qtext span { display: block; color: var(--muted); font-size: 15px; margin-top: 4px; }
     .qother { padding: 0 20px 16px 58px; }
     .qother textarea { min-height: 64px; }
     .qfoot { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--border); }
     .qdots { display: flex; gap: 6px; flex-wrap: wrap; margin-right: auto; }
-    .qdots i { width: 8px; height: 8px; border-radius: 50%; border: 1px solid #6b6b6b; cursor: pointer; }
-    .qdots i.done { background: #9a9a9a; border-color: #9a9a9a; }
+    .qdots i { width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--q-radio); cursor: pointer; }
+    .qdots i.done { background: var(--faint); border-color: var(--faint); }
     .qdots i.skip { border-style: dashed; }
     .qdots i.cur { background: var(--text); border-color: var(--text); transform: scale(1.25); }
     .qkey { font-size: 12px; color: var(--faint); border: 1px solid var(--border-strong); border-radius: 6px; padding: 1px 6px; margin-left: 4px; }
@@ -137,7 +137,7 @@
     .next-cta span, .coding-ai span { color: var(--muted); font-size: 15px; }
     .coding-ai { display: block; }
     .feedback { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
-    .fb-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: #d6d6d6; }
+    .fb-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--text-3); }
     .fb-btn {
       width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--border-strong);
       background: transparent; font-size: 20px; cursor: pointer;
@@ -688,6 +688,13 @@
   $("copySpec").onclick = () => copyText($("copySpec"), $("specText").value, "Copy");
   $("copyPrompt").onclick = () => copyText($("copyPrompt"), codingPrompt(), "Copy for coding AI");
   $("downloadPrompt").onclick = () => saveFile("coding-ai-prompt.md", codingPrompt());
+
+  // An idea typed on the home page before signing in.
+  try {
+    const pending = sessionStorage.getItem("rs-idea");
+    if (pending && !$("idea").value) $("idea").value = pending;
+    sessionStorage.removeItem("rs-idea");
+  } catch (e) {}
 
   // Opening a saved document (from My documents)
   const openId = new URLSearchParams(location.search).get("doc");

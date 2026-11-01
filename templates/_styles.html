@@ -1,12 +1,35 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  /* Light by default; dark when the visitor's device or browser is set to dark. */
   :root {
-    color-scheme: dark;
-    --bg: #000000; --surface: #1c1c1c; --surface-2: #141414; --raised: #2a2a2a;
-    --text: #f2f2f2; --muted: #a1a1a1; --faint: #6b6b6b; --border: #2b2b2b; --border-strong: #3a3a3a;
-    --danger: #ff8a80; --success: #7ee2a8; --warn-bg: #2a2410; --warn-text: #f3d27a;
+    color-scheme: light dark;
+    --bg: #f7f7f8; --surface: #ffffff; --surface-2: #f2f3f5; --raised: #ececef; --hover: #f5f6f8;
+    --text: #141414; --text-2: #3d4148; --text-3: #2b2f36; --muted: #5f6368; --faint: #8a8f98;
+    --border: #e7e8eb; --border-strong: #d6d8dd; --focus: #9aa0a8;
+    --accent: #2f6fe0; --accent-soft: #e8effc; --accent-line: #6f9cf0;
+    --danger: #c62828; --success: #1f9d55; --warn-bg: #fff6d6; --warn-text: #7a5600;
+    --topbar-bg: rgba(255,255,255,.85); --topbar-border: #ececef;
+    --shadow: 0 1px 2px rgba(16,24,40,.04), 0 10px 30px rgba(16,24,40,.06);
+    --btn-bg: linear-gradient(180deg, #2b2b2b 0%, #000 55%, #1a1a1a 100%); --btn-fg: #fff;
+    --btn-shadow: 0 6px 16px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.18);
+    --btn-2-bg: #ffffff; --btn-2-fg: #141414; --btn-2-border: #d6d8dd; --btn-2-hover: #f5f6f8;
+    --q-head: #f4f5f7; --q-body: #ffffff; --q-radio: #b6bac1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #000000; --surface: #1c1c1c; --surface-2: #141414; --raised: #2a2a2a; --hover: #1c1c1c;
+      --text: #f2f2f2; --text-2: #c9c9c9; --text-3: #dcdcdc; --muted: #a1a1a1; --faint: #6b6b6b;
+      --border: #2b2b2b; --border-strong: #3a3a3a; --focus: #8a8a8a;
+      --accent: #5b93f0; --accent-soft: #14233d; --accent-line: #3d6fc8;
+      --danger: #ff8a80; --success: #7ee2a8; --warn-bg: #2a2410; --warn-text: #f3d27a;
+      --topbar-bg: rgba(0,0,0,.85); --topbar-border: #1a1a1a;
+      --shadow: none;
+      --btn-bg: #f2f2f2; --btn-fg: #0a0a0a; --btn-shadow: none;
+      --btn-2-bg: #2a2a2a; --btn-2-fg: #f2f2f2; --btn-2-border: transparent; --btn-2-hover: #343434;
+      --q-head: #232323; --q-body: #161616; --q-radio: #6b6b6b;
+    }
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
@@ -17,10 +40,11 @@
   }
   .topbar {
     height: 64px; display: flex; align-items: center; justify-content: space-between;
-    padding: 0 24px; border-bottom: 1px solid #1a1a1a; background: var(--bg);
+    padding: 0 24px; border-bottom: 1px solid var(--topbar-border); background: var(--topbar-bg);
+    -webkit-backdrop-filter: saturate(180%) blur(12px); backdrop-filter: saturate(180%) blur(12px);
     position: sticky; top: 0; z-index: 10;
   }
-  .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 18px; letter-spacing: -.01em; }
+  .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 18px; letter-spacing: -.02em; }
   .brand svg { flex: none; }
   @media (max-width: 640px) {
     .topbar { padding: 0 14px; gap: 8px; }
@@ -32,15 +56,16 @@
   .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 10px;
     height: 48px; padding: 0 26px; border-radius: 999px; border: 1px solid transparent;
-    font: inherit; font-weight: 500; cursor: pointer; transition: background .15s, opacity .15s;
-    white-space: nowrap;
+    font: inherit; font-weight: 600; cursor: pointer; transition: background .15s, opacity .15s, transform .15s;
+    white-space: nowrap; text-decoration: none;
   }
-  .btn-primary { background: #f2f2f2; color: #0a0a0a; }
-  .btn-primary:hover:not(:disabled) { background: #ffffff; }
-  .btn-secondary { background: var(--raised); color: var(--text); }
-  .btn-secondary:hover:not(:disabled) { background: #343434; }
+  .btn-primary { background: var(--btn-bg); color: var(--btn-fg); box-shadow: var(--btn-shadow); }
+  .btn-primary:hover:not(:disabled) { opacity: .9; }
+  .btn-primary:active:not(:disabled) { transform: translateY(1px); }
+  .btn-secondary { background: var(--btn-2-bg); color: var(--btn-2-fg); border-color: var(--btn-2-border); }
+  .btn-secondary:hover:not(:disabled) { background: var(--btn-2-hover); }
   .btn-outline { background: transparent; color: var(--text); border-color: var(--border-strong); }
-  .btn-outline:hover:not(:disabled) { background: #161616; }
+  .btn-outline:hover:not(:disabled) { background: var(--hover); }
   .btn-sm { height: 36px; padding: 0 16px; font-size: 14px; }
   .btn:disabled { opacity: .4; cursor: not-allowed; }
   .btn .arrow { font-size: 18px; line-height: 1; }
@@ -55,16 +80,19 @@
     border: 1px solid var(--border-strong); border-radius: 14px; padding: 14px 16px;
     transition: border-color .15s;
   }
-  input[type=password]:focus, input[type=text]:focus, input[type=url]:focus, select:focus, textarea:focus { outline: none; border-color: #8a8a8a; }
+  input[type=password]:focus, input[type=text]:focus, input[type=url]:focus, select:focus, textarea:focus { outline: none; border-color: var(--focus); }
   textarea { min-height: 88px; resize: vertical; }
   ::placeholder { color: var(--faint); }
   .error { color: var(--danger); margin: 10px 0 0; min-height: 1em; font-size: 14px; }
   .muted { color: var(--muted); }
   .hidden { display: none !important; }
 
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 22px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow); }
   .icon-tile {
     width: 52px; height: 52px; border-radius: 14px; background: var(--surface-2);
-    display: grid; place-items: center; color: var(--text);
+    display: grid; place-items: center; color: var(--text); border: 1px solid var(--border);
   }
+  /* "—— Label" section eyebrow */
+  .eyebrow { display: inline-flex; align-items: center; gap: 14px; color: var(--muted); font-size: 15px; font-weight: 500; }
+  .eyebrow::before { content: ""; width: 32px; height: 1.5px; background: var(--accent-line); }
 </style>

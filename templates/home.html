@@ -4,39 +4,42 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Requirements Studio</title>
-  <meta name="description" content="Turn a product idea into a clear requirements document, then send it to Azure DevOps.">
+  <meta name="description" content="Turn a rough product idea into requirements and a technical spec your team, or an AI coding tool, can build from. Send it straight to Azure DevOps.">
   {% include "_styles.html" %}
   <style>
+    :root { --hero-glow: radial-gradient(1200px 520px at 50% -10%, #dfe7fb 0%, rgba(223,231,251,0) 70%); }
+    @media (prefers-color-scheme: dark) {
+      :root { --hero-glow: radial-gradient(1200px 520px at 50% -10%, #12203d 0%, rgba(18,32,61,0) 70%); }
+    }
     main { overflow-x: clip; }
     section { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+    .topbar .actions { display: flex; align-items: center; gap: 14px; }
+    .topbar .signin { color: var(--text); text-decoration: none; font-weight: 600; font-size: 15px; }
+    .topbar .signin:hover { text-decoration: underline; text-underline-offset: 4px; }
 
     /* ---------- Hero ---------- */
+    .hero-wrap { background: var(--hero-glow); }
     .hero { text-align: center; padding-top: 88px; }
-    .glow {
-      position: relative; display: inline-block; margin: 0; isolation: isolate;
-      font-size: clamp(56px, 13vw, 132px); font-weight: 600; letter-spacing: -.055em; line-height: .95;
-      color: #fff;
+    .hero h1 {
+      margin: 0 auto; max-width: 900px;
+      font-size: clamp(44px, 8.4vw, 88px); font-weight: 700; letter-spacing: -.045em; line-height: 1.02;
     }
-    .glow::before {
-      content: attr(data-text); position: absolute; inset: 0; z-index: -1;
-      background: linear-gradient(90deg, #4f8bff, #39d98a, #ffd23f, #ff5fa2, #a66bff, #4f8bff);
-      background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
-      filter: blur(18px); opacity: .9; animation: glowShift 8s linear infinite;
-    }
-    @keyframes glowShift { to { background-position: 200% 0; } }
     .hero .sub {
-      font-size: clamp(18px, 2.6vw, 22px); line-height: 1.55; color: #c9c9c9;
-      max-width: 620px; margin: 28px auto 0;
+      font-size: clamp(18px, 2.4vw, 21px); line-height: 1.6; color: var(--text-2);
+      max-width: 640px; margin: 26px auto 0;
     }
     .cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 36px; }
-    a.btn { text-decoration: none; }
-    .cta .btn { height: 52px; padding: 0 30px; font-size: 17px; text-decoration: none; }
+    .cta .btn { height: 56px; padding: 0 34px; font-size: 17px; }
+    .note { color: var(--muted); font-size: 15px; margin-top: 14px; font-weight: 500; }
+    .works { margin-top: 44px; color: var(--muted); font-size: 14px; }
+    .works ul { list-style: none; padding: 0; margin: 14px 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 28px; }
+    .works li { font-size: 18px; font-weight: 700; letter-spacing: -.02em; color: var(--faint); }
 
     /* ---------- Hero visual: idea -> questions -> requirements -> spec & backlog ---------- */
     .flow {
       position: relative; overflow: hidden; isolation: isolate; text-align: left;
-      margin: 64px auto 0; max-width: 1040px; border-radius: 28px; padding: clamp(16px, 3vw, 32px);
-      background: #8f7dff; --blobs:
+      margin: 56px auto 0; max-width: 1040px; border-radius: 28px; padding: clamp(16px, 3vw, 32px);
+      background: #8f7dff; box-shadow: var(--shadow); --blobs:
         radial-gradient(circle at 12% 30%, #ff9ec7 0, transparent 60%),
         radial-gradient(circle at 45% 80%, #6f8dff 0, transparent 60%),
         radial-gradient(circle at 70% 20%, #ffcf8a 0, transparent 60%),
@@ -44,7 +47,7 @@
     }
     .stages { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; position: relative; }
     .stage {
-      background: rgba(255,255,255,.9); color: #111; border-radius: 18px; padding: 16px;
+      background: rgba(255,255,255,.92); color: #111; border-radius: 18px; padding: 16px;
       min-height: 230px; display: flex; flex-direction: column; gap: 8px; cursor: pointer;
       box-shadow: 0 10px 30px rgba(0,0,0,.12); transition: transform .45s ease, opacity .45s ease, box-shadow .45s;
       opacity: .55; transform: scale(.97); -webkit-tap-highlight-color: transparent;
@@ -75,15 +78,42 @@
     .flow-caption { color: rgba(255,255,255,.95); font-size: 14px; font-weight: 500; margin-top: 12px; text-align: center; text-shadow: 0 1px 8px rgba(0,0,0,.15); }
 
     /* ---------- Section headings ---------- */
-    .head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 120px 0 32px; }
-    .head h2 { font-size: clamp(30px, 5vw, 44px); font-weight: 500; letter-spacing: -.03em; margin: 0; }
-    .head a { color: var(--text); text-decoration: none; font-weight: 500; white-space: nowrap; }
-    .head a:hover { text-decoration: underline; text-underline-offset: 5px; }
+    .section-head { text-align: center; margin: 140px auto 48px; max-width: 760px; }
+    .section-head h2 { font-size: clamp(36px, 6vw, 60px); font-weight: 700; letter-spacing: -.045em; line-height: 1.05; margin: 18px 0 0; }
+    .section-head p { color: var(--text-2); font-size: 19px; line-height: 1.6; margin: 18px auto 0; max-width: 600px; }
 
-    /* ---------- How it works rows ---------- */
-    .row { display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: center; padding: 20px 0; }
-    .tile { aspect-ratio: 1; border-radius: 18px; position: relative; overflow: hidden; isolation: isolate; }
-    /* Soft circles of color (about 60% of the tile) that slowly float around. */
+    /* ---------- Product stats ---------- */
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .stat { padding: 32px; }
+    .stat .big { font-size: clamp(52px, 8vw, 80px); font-weight: 700; letter-spacing: -.05em; line-height: 1; }
+    .stat .what { font-size: 20px; font-weight: 600; letter-spacing: -.02em; margin: 14px 0 22px; }
+    .rowlist { display: grid; gap: 10px; }
+    .rowitem {
+      display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px;
+      border: 1px solid var(--border); background: var(--surface); font-size: 15px;
+    }
+    .rowitem .grow { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .rowitem .num { color: var(--faint); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .pill-ok {
+      display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px;
+      background: linear-gradient(180deg, #34c768, #1fa653); color: #fff; font-size: 13px; font-weight: 600;
+      box-shadow: 0 4px 10px rgba(31,166,83,.25); white-space: nowrap;
+    }
+    .opt { display: flex; align-items: center; gap: 10px; }
+    .opt .r { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--q-radio); flex: none; }
+    .opt .r.on { border-color: var(--accent); background: var(--accent); box-shadow: inset 0 0 0 4px var(--surface); }
+    .timebar { height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; margin-top: 8px; }
+    .timebar span { display: block; height: 100%; border-radius: 4px; background: var(--accent); }
+
+    /* ---------- How it works: numbered steps ---------- */
+    .step { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; padding: 48px 0; }
+    .step:nth-child(even) .tile { order: -1; }
+    .step .label { display: flex; gap: 14px; color: var(--muted); font-size: 17px; font-weight: 500; }
+    .step .label b { color: var(--faint); font-weight: 500; font-variant-numeric: tabular-nums; }
+    .step h3 { font-size: clamp(30px, 4.4vw, 46px); font-weight: 700; letter-spacing: -.04em; line-height: 1.08; margin: 16px 0 18px; }
+    .step p { color: var(--text-2); font-size: 19px; line-height: 1.6; margin: 0; }
+    .tile { aspect-ratio: 4 / 3; border-radius: 24px; position: relative; overflow: hidden; isolation: isolate; box-shadow: var(--shadow); }
+    /* Soft circles of color that slowly float around. */
     .tile::before, .demo::before, .flow::before {
       content: ""; position: absolute; inset: -25%; z-index: -1;
       background: var(--blobs); animation: float 16s ease-in-out infinite alternate;
@@ -101,32 +131,27 @@
       radial-gradient(circle at 30% 25%, #c6ff6b 0, transparent 60%),
       radial-gradient(circle at 80% 60%, #4fd1ff 0, transparent 60%),
       radial-gradient(circle at 25% 80%, #8ef0c6 0, transparent 60%); }
-    .t4 { background: #6f8dff; --blobs:
-      radial-gradient(circle at 25% 25%, #4fd1ff 0, transparent 60%),
-      radial-gradient(circle at 80% 40%, #a66bff 0, transparent 60%),
-      radial-gradient(circle at 40% 85%, #8ef0c6 0, transparent 60%); }
     .t3 { background: #ff8a5c; --blobs:
       radial-gradient(circle at 30% 30%, #ffcf8a 0, transparent 60%),
       radial-gradient(circle at 75% 35%, #ff5a36 0, transparent 60%),
       radial-gradient(circle at 50% 85%, #ff9ab0 0, transparent 60%); }
-    .tile .mock { position: absolute; inset: 18%; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+    .t4 { background: #6f8dff; --blobs:
+      radial-gradient(circle at 25% 25%, #4fd1ff 0, transparent 60%),
+      radial-gradient(circle at 80% 40%, #a66bff 0, transparent 60%),
+      radial-gradient(circle at 40% 85%, #8ef0c6 0, transparent 60%); }
+    .tile .mock { position: absolute; inset: 14% 16%; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
     .pill-ui {
-      background: rgba(255,255,255,.88); color: #111; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 500;
+      background: rgba(255,255,255,.92); color: #111; border-radius: 999px; padding: 9px 15px; font-size: 14px; font-weight: 500;
       box-shadow: 0 6px 20px rgba(0,0,0,.12); width: fit-content; max-width: 100%;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .pill-ui.right { align-self: flex-end; background: #111; color: #fff; }
     .bar { height: 10px; border-radius: 6px; background: rgba(255,255,255,.85); }
-    .row h3 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 500; letter-spacing: -.02em; line-height: 1.2; margin: 0 0 14px; }
-    .meta { display: flex; gap: 18px; font-size: 16px; }
-    .meta b { font-weight: 500; }
-    .meta span { color: var(--muted); }
-    .row p { color: #bdbdbd; font-size: 17px; margin: 14px 0 0; max-width: 520px; }
 
     /* ---------- Live demo ---------- */
     .demo {
-      border-radius: 22px; padding: clamp(18px, 4vw, 40px); position: relative; overflow: hidden; isolation: isolate;
-      background: #9a6bff; --blobs:
+      border-radius: 28px; padding: clamp(18px, 4vw, 40px); position: relative; overflow: hidden; isolation: isolate;
+      box-shadow: var(--shadow); background: #9a6bff; --blobs:
         radial-gradient(circle at 15% 20%, #6f5cff 0, transparent 60%),
         radial-gradient(circle at 85% 30%, #ff7ab8 0, transparent 60%),
         radial-gradient(circle at 40% 90%, #b98cff 0, transparent 60%),
@@ -152,12 +177,84 @@
     .caret::after { content: "▍"; animation: caret 1s steps(1) infinite; margin-left: 1px; }
     @keyframes caret { 50% { opacity: 0; } }
 
-    /* ---------- Final CTA ---------- */
-    .final { text-align: center; padding: 120px 20px 40px; }
-    .final h2 { font-size: clamp(36px, 7vw, 64px); font-weight: 500; letter-spacing: -.04em; line-height: 1.05; margin: 0 0 12px; }
-    .final p { color: #c4c4c4; font-size: 19px; margin: 0; }
-    footer { text-align: center; color: var(--faint); font-size: 13px; padding: 40px 20px 56px; }
+    /* ---------- FAQ ---------- */
+    .faq { max-width: 820px; }
+    .faq details { border-bottom: 1px solid var(--border-strong); }
+    .faq summary {
+      list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 20px;
+      padding: 26px 0; font-size: clamp(19px, 2.4vw, 23px); font-weight: 600; letter-spacing: -.02em;
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after {
+      content: ""; flex: none; width: 10px; height: 10px; margin-right: 6px;
+      border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg) translateY(-3px); transition: transform .2s;
+    }
+    .faq details[open] summary::after { transform: rotate(-135deg) translateY(-3px); }
+    .faq details p { margin: 0 0 26px; color: var(--text-2); font-size: 18px; line-height: 1.65; max-width: 720px; }
+    .faq a { color: var(--text); }
 
+    /* ---------- Big dark call to action (dark in both themes) ---------- */
+    .cta-card {
+      position: relative; overflow: hidden; isolation: isolate; margin: 140px auto 0;
+      border-radius: 32px; padding: clamp(48px, 8vw, 88px) clamp(20px, 6vw, 72px); text-align: center; color: #fff;
+      background: radial-gradient(600px 380px at 50% 0%, #3a3b40 0%, rgba(58,59,64,0) 70%),
+                  linear-gradient(180deg, #1b1c20 0%, #172036 60%, #26407a 100%);
+      box-shadow: 0 30px 80px rgba(16,24,40,.25);
+    }
+    .cta-card::before {
+      content: ""; position: absolute; inset: 0; z-index: -1; opacity: .55;
+      background-image:
+        radial-gradient(1px 1px at 12% 70%, #fff 50%, transparent 51%),
+        radial-gradient(1px 1px at 22% 88%, #fff 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 81% 62%, #fff 50%, transparent 51%),
+        radial-gradient(1px 1px at 90% 84%, #fff 50%, transparent 51%),
+        radial-gradient(1px 1px at 68% 92%, #fff 50%, transparent 51%),
+        radial-gradient(1px 1px at 8% 40%, #fff 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 94% 30%, #fff 50%, transparent 51%),
+        radial-gradient(1px 1px at 35% 76%, #fff 50%, transparent 51%);
+      animation: twinkle 6s ease-in-out infinite alternate;
+    }
+    @keyframes twinkle { to { opacity: .25; } }
+    .cta-card .mark { width: 52px; height: 52px; margin: 0 auto 28px; color: #d9dbe1; }
+    .cta-card h2 { font-size: clamp(38px, 7vw, 68px); font-weight: 700; letter-spacing: -.045em; line-height: 1.04; margin: 0 auto; max-width: 720px; }
+    .cta-card p { color: #c9cfdc; font-size: clamp(17px, 2.2vw, 20px); line-height: 1.6; margin: 22px auto 0; max-width: 540px; }
+    .idea-form { max-width: 560px; margin: 36px auto 0; display: grid; gap: 14px; }
+    .idea-field {
+      display: flex; align-items: center; background: #fff; border-radius: 999px; overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.2);
+    }
+    .idea-field .ico { flex: none; width: 58px; height: 58px; display: grid; place-items: center; color: #8a8f98; border-right: 1px solid #e7e8eb; }
+    .idea-field input {
+      flex: 1; border: 0; border-radius: 0; background: transparent; color: #141414; height: 58px; padding: 0 20px; font-size: 17px;
+    }
+    .idea-field input::placeholder { color: #9aa0a8; }
+    .idea-field input:focus { border: 0; }
+    .idea-form .btn {
+      height: 58px; font-size: 18px; color: #fff; border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, #2b2b2b 0%, #000 55%, #1a1a1a 100%);
+      box-shadow: 0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.18);
+    }
+    .cta-card .small { color: #aeb6c7; font-size: 15px; margin-top: 22px; }
+
+    /* ---------- Footer ---------- */
+    footer { max-width: 1040px; margin: 120px auto 0; padding: 48px 20px 0; border-top: 1px solid var(--border-strong); overflow: hidden; }
+    .foot-top { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 40px; }
+    .foot-brand .brand { font-size: 26px; gap: 12px; }
+    .foot-brand .brand svg { width: 34px; height: 34px; }
+    .foot-brand p { color: var(--muted); font-size: 18px; margin: 18px 0 24px; }
+    .foot-col h4 { margin: 6px 0 18px; font-size: 17px; font-weight: 700; }
+    .foot-col a { display: block; color: var(--text); text-decoration: none; font-size: 17px; padding: 8px 0; }
+    .foot-col a:hover { text-decoration: underline; text-underline-offset: 4px; }
+    .foot-bottom { margin-top: 48px; padding-top: 28px; border-top: 1px solid var(--border); color: var(--muted); font-size: 15px; display: flex; flex-wrap: wrap; gap: 8px 24px; }
+    .foot-bottom a { color: var(--muted); text-decoration: none; }
+    .foot-bottom a:hover { color: var(--text); }
+    .wordmark {
+      margin: 36px 0 -0.22em; font-size: min(10.4vw, 112px); font-weight: 800; letter-spacing: -.05em; line-height: 1;
+      white-space: nowrap; user-select: none;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 22%, transparent) 0%, color-mix(in srgb, var(--accent) 4%, transparent) 90%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
 
     /* ---------- Scroll reveal ---------- */
     .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
@@ -166,21 +263,25 @@
     @media (max-width: 860px) {
       .stages { grid-template-columns: 1fr 1fr; }
       .stage { min-height: 200px; }
+      .step { grid-template-columns: 1fr; gap: 28px; padding: 36px 0; }
+      .step:nth-child(even) .tile { order: 0; }
+      .stats { grid-template-columns: 1fr; }
+      .foot-top { grid-template-columns: 1fr 1fr; }
+      .foot-brand { grid-column: 1 / -1; }
     }
     @media (max-width: 480px) {
       .stage { padding: 12px; min-height: 0; gap: 6px; }
       .stage h4 { font-size: 15px; }
       .note-card, .chip, .mini, .out { font-size: 12px; }
       .stage .extra { display: none; }
+      .topbar .signin { display: none; }
+      .stat { padding: 24px; }
     }
     @media (max-width: 720px) {
       .hero { padding-top: 56px; }
-      .row { grid-template-columns: 120px 1fr; gap: 18px; }
-      .tile .mock { display: none; }
-      .row p { display: none; }
-      .meta { font-size: 14px; gap: 12px; }
-      .head { margin-top: 88px; }
+      .section-head { margin-top: 100px; }
       .window { min-height: 420px; }
+      .cta-card { margin-top: 100px; border-radius: 28px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before { animation: none !important; transition: none !important; }
@@ -193,111 +294,175 @@
 <body>
   <header class="topbar">
     <a class="brand" href="{{ url_for('home') }}">{% include "_logo.html" %}<span>Requirements Studio</span></a>
-    <a class="btn btn-primary btn-sm" href="{{ url_for('login') }}">Sign in</a>
+    <div class="actions">
+      <a class="signin" href="{{ url_for('login') }}">Sign in</a>
+      <a class="btn btn-primary btn-sm" href="{{ url_for('login') }}">Get started <span class="arrow">→</span></a>
+    </div>
   </header>
 
   <main>
-    <section class="hero">
-      <h1 class="glow" data-text="Ideas in. Specs out.">Ideas in. Specs out.</h1>
-      <p class="sub">Describe what you want to build. Answer a few smart questions. Get requirements and a technical spec your team, or an AI coding tool, can build from. Send it straight to Azure DevOps.</p>
-      <div class="cta">
-        <a class="btn btn-primary" href="{{ url_for('login') }}">Get started <span class="arrow">→</span></a>
-        <a class="btn btn-secondary" href="#how">See how it works</a>
-      </div>
+    <div class="hero-wrap">
+      <section class="hero">
+        <h1>Turn a rough idea into a spec your team can build.</h1>
+        <p class="sub">Describe what you want to build. Answer a few smart questions. Get requirements and a technical spec your team, or an AI coding tool, can build from.</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="{{ url_for('login') }}">Get started <span class="arrow">→</span></a>
+        </div>
+        <p class="note">From idea to spec in about 5 minutes.</p>
 
-      <div class="flow" id="flow">
-        <div class="stages" role="list" aria-label="How an idea becomes a spec">
-          <div class="stage" role="listitem" data-i="0">
-            <div class="tag"><i>1</i>Idea</div>
-            <h4>Say it in plain words</h4>
-            <div class="note-card">"An app that helps HR track new-hire onboarding across teams."</div>
-          </div>
-          <div class="stage" role="listitem" data-i="1">
-            <div class="tag"><i>2</i>Questions</div>
-            <h4>AI asks what matters</h4>
-            <div class="chip">Who adds a new hire?</div>
-            <div class="chip ans">HR managers</div>
-            <div class="chip extra">When is onboarding done?</div>
-          </div>
-          <div class="stage" role="listitem" data-i="2">
-            <div class="tag"><i>3</i>Requirements</div>
-            <h4>A clear document</h4>
-            <div class="mini"><b>Epic: New hire setup</b>
-              <div class="story">As HR, I add a new hire so tasks start</div>
-              <div class="story extra">As a lead, I see my team's tasks</div>
+        <div class="works">
+          Send your work to
+          <ul><li>Azure DevOps</li><li>GitHub Copilot</li><li>Codex</li><li>Claude Code</li><li>Cursor</li></ul>
+        </div>
+
+        <div class="flow" id="flow">
+          <div class="stages" role="list" aria-label="How an idea becomes a spec">
+            <div class="stage" role="listitem" data-i="0">
+              <div class="tag"><i>1</i>Idea</div>
+              <h4>Say it in plain words</h4>
+              <div class="note-card">"An app that helps HR track new-hire onboarding across teams."</div>
+            </div>
+            <div class="stage" role="listitem" data-i="1">
+              <div class="tag"><i>2</i>Questions</div>
+              <h4>AI asks what matters</h4>
+              <div class="chip">Who adds a new hire?</div>
+              <div class="chip ans">HR managers</div>
+              <div class="chip extra">When is onboarding done?</div>
+            </div>
+            <div class="stage" role="listitem" data-i="2">
+              <div class="tag"><i>3</i>Requirements</div>
+              <h4>A clear document</h4>
+              <div class="mini"><b>Epic: New hire setup</b>
+                <div class="story">As HR, I add a new hire so tasks start</div>
+                <div class="story extra">As a lead, I see my team's tasks</div>
+              </div>
+            </div>
+            <div class="stage" role="listitem" data-i="3">
+              <div class="tag"><i>4</i>Spec &amp; backlog</div>
+              <h4>Ready to build</h4>
+              <div class="out">Azure DevOps · 6 stories <span class="ok">✓</span></div>
+              <div class="out code">spec → coding AI <span class="ok">✓</span></div>
             </div>
           </div>
-          <div class="stage" role="listitem" data-i="3">
-            <div class="tag"><i>4</i>Spec &amp; backlog</div>
-            <h4>Ready to build</h4>
-            <div class="out">Azure DevOps · 6 stories <span class="ok">✓</span></div>
-            <div class="out code">spec → coding AI <span class="ok">✓</span></div>
+          <div class="progress" aria-hidden="true"><span id="flowBar"></span></div>
+          <div class="flow-caption">From a one-line idea to a buildable spec in about 5 minutes.</div>
+        </div>
+      </section>
+    </div>
+
+    <section>
+      <div class="section-head reveal">
+        <span class="eyebrow">What you get</span>
+        <h2>Less back-and-forth. More building.</h2>
+        <p>Skip the long meetings and messy docs. Here's what one idea turns into.</p>
+      </div>
+      <div class="stats">
+        <div class="card stat reveal">
+          <div class="big">~5 min</div>
+          <div class="what">From a one-line idea to a full spec</div>
+          <div class="rowlist">
+            <div class="rowitem"><span class="grow">Describe your idea</span><span class="num">1 min</span></div>
+            <div class="rowitem"><span class="grow">Answer questions</span><span class="num">3 min</span></div>
+            <div class="rowitem"><span class="grow">Requirements + spec written</span><span class="num">~1 min</span></div>
           </div>
         </div>
-        <div class="progress" aria-hidden="true"><span id="flowBar"></span></div>
-        <div class="flow-caption">From a one-line idea to a buildable spec in about 5 minutes.</div>
+        <div class="card stat reveal">
+          <div class="big">4 steps</div>
+          <div class="what">Idea, questions, requirements, spec</div>
+          <div class="rowlist">
+            <div class="rowitem"><span class="num">01</span><span class="grow">Describe</span><span class="pill-ok">✓ Done</span></div>
+            <div class="rowitem"><span class="num">02</span><span class="grow">Clarify</span><span class="pill-ok">✓ Done</span></div>
+            <div class="rowitem"><span class="num">03</span><span class="grow">Requirements</span><span class="pill-ok">✓ Done</span></div>
+            <div class="rowitem"><span class="num">04</span><span class="grow">Tech spec</span><span class="pill-ok">✓ Done</span></div>
+          </div>
+        </div>
+        <div class="card stat reveal">
+          <div class="big">2–4</div>
+          <div class="what">Suggested answers for every question</div>
+          <div class="rowlist">
+            <div class="rowitem"><span class="grow"><b>Who adds a new hire?</b></span></div>
+            <div class="rowitem opt"><span class="r on"></span><span class="grow">HR managers</span></div>
+            <div class="rowitem opt"><span class="r"></span><span class="grow">Hiring managers</span></div>
+            <div class="rowitem opt"><span class="r"></span><span class="grow">Other: write your own</span></div>
+          </div>
+        </div>
+        <div class="card stat reveal">
+          <div class="big">1 click</div>
+          <div class="what">To send epics and user stories to Azure DevOps</div>
+          <div class="rowlist">
+            <div class="rowitem"><span class="grow">Epic: New hire setup</span><span class="pill-ok">✓ Created</span></div>
+            <div class="rowitem"><span class="grow">Story: Add a new hire</span><span class="pill-ok">✓ Created</span></div>
+            <div class="rowitem"><span class="grow">Story: Assign onboarding tasks</span><span class="pill-ok">✓ Created</span></div>
+          </div>
+        </div>
       </div>
     </section>
 
     <section id="how">
-      <div class="head reveal"><h2>How it works</h2><a href="{{ url_for('login') }}">Try it →</a></div>
+      <div class="section-head reveal">
+        <span class="eyebrow">How it works</span>
+        <h2>From idea to backlog in one place.</h2>
+      </div>
 
-      <div class="row reveal">
+      <div class="step reveal">
+        <div>
+          <div class="label"><b>01</b>Describe</div>
+          <h3>Start with your idea, in plain words.</h3>
+          <p>No templates, no jargon. Say what you want to build and who it's for.</p>
+        </div>
         <div class="tile t1"><div class="mock">
           <div class="pill-ui right">An app for HR onboarding</div>
           <div class="pill-ui">Got it! A few questions…</div>
         </div></div>
-        <div>
-          <h3>Describe your idea in plain words</h3>
-          <div class="meta"><b>Step 1</b><span>About 1 min</span></div>
-          <p>No templates, no jargon. Just say what you want to build and who it's for.</p>
-        </div>
       </div>
 
-      <div class="row reveal">
+      <div class="step reveal">
+        <div>
+          <div class="label"><b>02</b>Clarify</div>
+          <h3>Answer focused questions. Tap or type.</h3>
+          <p>The AI asks how it should work, with suggested answers to pick from. Not sure? Skip it, and it becomes an open question.</p>
+        </div>
         <div class="tile t2"><div class="mock">
           <div class="pill-ui">Who uses it day to day?</div>
-          <div class="pill-ui">What happens first?</div>
+          <div class="pill-ui right">HR managers</div>
           <div class="pill-ui">How do you know it's done?</div>
         </div></div>
-        <div>
-          <h3>Answer focused questions about how it should work</h3>
-          <div class="meta"><b>Step 2</b><span>About 3 min</span></div>
-          <p>The AI asks about workflows and product flow, not tech details, so anyone on the team can answer.</p>
-        </div>
       </div>
 
-      <div class="row reveal">
+      <div class="step reveal">
+        <div>
+          <div class="label"><b>03</b>Requirements</div>
+          <h3>Get a requirements doc. Send it to your backlog.</h3>
+          <p>Epics, user stories and acceptance criteria. Edit it, download it, or push it to Azure DevOps in one click.</p>
+        </div>
         <div class="tile t3"><div class="mock">
           <div class="bar" style="width:70%;height:14px"></div>
           <div class="bar" style="width:95%"></div>
           <div class="bar" style="width:80%"></div>
           <div class="pill-ui right">Sent to Azure DevOps ✓</div>
         </div></div>
-        <div>
-          <h3>Get a requirements document, then send it to your backlog</h3>
-          <div class="meta"><b>Step 3</b><span>Instant</span></div>
-          <p>Epics, user stories and acceptance criteria. Edit it, download it, or push it to Azure DevOps in one click.</p>
-        </div>
       </div>
 
-      <div class="row reveal">
+      <div class="step reveal">
+        <div>
+          <div class="label"><b>04</b>Tech spec</div>
+          <h3>Turn it into a spec an AI can build from.</h3>
+          <p>A few technical questions, then a full spec with a build plan and tests. Copy it straight into GitHub Copilot, Codex, Claude Code or Cursor.</p>
+        </div>
         <div class="tile t4"><div class="mock">
           <div class="pill-ui">Web or mobile?</div>
           <div class="bar" style="width:85%;height:14px"></div>
           <div class="bar" style="width:65%"></div>
           <div class="pill-ui right">Copied for coding AI ✓</div>
         </div></div>
-        <div>
-          <h3>Turn it into a technical spec an AI can build from</h3>
-          <div class="meta"><b>Step 4</b><span>About 2 min</span></div>
-          <p>A few technical questions, then a full spec with a build plan and tests. Copy it straight into GitHub Copilot, Codex, Claude Code or Cursor.</p>
-        </div>
       </div>
     </section>
 
-    <section>
-      <div class="head reveal"><h2>See it in action</h2></div>
+    <section id="demo">
+      <div class="section-head reveal">
+        <span class="eyebrow">Demo</span>
+        <h2>See it in action.</h2>
+      </div>
       <div class="demo reveal">
         <div class="window">
           <div class="dots"><i></i><i></i><i></i></div>
@@ -318,14 +483,94 @@
       </div>
     </section>
 
-    <section class="final reveal">
-      <h2>Ready to write your first spec?</h2>
-      <p>It takes about five minutes.</p>
-      <div class="cta"><a class="btn btn-primary" href="{{ url_for('login') }}">Get started <span class="arrow">→</span></a></div>
+    <section id="faq">
+      <div class="section-head reveal">
+        <span class="eyebrow">FAQ</span>
+        <h2>Your questions, answered.</h2>
+      </div>
+      <div class="faq" style="margin:0 auto">
+        <details open>
+          <summary>Who is it for?</summary>
+          <p>Anyone who turns ideas into work for engineers: product managers, founders, team leads and architects. If you've ever had to write requirements from a one-line idea, it's for you.</p>
+        </details>
+        <details>
+          <summary>Do I need to be technical?</summary>
+          <p>No. The first questions are about how the product should work, not how it's built. The technical spec has its own questions, and you can skip any of them: the spec lists what it assumed.</p>
+        </details>
+        <details>
+          <summary>Can I change what the AI writes?</summary>
+          <p>Yes. Every document and spec has an Edit tab, and your changes are saved. You can also ask for more questions before the document is written.</p>
+        </details>
+        <details>
+          <summary>Does it work with Azure DevOps?</summary>
+          <p>Yes. Once your admin connects your organization's project, one click creates the epics and user stories, each story linked under its epic.</p>
+        </details>
+        <details>
+          <summary>Can I use it with AI coding tools?</summary>
+          <p>Yes. "Copy for coding AI" gives you one ready-to-paste prompt with the spec and the requirements, for tools like GitHub Copilot, Codex, Claude Code or Cursor.</p>
+        </details>
+        <details>
+          <summary>Where does my data go?</summary>
+          <p>Your idea and answers are sent to OpenAI to write the questions and documents. Documents are saved in your organization's private space, and other organizations can't see them. Read the <a href="{{ url_for('privacy') }}">privacy page</a> for details.</p>
+        </details>
+        <details>
+          <summary>How do I get access?</summary>
+          <p>Each organization signs in with its own code. If you don't have one yet, ask the person who invited you to try Requirements Studio.</p>
+        </details>
+      </div>
+    </section>
+
+    <section>
+      <div class="cta-card reveal">
+        <svg class="mark" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <rect x="4" y="3" width="17" height="22" rx="4" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M8.5 9h8M8.5 13h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="20" cy="20" r="5.2" fill="#1b1c20" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M17.8 20.1l1.5 1.5 2.9-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h2>Turn your next idea into a spec today.</h2>
+        <p>Describe it in one sentence. You'll have requirements in minutes.</p>
+        <form class="idea-form" id="ideaForm" action="{{ url_for('login') }}" method="get">
+          <label class="idea-field">
+            <span class="ico" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3z"/></svg>
+            </span>
+            <input id="ctaIdea" type="text" placeholder="An app that helps HR track onboarding" aria-label="Describe your idea" maxlength="500">
+          </label>
+          <button class="btn" type="submit">Start <span class="arrow">→</span></button>
+        </form>
+        <p class="small">Sign in with your organization's code to continue.</p>
+      </div>
     </section>
   </main>
 
-  <footer>Requirements Studio · AI-generated content may contain mistakes. · <a href="{{ url_for('privacy') }}" style="color:inherit">Privacy</a></footer>
+  <footer>
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand" href="{{ url_for('home') }}">{% include "_logo.html" %}<span>Requirements Studio</span></a>
+        <p>From a rough idea to a buildable spec.</p>
+        <a class="btn btn-primary" href="{{ url_for('login') }}">Get started <span class="arrow">→</span></a>
+      </div>
+      <div class="foot-col">
+        <h4>Product</h4>
+        <a href="#how">How it works</a>
+        <a href="#demo">Demo</a>
+        <a href="#faq">FAQ</a>
+        <a href="{{ url_for('login') }}">Sign in</a>
+      </div>
+      <div class="foot-col">
+        <h4>Company</h4>
+        <a href="{{ url_for('privacy') }}">Privacy</a>
+        <a href="{{ url_for('admin_login') }}">Admin</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Requirements Studio.</span>
+      <span>AI-generated content may contain mistakes.</span>
+      <a href="{{ url_for('privacy') }}">Privacy</a>
+    </div>
+    <div class="wordmark" aria-hidden="true">Requirements</div>
+  </footer>
 
 <script>
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -356,6 +601,12 @@
     if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
   }), { threshold: 0.15 });
   document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+  // The idea typed in the bottom card is waiting in the tool after sign-in.
+  document.getElementById("ideaForm").addEventListener("submit", () => {
+    const idea = document.getElementById("ctaIdea").value.trim();
+    try { if (idea) sessionStorage.setItem("rs-idea", idea); } catch (e) {}
+  });
 
   // Demo: type the idea, show questions, build the doc, send it. Loops while visible.
   const idea = "An app that helps our HR team track new-hire onboarding";

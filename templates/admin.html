@@ -7,8 +7,8 @@
   {% include "_styles.html" %}
   <style>
     main { max-width: 860px; margin: 0 auto; padding: 56px 20px 64px; }
-    h1 { font-size: clamp(40px, 7vw, 60px); font-weight: 500; letter-spacing: -.04em; line-height: 1.05; margin: 0 0 12px; }
-    .lead { font-size: 18px; color: #c9c9c9; margin: 0 0 36px; }
+    h1 { font-size: clamp(40px, 7vw, 60px); font-weight: 700; letter-spacing: -.045em; line-height: 1.05; margin: 0 0 12px; }
+    .lead { font-size: 18px; color: var(--text-2); margin: 0 0 36px; }
     .who { display: flex; align-items: center; gap: 12px; }
     .navlink { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; }
     .navlink:hover { color: var(--text); }
@@ -23,9 +23,9 @@
     .hintline { font-size: 13px; color: var(--faint); margin: 6px 0 0; }
 
     .flash { padding: 14px 18px; border-radius: 14px; margin-bottom: 16px; font-size: 15px; }
-    .flash.ok { background: #10251a; color: var(--success); }
-    .flash.error { background: #2a1414; color: var(--danger); }
-    .newcode { background: var(--surface); border: 1px solid #3d3d3d; border-radius: 22px; padding: 28px; margin-bottom: 16px; }
+    .flash.ok { background: color-mix(in srgb, var(--success) 14%, var(--surface)); color: var(--success); }
+    .flash.error { background: color-mix(in srgb, var(--danger) 12%, var(--surface)); color: var(--danger); }
+    .newcode { background: var(--surface); border: 1px solid var(--border-strong); box-shadow: var(--shadow); border-radius: 22px; padding: 28px; margin-bottom: 16px; }
     .newcode .code {
       font: 600 clamp(26px, 6vw, 40px)/1.2 ui-monospace, "SF Mono", Consolas, monospace; letter-spacing: .06em;
       margin: 14px 0; word-break: break-all;
@@ -41,8 +41,8 @@
     summary::before { content: "+ "; }
     details[open] summary::before { content: "– "; }
     .row-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
-    .btn-danger { background: transparent; color: var(--danger); border-color: #4a2424; }
-    .btn-danger:hover:not(:disabled) { background: #1f1010; }
+    .btn-danger { background: transparent; color: var(--danger); border-color: color-mix(in srgb, var(--danger) 35%, transparent); }
+    .btn-danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 10%, transparent); }
     .check { display: flex; align-items: center; gap: 8px; font-weight: 400; color: var(--muted); }
     .empty { color: var(--muted); text-align: center; padding: 40px 20px; }
     form.inline-form { display: inline; }
