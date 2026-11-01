@@ -1,35 +1,35 @@
 """Send a requirements plan to Azure DevOps as Epics with child User Stories.
 
-Set these to turn it on:
-  AZDO_ORG_URL     e.g. https://dev.azure.com/your-org
-  AZDO_PROJECT     the project name
-  AZDO_PAT         a Personal Access Token with "Work Items: Read & write"
-  AZDO_STORY_TYPE  optional, default "User Story" (Scrum projects use "Product Backlog Item")
+Each org has its own settings, set on the admin page:
+  org URL     e.g. https://dev.azure.com/your-org
+  project     the project name
+  token       a Personal Access Token with "Work Items: Read & write" (stored encrypted)
+  story type  default "User Story" (Scrum projects use "Product Backlog Item")
 """
 
 import base64
 import html
 import json
-import os
 import urllib.error
 import urllib.request
 from urllib.parse import quote
 
+import db
+
 API_VERSION = "7.1"
 
 
-def settings():
+def settings(org):
     return {
-        "org_url": os.environ.get("AZDO_ORG_URL", "").rstrip("/"),
-        "project": os.environ.get("AZDO_PROJECT", ""),
-        "pat": os.environ.get("AZDO_PAT", ""),
-        "story_type": os.environ.get("AZDO_STORY_TYPE", "User Story"),
+        "org_url": org["azdo_org_url"].rstrip("/"),
+        "project": org["azdo_project"],
+        "pat": db.decrypt(org["azdo_pat_encrypted"]),
+        "story_type": org["azdo_story_type"] or "User Story",
     }
 
 
-def is_configured():
-    s = settings()
-    return bool(s["org_url"] and s["project"] and s["pat"])
+def is_configured(org):
+    return bool(org["azdo_org_url"] and org["azdo_project"] and org["azdo_pat_encrypted"])
 
 
 def _to_html(text, bullets=()):
@@ -74,7 +74,7 @@ def _create(token, s, item_type, title, description_html, parent_url=None):
     status, item = _post(url, token, ops)
     # A bad token gets a 401, or a 203 with a sign-in web page instead of JSON.
     if status == 401 or (status < 400 and not isinstance(item, dict)):
-        raise RuntimeError("Azure DevOps rejected the access token (AZDO_PAT).")
+        raise RuntimeError("Azure DevOps rejected your org's access token. Ask your admin to update it.")
     if status >= 400:
         message = item.get("message", "") if isinstance(item, dict) else item
         raise RuntimeError(f"Azure DevOps error ({status}): {message[:300]}")
@@ -87,9 +87,9 @@ def _create(token, s, item_type, title, description_html, parent_url=None):
     }
 
 
-def send_plan(plan):
+def send_plan(plan, org):
     """Create one Epic per plan epic, with its stories as children. Returns the created items."""
-    s = settings()
+    s = settings(org)
     token = base64.b64encode(f":{s['pat']}".encode()).decode()
     created = []
     for epic in plan.epics:

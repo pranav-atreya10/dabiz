@@ -6,14 +6,15 @@
   <title>Usage · Requirements Studio</title>
   {% include "_styles.html" %}
   <style>
-    :root { --bar: #3987e5; --bar-hover: #5c9ef0; --grid: #2a2a2a; }
+    :root { --bar: #3a506b; --bar-hover: #5bc0de; --grid: #e6ecf5; }
+    @media (prefers-color-scheme: dark) { :root { --bar: #5bc0de; --bar-hover: #8fd5ea; --grid: #26314f; } }
     main { max-width: 960px; margin: 0 auto; padding: 56px 20px 64px; }
     .nav { display: flex; align-items: center; gap: 8px; }
     .nav a.link { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; padding: 6px 12px; border-radius: 999px; }
     .nav a.link:hover { color: var(--text); }
     .nav a.link.here { color: var(--text); background: var(--raised); }
-    h1 { font-size: clamp(44px, 8vw, 64px); font-weight: 500; letter-spacing: -.04em; line-height: 1.02; margin: 0 0 12px; }
-    .lead { font-size: 18px; color: #c9c9c9; margin: 0 0 28px; }
+    h1 { font-size: clamp(44px, 8vw, 64px); font-weight: 700; letter-spacing: -.045em; line-height: 1.02; margin: 0 0 12px; }
+    .lead { font-size: 18px; color: var(--text-2); margin: 0 0 28px; }
 
     .seg { display: inline-flex; padding: 4px; gap: 2px; border: 1px solid var(--border-strong); border-radius: 999px; margin-bottom: 24px; }
     .seg button { background: none; border: 0; color: var(--muted); font: inherit; font-weight: 500; font-size: 15px; padding: 8px 18px; border-radius: 999px; cursor: pointer; }
@@ -38,7 +39,7 @@
     .chart .bar { fill: var(--bar); }
     .chart .bar.hot { fill: var(--bar-hover); }
     .tip {
-      position: absolute; pointer-events: none; background: #f2f2f2; color: #0a0a0a; border-radius: 12px;
+      position: absolute; pointer-events: none; background: var(--text); color: var(--bg); border-radius: 12px;
       padding: 10px 12px; font-size: 13px; line-height: 1.45; white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,.4);
       transform: translate(-50%, calc(-100% - 10px)); opacity: 0; transition: opacity .1s;
     }
@@ -51,7 +52,7 @@
     .hrow .name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .hrow .track { height: 12px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
     .hrow .fill { height: 100%; border-radius: 6px; background: var(--bar); min-width: 4px; }
-    .hrow .num { font-variant-numeric: tabular-nums; color: #dcdcdc; text-align: right; font-size: 14px; white-space: nowrap; }
+    .hrow .num { font-variant-numeric: tabular-nums; color: var(--text-3); text-align: right; font-size: 14px; white-space: nowrap; }
     .hrow .num span { color: var(--faint); margin-left: 8px; }
 
     table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
@@ -191,7 +192,7 @@
       const num = document.createElement("div"); num.className = "num";
       num.textContent = full.format(r.tokens);
       const extra = document.createElement("span");
-      extra.textContent = priced ? money(r.cost) : r.calls + " calls";
+      extra.textContent = priced ? money(r.cost) : r.calls + (r.calls === 1 ? " call" : " calls");
       num.append(extra);
       row.append(name, track, num);
       el.append(row);
