@@ -7,6 +7,7 @@ questions -> person answers -> the AI writes a requirements doc to download.
 import hmac
 import json
 import os
+import re
 from functools import wraps
 from urllib.parse import urlparse
 
@@ -167,6 +168,50 @@ PLAN_SYSTEM = """Turn this requirements document into work items. Make one epic 
 the document, with its user stories under it. Story titles should be short (under 80 characters);
 put the full "As a ..., I want ..., so that ..." sentence in the story description. Copy the
 acceptance criteria as a list. Don't add epics or stories that aren't in the document."""
+
+
+# Applied to everything the AI writes, so documents read like a person wrote them.
+WRITING_RULES = """
+
+Writing style. Follow every rule:
+- Never use em dashes or en dashes in sentences. Use commas, periods, colons or parentheses.
+- Use plain, everyday words. Never write: delve, tapestry, testament, pivotal, seamless,
+  leverage, robust, crucial, moreover, furthermore, "in today's digital world",
+  "it is important to note", "here's the thing", "let that sink in", "let's dive in",
+  "despite these challenges", "serves as" (write "is"), "experts say", "in conclusion".
+- Don't write "it's not X, it's Y" contrasts. Don't group things in threes out of habit.
+- No greetings, praise or sign-offs: no "Great question", "Certainly", "You're absolutely
+  right", "I hope this helps", "Would you like me to". Never mention being an AI.
+- No emojis. Don't bold random phrases; only use bold where the format above asks for it.
+- Write headings in sentence case, not Title Case.
+- Write normal sentences and paragraphs, or the lists the format asks for. Don't stack
+  one-line paragraphs for effect.
+- No placeholders like [your name], no links, and don't cite unnamed experts or studies."""
+
+QUESTIONS_SYSTEM += WRITING_RULES
+MORE_QUESTIONS_SYSTEM += WRITING_RULES
+DOC_SYSTEM += WRITING_RULES
+SPEC_QUESTIONS_SYSTEM += WRITING_RULES
+SPEC_SYSTEM += WRITING_RULES
+PLAN_SYSTEM += WRITING_RULES
+
+
+def plain(text):
+    """Backup for the style rules: swap dashes used as punctuation for commas.
+    Number ranges like 2–4 (no spaces) are left alone."""
+    text = re.sub(r"\s*—\s*", ", ", text)
+    return re.sub(r"\s+–\s+", ", ", text)
+
+
+def plain_questions(questions):
+    out = []
+    for q in questions:
+        d = q.model_dump()
+        d["question"] = plain(d["question"])
+        for o in d["options"]:
+            o["label"], o["description"] = plain(o["label"]), plain(o["description"])
+        out.append(d)
+    return out
 
 
 def get_client():
@@ -370,7 +415,7 @@ def questions():
         usage.record(g.org["id"], "questions", MODEL, response)
         if response.output_parsed is None:
             raise RuntimeError("The AI didn't return any questions. Try again.")
-        return jsonify(questions=[q.model_dump() for q in response.output_parsed.questions])
+        return jsonify(questions=plain_questions(response.output_parsed.questions))
     except (openai.OpenAIError, RuntimeError) as e:
         return jsonify(error=str(e)), 502
 
@@ -388,7 +433,7 @@ def requirements():
             input=f"Main idea:\n{idea}\n\nQuestions and answers:\n{_qa_text(answers)}",
         )
         usage.record(g.org["id"], "document", MODEL, response)
-        content = response.output_text
+        content = plain(response.output_text)
         doc_id = db.create_document(g.org["id"], idea, json.dumps(answers), content)
         return jsonify(document=content, id=doc_id, title=db.title_from(content))
     except (openai.OpenAIError, RuntimeError) as e:
@@ -464,7 +509,7 @@ def spec_questions(doc_id):
         usage.record(g.org["id"], "spec_questions", MODEL, response)
         if response.output_parsed is None:
             raise RuntimeError("The AI didn't return any questions. Try again.")
-        return jsonify(questions=[q.model_dump() for q in response.output_parsed.questions])
+        return jsonify(questions=plain_questions(response.output_parsed.questions))
     except (openai.OpenAIError, RuntimeError) as e:
         return jsonify(error=str(e)), 502
 
@@ -483,7 +528,7 @@ def write_spec(doc_id):
             input=f"Requirements document:\n{doc['content']}\n\nTechnical questions and answers:\n{_qa_text(answers)}",
         )
         usage.record(g.org["id"], "spec", MODEL, response)
-        spec = response.output_text
+        spec = plain(response.output_text)
         db.save_spec(g.org["id"], doc_id, spec, json.dumps(answers))
         return jsonify(spec=spec)
     except (openai.OpenAIError, RuntimeError) as e:
