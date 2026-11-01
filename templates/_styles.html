@@ -5,32 +5,58 @@
   /* Light by default; dark when the visitor's device or browser is set to dark. */
   :root {
     color-scheme: light dark;
-    --bg: #f7f7f8; --surface: #ffffff; --surface-2: #f2f3f5; --raised: #ececef; --hover: #f5f6f8;
-    --text: #141414; --text-2: #3d4148; --text-3: #2b2f36; --muted: #5f6368; --faint: #8a8f98;
-    --border: #e7e8eb; --border-strong: #d6d8dd; --focus: #9aa0a8;
-    --accent: #2f6fe0; --accent-soft: #e8effc; --accent-line: #6f9cf0;
-    --danger: #c62828; --success: #1f9d55; --warn-bg: #fff6d6; --warn-text: #7a5600;
-    --topbar-bg: rgba(255,255,255,.85); --topbar-border: #ececef;
-    --shadow: 0 1px 2px rgba(16,24,40,.04), 0 10px 30px rgba(16,24,40,.06);
-    --btn-bg: linear-gradient(180deg, #2b2b2b 0%, #000 55%, #1a1a1a 100%); --btn-fg: #fff;
-    --btn-shadow: 0 6px 16px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.18);
-    --btn-2-bg: #ffffff; --btn-2-fg: #141414; --btn-2-border: #d6d8dd; --btn-2-hover: #f5f6f8;
-    --q-head: #f4f5f7; --q-body: #ffffff; --q-radio: #b6bac1;
+    --bg: #f5f7fb; --surface: #ffffff; --surface-2: #eef2f8; --raised: #e6ecf5; --hover: #f3f6fb;
+    --text: #0b132b; --text-2: #3a506b; --text-3: #1c2541; --muted: #55657d; --faint: #8592a6;
+    --border: #e1e7f0; --border-strong: #cfd8e5; --focus: #5bc0de;
+    --accent: #d97706; --accent-soft: #fdf1e2; --accent-line: #5bc0de;
+    --danger: #c62828; --success: #1f9d55; --warn-bg: #fdf1e2; --warn-text: #8a4b05;
+    --topbar-bg: rgba(255,255,255,.85); --topbar-border: #e6ecf5;
+    --shadow: 0 1px 2px rgba(11,19,43,.04), 0 10px 30px rgba(11,19,43,.07);
+    --btn-bg: linear-gradient(180deg, #f59e0b 0%, #d97706 55%, #b45309 100%); --btn-fg: #fff;
+    --btn-shadow: 0 6px 16px rgba(217,119,6,.28), inset 0 1px 0 rgba(255,255,255,.28);
+    --btn-2-bg: #ffffff; --btn-2-fg: #0b132b; --btn-2-border: #cfd8e5; --btn-2-hover: #f3f6fb;
+    --q-head: #eef2f8; --q-body: #ffffff; --q-radio: #a9b5c6;
+    /* Gradient artwork: navy to sky, with an amber sphere */
+    --art-bg: linear-gradient(165deg, #e9f2fa 0%, #a8d8ea 30%, #3a506b 68%, #0b132b 100%);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #000000; --surface: #1c1c1c; --surface-2: #141414; --raised: #2a2a2a; --hover: #1c1c1c;
-      --text: #f2f2f2; --text-2: #c9c9c9; --text-3: #dcdcdc; --muted: #a1a1a1; --faint: #6b6b6b;
-      --border: #2b2b2b; --border-strong: #3a3a3a; --focus: #8a8a8a;
-      --accent: #5b93f0; --accent-soft: #14233d; --accent-line: #3d6fc8;
-      --danger: #ff8a80; --success: #7ee2a8; --warn-bg: #2a2410; --warn-text: #f3d27a;
-      --topbar-bg: rgba(0,0,0,.85); --topbar-border: #1a1a1a;
-      --shadow: none;
-      --btn-bg: #f2f2f2; --btn-fg: #0a0a0a; --btn-shadow: none;
-      --btn-2-bg: #2a2a2a; --btn-2-fg: #f2f2f2; --btn-2-border: transparent; --btn-2-hover: #343434;
-      --q-head: #232323; --q-body: #161616; --q-radio: #6b6b6b;
+      --bg: #0b132b; --surface: #1c2541; --surface-2: #141c36; --raised: #26314f; --hover: #222c4a;
+      --text: #f1f4fa; --text-2: #c3cddd; --text-3: #dce3ee; --muted: #9aa8bf; --faint: #6c7a93;
+      --border: #2a3656; --border-strong: #3a506b; --focus: #5bc0de;
+      --accent: #f59e0b; --accent-soft: #3a2a12; --accent-line: #5bc0de;
+      --danger: #ff8a80; --success: #7ee2a8; --warn-bg: #3a2a12; --warn-text: #f4d6b0;
+      --topbar-bg: rgba(11,19,43,.85); --topbar-border: #1c2541;
+      --shadow: 0 10px 30px rgba(0,0,0,.25);
+      --btn-shadow: 0 6px 18px rgba(245,158,11,.25), inset 0 1px 0 rgba(255,255,255,.28);
+      --btn-2-bg: #26314f; --btn-2-fg: #f1f4fa; --btn-2-border: transparent; --btn-2-hover: #2f3b5c;
+      --q-head: #26314f; --q-body: #1c2541; --q-radio: #6c7a93;
+      --art-bg: linear-gradient(165deg, #3a506b 0%, #1c2541 45%, #0b132b 100%);
     }
   }
+  /* Gradient artwork (home page): glassy stripes plus a glowing amber sphere. */
+  .art { position: relative; overflow: hidden; isolation: isolate; background: var(--art-bg); }
+  .art::before {
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,.28) 0 1.5px, rgba(255,255,255,0) 1.5px 26px),
+      linear-gradient(90deg, rgba(91,192,222,0) 40%, rgba(91,192,222,.35) 75%, rgba(244,214,176,.25) 100%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0 42%, #000 72%);
+    mask-image: linear-gradient(90deg, transparent 0 42%, #000 72%);
+  }
+  .art::after {
+    content: ""; position: absolute; z-index: -2; border-radius: 50%;
+    width: var(--ss, 70%); aspect-ratio: 1; left: var(--sx, 52%); top: var(--sy, 18%);
+    background: radial-gradient(circle at 32% 28%, #fff1d9 0%, #f4d6b0 10%, #f59e0b 24%, #d97706 36%, #3a506b 64%, #0b132b 90%);
+    box-shadow: 0 0 120px rgba(217,119,6,.35), inset -30px -40px 80px rgba(11,19,43,.55);
+    animation: orbit 18s ease-in-out infinite alternate;
+  }
+  @keyframes orbit {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-6%, 4%) scale(1.05); }
+    100% { transform: translate(4%, -3%) scale(.98); }
+  }
+  @media (prefers-reduced-motion: reduce) { .art::after { animation: none; } }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body {
