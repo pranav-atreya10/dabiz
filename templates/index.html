@@ -136,6 +136,18 @@
     .next-cta b, .coding-ai b { display: block; font-weight: 600; margin-bottom: 2px; }
     .next-cta span, .coding-ai span { color: var(--muted); font-size: 15px; }
     .coding-ai { display: block; }
+    .tools { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 10px; margin-top: 16px; }
+    .tool-btn {
+      text-align: left; padding: 14px 16px; border-radius: 14px; cursor: pointer; font: inherit; color: var(--text);
+      background: var(--surface); border: 1px solid var(--border-strong); transition: border-color .15s, transform .15s;
+    }
+    .tool-btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .tool-btn b { display: block; font-size: 15px; font-weight: 600; }
+    .tool-btn small { color: var(--muted); font-size: 12px; font-family: ui-monospace, "SF Mono", Consolas, monospace; }
+    .tool-btn.busy { opacity: .6; cursor: wait; }
+    .tool-help { margin-top: 14px; padding: 14px 16px; border-radius: 14px; background: var(--accent-soft); color: var(--text); font-size: 14px; }
+    .tool-help ol { margin: 6px 0 0; padding-left: 20px; }
+    .tool-help code { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 13px; }
     .feedback { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
     .fb-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--text-3); }
     .fb-btn {
@@ -302,10 +314,19 @@
         </div>
         <div class="coding-ai">
           <b>Build it with an AI coding tool</b>
-          <span>Get one ready-to-paste prompt with the spec and the requirements, for tools like GitHub Copilot, Codex, Claude Code or Cursor.</span>
-          <div class="actions" style="margin-top:14px">
-            <button class="btn btn-secondary" id="copyPrompt">Copy for coding AI</button>
-            <button class="btn btn-outline" id="downloadPrompt">Download prompt .md</button>
+          <span>Download a starter folder for your tool. It has the spec, the requirements, and the instructions file the tool reads on its own.</span>
+          <div class="tools" role="group" aria-label="Export to a coding tool">
+            <button class="tool-btn" data-tool="codex"><b>Codex</b><small>AGENTS.md</small></button>
+            <button class="tool-btn" data-tool="claude-code"><b>Claude Code</b><small>CLAUDE.md</small></button>
+            <button class="tool-btn" data-tool="cursor"><b>Cursor</b><small>Cursor rules</small></button>
+            <button class="tool-btn" data-tool="copilot"><b>GitHub Copilot</b><small>Copilot instructions</small></button>
+            <button class="tool-btn" data-tool="other"><b>Other tools</b><small>AGENTS.md</small></button>
+          </div>
+          <div class="tool-help hidden" id="toolHelp"></div>
+          <p class="error" id="errExport"></p>
+          <div class="actions" style="margin-top:6px">
+            <button class="btn btn-secondary btn-sm" id="copyPrompt">Copy as one prompt</button>
+            <button class="btn btn-outline btn-sm" id="downloadPrompt">Download prompt .md</button>
           </div>
         </div>
       </div>
@@ -684,9 +705,41 @@
       "",
     ].join("\n");
   }
+  // Starter folders for coding tools (built by the server from the saved doc and spec).
+  const TOOL_STEPS = {
+    "codex": ["Unzip the folder and open a terminal in it.", "Run <code>codex</code>.", "Ask it to read the project instructions and start task 1."],
+    "claude-code": ["Unzip the folder and open a terminal in it.", "Run <code>claude</code>.", "Ask it to read the project instructions and start task 1."],
+    "cursor": ["Unzip the folder and open it in Cursor.", "Open the Agent chat.", "Ask it to read the project instructions and start task 1."],
+    "copilot": ["Unzip the folder and open it in VS Code.", "Open Copilot Chat in Agent mode.", "Ask it to read the project instructions and start task 1."],
+    "other": ["Unzip the folder and open it in your tool.", "If it doesn't read <code>AGENTS.md</code> on its own, ask it to.", "Ask it to start task 1 of the plan."],
+  };
+  document.querySelectorAll(".tool-btn").forEach((b) => b.onclick = async () => {
+    const tool = b.dataset.tool;
+    $("errExport").textContent = "";
+    b.classList.add("busy");
+    try {
+      if (specDirty) await $("saveSpec").onclick();
+      if (dirty) await saveDoc();
+      const res = await fetch("/api/documents/" + docId + "/export/" + tool);
+      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Couldn't build the download."); }
+      const name = (res.headers.get("Content-Disposition") || "").match(/filename="([^"]+)"/)?.[1] || "starter.zip";
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(await res.blob());
+      a.download = name;
+      a.click();
+      const label = b.querySelector("b").textContent;
+      $("toolHelp").innerHTML = "<b>Downloaded for " + label + ". Next:</b><ol>" + TOOL_STEPS[tool].map((s) => "<li>" + s + "</li>").join("") + "</ol>";
+      $("toolHelp").classList.remove("hidden");
+    } catch (e) {
+      $("errExport").textContent = e.message;
+    } finally {
+      b.classList.remove("busy");
+    }
+  });
+
   $("downloadSpec").onclick = () => saveFile("technical-spec.md", $("specText").value);
   $("copySpec").onclick = () => copyText($("copySpec"), $("specText").value, "Copy");
-  $("copyPrompt").onclick = () => copyText($("copyPrompt"), codingPrompt(), "Copy for coding AI");
+  $("copyPrompt").onclick = () => copyText($("copyPrompt"), codingPrompt(), "Copy as one prompt");
   $("downloadPrompt").onclick = () => saveFile("coding-ai-prompt.md", codingPrompt());
 
   // An idea typed on the home page before signing in.

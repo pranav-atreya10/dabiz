@@ -12,11 +12,12 @@ from functools import wraps
 from urllib.parse import urlparse
 
 import openai
-from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, Response, flash, g, jsonify, redirect, render_template, request, session, url_for
 from pydantic import BaseModel
 
 import db
 import devops
+import export
 import usage
 
 # Change the model without touching code by setting OPENAI_MODEL.
@@ -545,6 +546,22 @@ def save_spec(doc_id):
         return jsonify(error="That document doesn't exist."), 404
     db.save_spec(g.org["id"], doc_id, spec)
     return jsonify(ok=True)
+
+
+@app.get("/api/documents/<int:doc_id>/export/<tool>")
+@login_required
+def export_for_tool(doc_id, tool):
+    """Download a starter folder (zip) for an AI coding tool."""
+    if tool not in export.TOOLS:
+        return jsonify(error="Unknown coding tool."), 404
+    doc = db.get_document(g.org["id"], doc_id)
+    if not doc:
+        return jsonify(error="That document doesn't exist."), 404
+    if not doc["spec"].strip():
+        return jsonify(error="Create the technical spec first."), 400
+    filename, data = export.build_zip(tool, doc["title"], doc["content"], doc["spec"])
+    return Response(data, mimetype="application/zip",
+                    headers={"Content-Disposition": f'attachment; filename="{filename}"'})
 
 
 @app.get("/privacy")

@@ -72,3 +72,11 @@ document, and can be edited, downloaded or copied.
 **Copy for coding AI** builds one ready-to-paste prompt (the spec plus the requirements, with
 instructions to work task by task, write tests, and ask about open questions) for tools like
 GitHub Copilot, Codex, Claude Code or Cursor.
+
+## Export to AI coding tools
+
+After the technical spec is written, "Build it with an AI coding tool" downloads a starter folder
+(zip) for Codex, Claude Code, Cursor, GitHub Copilot, or any other tool. Each folder has
+`docs/SPEC.md`, `docs/REQUIREMENTS.md`, a `START_HERE.md` with three steps, and the instructions
+file that tool reads on its own: `AGENTS.md` (Codex and others), `CLAUDE.md` (Claude Code),
+`.cursor/rules/requirements-studio.mdc` (Cursor) or `.github/copilot-instructions.md` (Copilot).
