@@ -21,7 +21,7 @@ admin page (`/admin`), and sets each org's Azure DevOps connection there too.
 | `OPENAI_API_KEY` | Your OpenAI key. Required. |
 | `SECRET_KEY` | A long random string. Signs logins and encrypts saved tokens. Required. If it changes, everyone is signed out and saved Azure DevOps tokens have to be entered again. |
 | `ADMIN_PASSWORD` | Password for the admin page. Required to manage orgs. |
-| `DATABASE_URL` | A Postgres connection string. Required on Vercel (for example a free Neon database from the Vercel Marketplace). Without it the app uses a local `orgs.db` file, which only works on your own computer. |
+| `DATABASE_URL` | A Postgres connection string (`POSTGRES_URL`, or the same names with a `REQ_` prefix from the Vercel Neon integration, also work). Required on Vercel (for example a free Neon database from the Vercel Marketplace). Without it the app uses a local `orgs.db` file, which only works on your own computer. |
 | `OPENAI_MODEL` | Optional. Default `gpt-5`. |
 
 ## Run it

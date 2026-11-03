@@ -14,7 +14,11 @@ from contextlib import contextmanager
 
 from cryptography.fernet import Fernet, InvalidToken
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "")
+# Vercel's Neon integration can add a prefix to its variable names (e.g. REQ_DATABASE_URL),
+# so accept the common names, plain ones first.
+DATABASE_URL = next((os.environ[k] for k in (
+    "DATABASE_URL", "POSTGRES_URL", "REQ_DATABASE_URL", "REQ_POSTGRES_URL",
+) if os.environ.get(k)), "")
 SQLITE_PATH = os.environ.get("SQLITE_PATH", "app.db")
 
 SCHEMA = [
