@@ -6,9 +6,10 @@
   <title>Admin · Requirements Studio</title>
   {% include "_styles.html" %}
   <style>
+    .sky { height: 100vh; }
     .wrap { min-height: calc(100vh - 64px); display: grid; place-items: center; padding: 32px 16px; }
     .login { width: 100%; max-width: 440px; padding: 40px 32px; }
-    h1 { font-size: 40px; font-weight: 700; letter-spacing: -.045em; line-height: 1.1; margin: 28px 0 10px; }
+    h1 { font-size: 40px; font-weight: 300; letter-spacing: -.04em; line-height: 1.1; margin: 28px 0 10px; }
     .lead { font-size: 17px; margin: 0 0 28px; }
     label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
     .btn { width: 100%; margin-top: 18px; }
@@ -19,6 +20,7 @@
   <header class="topbar">
     <a class="brand" href="{{ url_for('home') }}">{% include "_logo.html" %}<span>Requirements Studio</span></a>
   </header>
+  <div class="sky" aria-hidden="true"><div class="glass"><i class="orb"></i><i class="ribs"></i></div></div>
   <main class="wrap">
     <form class="card login" method="post" action="{{ url_for('admin_login') }}">
       <div class="icon-tile">

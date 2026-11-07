@@ -6,10 +6,11 @@
   <title>Requirements Studio</title>
   {% include "_styles.html" %}
   <style>
-    main { max-width: 860px; margin: 0 auto; padding: 72px 20px 64px; }
+    main { position: relative; max-width: 860px; margin: 0 auto; padding: 72px 20px 64px; }
+    .hero h1 em { display: block; }
 
     .hero { margin-bottom: 40px; }
-    .hero h1 { font-size: clamp(44px, 8vw, 72px); font-weight: 700; letter-spacing: -.045em; line-height: 1.02; margin: 0 0 20px; }
+    .hero h1 { font-size: clamp(44px, 8vw, 72px); font-weight: 300; letter-spacing: -.04em; line-height: 1.02; margin: 0 0 20px; }
     .hero p { font-size: clamp(18px, 2.6vw, 22px); line-height: 1.5; color: var(--text-2); margin: 0; max-width: 640px; }
 
     .stepper {
@@ -185,9 +186,10 @@
     </div>
   </header>
 
+  <div class="sky" aria-hidden="true"><div class="glass"><i class="orb"></i><i class="ribs"></i></div></div>
   <main>
     <section class="hero">
-      <h1>Turn an idea into requirements</h1>
+      <h1>Turn an idea <em>into requirements.</em></h1>
       <p>Describe what you want to build. Answer a few questions. Get a structured requirements document, ready for your team.</p>
     </section>
 

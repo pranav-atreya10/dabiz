@@ -6,14 +6,14 @@
   <title>Usage · Requirements Studio</title>
   {% include "_styles.html" %}
   <style>
-    :root { --bar: #3a506b; --bar-hover: #5bc0de; --grid: #e6ecf5; }
-    @media (prefers-color-scheme: dark) { :root { --bar: #5bc0de; --bar-hover: #8fd5ea; --grid: #26314f; } }
+    :root { --bar: #072D59; --bar-hover: #FD6E88; --grid: #d3eaf5; }
+    @media (prefers-color-scheme: dark) { :root { --bar: #8cc4f2; --bar-hover: #FD6E88; --grid: #12406f; } }
     main { max-width: 960px; margin: 0 auto; padding: 56px 20px 64px; }
     .nav { display: flex; align-items: center; gap: 8px; }
     .nav a.link { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; padding: 6px 12px; border-radius: 999px; }
     .nav a.link:hover { color: var(--text); }
     .nav a.link.here { color: var(--text); background: var(--raised); }
-    h1 { font-size: clamp(44px, 8vw, 64px); font-weight: 700; letter-spacing: -.045em; line-height: 1.02; margin: 0 0 12px; }
+    h1 { font-size: clamp(44px, 8vw, 64px); font-weight: 300; letter-spacing: -.04em; line-height: 1.02; margin: 0 0 12px; }
     .lead { font-size: 18px; color: var(--text-2); margin: 0 0 28px; }
 
     .seg { display: inline-flex; padding: 4px; gap: 2px; border: 1px solid var(--border-strong); border-radius: 999px; margin-bottom: 24px; }
@@ -87,6 +87,7 @@
     </nav>
   </header>
 
+  <div class="sky" aria-hidden="true"><div class="glass"><i class="orb"></i><i class="ribs"></i></div></div>
   <main>
     <h1>Usage</h1>
     <p class="lead">AI tokens used by {{ scope }}. Every question, document and Azure DevOps send counts.</p>
