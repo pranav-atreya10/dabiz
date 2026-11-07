@@ -2,3 +2,6 @@
 __pycache__/
 .env
 app.db
+
+# Impeccable engine binary (downloaded by `npx impeccable install`)
+.claude/skills/impeccable/scripts/bin/
