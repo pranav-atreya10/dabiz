@@ -51,15 +51,15 @@
 
     <div class="tiles">
       <div class="card tile"><div class="label">Ratings</div><div class="value">{{ ups + downs }}</div></div>
-      <div class="card tile"><div class="label">👍 Useful</div><div class="value">{{ ups }}{% if ups + downs %}<span class="muted" style="font-size:18px;font-weight:500"> · {{ (100 * ups / (ups + downs))|round|int }}%</span>{% endif %}</div></div>
-      <div class="card tile"><div class="label">👎 Not useful</div><div class="value">{{ downs }}</div></div>
+      <div class="card tile"><div class="label"><span class="thumb up" aria-hidden="true"></span> Useful</div><div class="value">{{ ups }}{% if ups + downs %}<span class="muted" style="font-size:18px;font-weight:500"> · {{ (100 * ups / (ups + downs))|round|int }}%</span>{% endif %}</div></div>
+      <div class="card tile"><div class="label"><span class="thumb down" aria-hidden="true"></span> Not useful</div><div class="value">{{ downs }}</div></div>
     </div>
 
     <div class="card">
       {% for i in items %}
         <div class="item">
           <div class="item-head">
-            <span class="r" aria-label="{{ 'Useful' if i.rating == 1 else 'Not useful' }}">{{ "👍" if i.rating == 1 else "👎" }}</span>
+            <span class="r" aria-label="{{ 'Useful' if i.rating == 1 else 'Not useful' }}">{% if i.rating == 1 %}<span class="thumb up" aria-hidden="true"></span>{% else %}<span class="thumb down" aria-hidden="true"></span>{% endif %}</span>
             <a href="{{ url_for('admin_document', doc_id=i.id) }}">{{ i.title }}</a>
             <span class="meta">{{ i.org_name or "Deleted org" }} · {{ i.feedback_at|string|truncate(16, True, "") }}</span>
           </div>

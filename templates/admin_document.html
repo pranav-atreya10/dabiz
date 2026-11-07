@@ -26,7 +26,7 @@
   <main>
     <a class="back" href="{{ url_for('admin_feedback') }}">← Back to feedback</a>
     <h1>{{ doc.title }}</h1>
-    <p class="meta">{{ doc.org_name or "Deleted org" }} · {{ "👍 Useful" if doc.rating == 1 else "👎 Not useful" if doc.rating == -1 else "Not rated" }}</p>
+    <p class="meta">{{ doc.org_name or "Deleted org" }} · {% if doc.rating == 1 %}<span class="thumb up" aria-hidden="true"></span> Useful{% elif doc.rating == -1 %}<span class="thumb down" aria-hidden="true"></span> Not useful{% else %}Not rated{% endif %}</p>
     {% if doc.feedback %}<div class="card box"><h2>Their comment</h2><p>{{ doc.feedback }}</p></div>{% endif %}
     <div class="card box"><h2>Their idea</h2><p>{{ doc.idea }}</p></div>
     <div class="card box"><h2>Document</h2><pre>{{ doc.content }}</pre></div>

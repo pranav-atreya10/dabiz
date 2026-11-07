@@ -153,10 +153,10 @@
     .fb-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--text-3); }
     .fb-btn {
       width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--border-strong);
-      background: transparent; font-size: 20px; cursor: pointer;
+      background: transparent; color: var(--text); cursor: pointer; display: inline-grid; place-items: center;
     }
     .fb-btn:hover { background: var(--raised); }
-    .fb-btn.picked { background: var(--text); border-color: var(--text); }
+    .fb-btn.picked { background: var(--text); border-color: var(--text); color: var(--bg); }
     .fb-more { margin-top: 14px; }
     footer { text-align: center; font-size: 13px; color: var(--faint); margin-top: 40px; }
 
@@ -254,7 +254,7 @@
         </div>
       </div>
       <div class="actions">
-        <button class="btn btn-primary" id="download">Download .md</button>
+        <button class="btn btn-secondary" id="download">Download .md</button>
         <button class="btn btn-secondary" id="copy">Copy</button>
         <span class="spacer"></span>
         <button class="btn btn-outline" id="sendDevops" disabled>Send to Azure DevOps <span class="arrow">→</span></button>
@@ -273,8 +273,8 @@
       <div class="feedback" id="feedback">
         <div class="fb-row">
           <span>Was this document useful?</span>
-          <button class="fb-btn" data-rating="1" aria-label="Yes, useful">👍</button>
-          <button class="fb-btn" data-rating="-1" aria-label="No, not useful">👎</button>
+          <button class="fb-btn" data-rating="1" aria-label="Yes, useful"><span class="thumb up" aria-hidden="true"></span></button>
+          <button class="fb-btn" data-rating="-1" aria-label="No, not useful"><span class="thumb down" aria-hidden="true"></span></button>
         </div>
         <div class="fb-more hidden" id="fbMore">
           <textarea id="fbComment" rows="2" placeholder="What would have made it better? (optional)"></textarea>
@@ -311,7 +311,7 @@
           </div>
         </div>
         <div class="actions">
-          <button class="btn btn-primary" id="downloadSpec">Download spec .md</button>
+          <button class="btn btn-secondary" id="downloadSpec">Download spec .md</button>
           <button class="btn btn-secondary" id="copySpec">Copy</button>
         </div>
         <div class="coding-ai">

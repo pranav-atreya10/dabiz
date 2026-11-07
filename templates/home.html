@@ -32,7 +32,7 @@
     .idea-form:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--sel), var(--shadow); }
     .idea-note { margin: 14px 0 0 22px; font-size: 14px; color: var(--muted); }
 
-    .sends { margin-top: auto; padding-top: 72px; max-width: min(640px, 48vw); display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 36px; }
+    .sends { margin-top: auto; padding-top: 72px; max-width: min(720px, 52vw); display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 28px; }
     .sends span { font-size: 13px; color: var(--muted); letter-spacing: .02em; }
     .sends b { font-size: 19px; font-weight: 600; letter-spacing: -.02em; color: var(--text); opacity: .78; }
 
@@ -66,8 +66,12 @@
     /* How it works: the four stages, lit one after another */
     .flow { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--border-strong); }
     .flow .bar { position: absolute; top: -1px; left: 0; height: 2px; width: 25%; background: var(--accent); transition: width .9s cubic-bezier(.2,.8,.2,1); }
-    .stage { padding: 28px 28px 8px 0; cursor: pointer; opacity: .6; transition: opacity .5s; }
-    .stage.on { opacity: 1; }
+    .stage { padding: 28px 28px 8px 0; cursor: pointer; }
+    .stage .ex { transition: border-color .5s, background-color .5s, box-shadow .5s; }
+    .stage:not(.on) .ex { background: transparent; border-style: dashed; }
+    .stage.on .ex { box-shadow: var(--shadow); }
+    .stage .n { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--border-strong); transition: background-color .5s, color .5s, border-color .5s; }
+    .stage.on .n { background: var(--text); color: var(--bg); border-color: var(--text); }
     .stage .n { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
     .stage h3 { margin: 10px 0 8px; font-size: 22px; font-weight: 500; letter-spacing: -.02em; }
     .stage p { margin: 0 0 22px; color: var(--text-2); font-size: 15px; }
@@ -98,8 +102,6 @@
     .band { background: #072D59; color: #eaf7fd; }
     .band .sec-head p { color: #bcdcef; }
     .window { max-width: 760px; margin: 0 auto; border-radius: 26px; background: #0a3767; border: 1px solid #1f5288; padding: 18px; }
-    .window .dots { display: flex; gap: 7px; padding: 2px 4px 16px; }
-    .window .dots i { width: 10px; height: 10px; border-radius: 50%; background: #1f5288; }
     .chat { display: flex; flex-direction: column; gap: 12px; min-height: 380px; }
     .bubble { max-width: 78%; padding: 14px 18px; border-radius: 20px; font-size: 15px; line-height: 1.5; opacity: 0; translate: 0 10px; transition: opacity .5s, translate .5s cubic-bezier(.2,.8,.2,1); }
     .bubble.show { opacity: 1; translate: 0 0; }
@@ -108,8 +110,9 @@
     .bubble.ai ol { margin: 8px 0 0; padding-left: 20px; }
     .bubble.sent { align-self: center; background: #FD6E88; color: #072D59; font-weight: 600; border-radius: 999px; display: flex; gap: 10px; align-items: center; }
     .docmock { width: 78%; }
-    .docmock .l { height: 9px; border-radius: 5px; background: #2a62a0; margin: 9px 0; width: var(--w); }
-    .docmock .l.t { height: 13px; background: #DBF2FC; opacity: .8; }
+    .docmock b { display: block; font-weight: 600; color: #DBF2FC; margin-top: 2px; }
+    .docmock b + p, .docmock p { margin: 4px 0 10px; color: #bcdcef; }
+    .docmock p:last-child { margin-bottom: 0; }
     .caret::after { content: ""; display: inline-block; width: 2px; height: 1.05em; background: #FD6E88; margin-left: 2px; vertical-align: -3px; animation: blink 1s steps(1) infinite; }
     @keyframes blink { 50% { opacity: 0; } }
 
@@ -194,7 +197,7 @@
     </nav>
     <div class="actions">
       <a class="signin" href="{{ url_for('login') }}">Sign in</a>
-      <a class="btn btn-primary btn-sm" href="{{ url_for('login') }}">Get started</a>
+      <a class="btn btn-outline btn-sm" href="{{ url_for('login') }}">Get started</a>
     </div>
   </header>
 
@@ -301,17 +304,16 @@
           <p>This plays a short example. The real thing asks six to eight questions before it writes.</p>
         </div>
         <div class="window reveal">
-          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
           <div class="chat" id="chat">
             <div class="bubble me" id="b1"><span id="typed"></span></div>
             <div class="bubble ai" id="b2">A few questions first:
               <ol><li>Who adds a new hire?</li><li>Which teams get tasks?</li><li>When is onboarding finished?</li></ol>
             </div>
-            <div class="bubble ai docmock" id="b3" aria-label="Requirements document being written">
-              <div class="l t" style="--w:55%"></div>
-              <div class="l" style="--w:92%"></div><div class="l" style="--w:78%"></div>
-              <div class="l t" style="--w:40%"></div>
-              <div class="l" style="--w:88%"></div><div class="l" style="--w:64%"></div>
+            <div class="bubble ai docmock" id="b3">
+              <b>Epic: New hire setup</b>
+              <p>As HR, I add a new hire so their onboarding tasks start automatically.</p>
+              <b>Acceptance criteria</b>
+              <p>Given a start date, IT and facilities each get a task within one hour.</p>
             </div>
             <div class="bubble sent" id="b4"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5l3 3 7-7"/></svg>2 epics and 6 stories sent to Azure DevOps</div>
           </div>

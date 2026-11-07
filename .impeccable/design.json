@@ -1,0 +1,707 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-07T14:49:34+00:00",
+  "title": "Design System: Requirements Studio",
+  "extensions": {
+    "colorMeta": {
+      "crimson-pink": {
+        "role": "primary",
+        "displayName": "Crimson Pink",
+        "canonical": "#FD6E88",
+        "tonalRamp": [
+          "#5a1424",
+          "#8a1f37",
+          "#c22d52",
+          "#e44b6b",
+          "#FD6E88",
+          "#ff9cae",
+          "#ffc6d1",
+          "#ffe8ed"
+        ]
+      },
+      "crimson-pink-hover": {
+        "role": "primary",
+        "displayName": "Crimson Pink, hover",
+        "canonical": "#ff8399",
+        "tonalRamp": [
+          "#5a1424",
+          "#8a1f37",
+          "#c22d52",
+          "#e44b6b",
+          "#FD6E88",
+          "#ff9cae",
+          "#ffc6d1",
+          "#ffe8ed"
+        ]
+      },
+      "crimson-ink": {
+        "role": "primary",
+        "displayName": "Crimson Ink",
+        "canonical": "#c22d52",
+        "tonalRamp": [
+          "#5a1424",
+          "#8a1f37",
+          "#c22d52",
+          "#e44b6b",
+          "#FD6E88",
+          "#ff9cae",
+          "#ffc6d1",
+          "#ffe8ed"
+        ]
+      },
+      "pink-blush": {
+        "role": "primary",
+        "displayName": "Pink Blush",
+        "canonical": "#ffe8ed",
+        "tonalRamp": [
+          "#5a1424",
+          "#8a1f37",
+          "#c22d52",
+          "#e44b6b",
+          "#FD6E88",
+          "#ff9cae",
+          "#ffc6d1",
+          "#ffe8ed"
+        ]
+      },
+      "seal-blue": {
+        "role": "secondary",
+        "displayName": "Seal Blue",
+        "canonical": "#DBF2FC",
+        "tonalRamp": [
+          "#04172f",
+          "#072D59",
+          "#0d3a6e",
+          "#164f9c",
+          "#3d84d6",
+          "#8cc4f2",
+          "#a9d6f2",
+          "#DBF2FC"
+        ]
+      },
+      "navy": {
+        "role": "secondary",
+        "displayName": "Navy",
+        "canonical": "#072D59",
+        "tonalRamp": [
+          "#04172f",
+          "#072D59",
+          "#0d3a6e",
+          "#164f9c",
+          "#3d84d6",
+          "#8cc4f2",
+          "#a9d6f2",
+          "#DBF2FC"
+        ]
+      },
+      "sky-mid": {
+        "role": "tertiary",
+        "displayName": "Sky Mid",
+        "canonical": "#a9d6f2",
+        "tonalRamp": [
+          "#04172f",
+          "#072D59",
+          "#0d3a6e",
+          "#164f9c",
+          "#3d84d6",
+          "#8cc4f2",
+          "#a9d6f2",
+          "#DBF2FC"
+        ]
+      },
+      "sky-deep": {
+        "role": "tertiary",
+        "displayName": "Sky Deep",
+        "canonical": "#5f9fdc",
+        "tonalRamp": [
+          "#04172f",
+          "#072D59",
+          "#0d3a6e",
+          "#164f9c",
+          "#3d84d6",
+          "#8cc4f2",
+          "#a9d6f2",
+          "#DBF2FC"
+        ]
+      },
+      "ice-ground": {
+        "role": "neutral",
+        "displayName": "Ice Ground",
+        "canonical": "#eef8fd",
+        "tonalRamp": [
+          "#04172f",
+          "#0d3463",
+          "#24466f",
+          "#44658c",
+          "#5b7a9c",
+          "#a3cbe2",
+          "#cbe5f2",
+          "#eef8fd"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#04172f",
+          "#0d3463",
+          "#24466f",
+          "#44658c",
+          "#5b7a9c",
+          "#a3cbe2",
+          "#cbe5f2",
+          "#eef8fd"
+        ]
+      },
+      "surface-mist": {
+        "role": "neutral",
+        "displayName": "Surface Mist",
+        "canonical": "#f4fbfe",
+        "tonalRamp": [
+          "#04172f",
+          "#0d3463",
+          "#24466f",
+          "#44658c",
+          "#5b7a9c",
+          "#a3cbe2",
+          "#cbe5f2",
+          "#eef8fd"
+        ]
+      },
+      "hover-frost": {
+        "role": "neutral",
+        "displayName": "Hover Frost",
+        "canonical": "#e7f5fc",
+        "tonalRamp": [
+          "#04172f",
+          "#0d3463",
+          "#24466f",
+          "#44658c",
+          "#5b7a9c",
+          "#a3cbe2",
+          "#cbe5f2",
+          "#eef8fd"
+        ]
+      },
+      "ink-secondary": {
+        "role": "neutral",
+        "displayName": "Ink Secondary",
+        "canonical": "#24466f",
+        "tonalRamp": [
+          "#04172f",
+          "#0d3463",
+          "#24466f",
+          "#44658c",
+          "#5b7a9c",
+          "#a3cbe2",
+          "#cbe5f2",
+          "#eef8fd"
+        ]
+      },
+      "ink-tertiary": {
+        "role": "neutral",
+        "displayName": "Ink Tertiary",
+        "canonical": "#0d3463",
+        "tonalRamp": [
+          "#04172f",
+          "#0d3463",
+          "#24466f",
+          "#44658c",
+          "#5b7a9c",
+          "#a3cbe2",
+          "#cbe5f2",
+          "#eef8fd"
+        ]
+      },
+      "muted-slate": {
+        "role": "neutral",
+        "displayName": "Muted Slate",
+        "canonical": "#44658c",
+        "tonalRamp": [
+          "#04172f",
+          "#0d3463",
+          "#24466f",
+          "#44658c",
+          "#5b7a9c",
+          "#a3cbe2",
+          "#cbe5f2",
+          "#eef8fd"
+        ]
+      },
+      "faint-slate": {
+        "role": "neutral",
+        "displayName": "Faint Slate",
+        "canonical": "#5b7a9c",
+        "tonalRamp": [
+          "#04172f",
+          "#0d3463",
+          "#24466f",
+          "#44658c",
+          "#5b7a9c",
+          "#a3cbe2",
+          "#cbe5f2",
+          "#eef8fd"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#cbe5f2",
+        "tonalRamp": [
+          "#04172f",
+          "#0d3463",
+          "#24466f",
+          "#44658c",
+          "#5b7a9c",
+          "#a3cbe2",
+          "#cbe5f2",
+          "#eef8fd"
+        ]
+      },
+      "hairline-strong": {
+        "role": "neutral",
+        "displayName": "Hairline Strong",
+        "canonical": "#a3cbe2",
+        "tonalRamp": [
+          "#04172f",
+          "#0d3463",
+          "#24466f",
+          "#44658c",
+          "#5b7a9c",
+          "#a3cbe2",
+          "#cbe5f2",
+          "#eef8fd"
+        ]
+      },
+      "danger": {
+        "role": "neutral",
+        "displayName": "Danger",
+        "canonical": "#b3243c"
+      },
+      "success": {
+        "role": "neutral",
+        "displayName": "Success",
+        "canonical": "#0f7a5a"
+      },
+      "warn-bg": {
+        "role": "neutral",
+        "displayName": "Warning Ground",
+        "canonical": "#fff1dc"
+      },
+      "warn-text": {
+        "role": "neutral",
+        "displayName": "Warning Ink",
+        "canonical": "#7a4300"
+      },
+      "night-ground": {
+        "role": "neutral",
+        "displayName": "Night Ground (dark bg)",
+        "canonical": "#04172f",
+        "tonalRamp": [
+          "#04172f",
+          "#072D59",
+          "#0d3a6e",
+          "#164f9c",
+          "#3d84d6",
+          "#8cc4f2",
+          "#a9d6f2",
+          "#DBF2FC"
+        ]
+      },
+      "night-raised": {
+        "role": "neutral",
+        "displayName": "Night Raised (dark raised)",
+        "canonical": "#0d3a6e",
+        "tonalRamp": [
+          "#04172f",
+          "#072D59",
+          "#0d3a6e",
+          "#164f9c",
+          "#3d84d6",
+          "#8cc4f2",
+          "#a9d6f2",
+          "#DBF2FC"
+        ]
+      },
+      "night-ink": {
+        "role": "neutral",
+        "displayName": "Night Ink (dark text)",
+        "canonical": "#eaf7fd",
+        "tonalRamp": [
+          "#04172f",
+          "#072D59",
+          "#0d3a6e",
+          "#164f9c",
+          "#3d84d6",
+          "#8cc4f2",
+          "#a9d6f2",
+          "#DBF2FC"
+        ]
+      },
+      "night-ink-secondary": {
+        "role": "neutral",
+        "displayName": "Night Ink Secondary",
+        "canonical": "#bcdcef",
+        "tonalRamp": [
+          "#04172f",
+          "#072D59",
+          "#0d3a6e",
+          "#164f9c",
+          "#3d84d6",
+          "#8cc4f2",
+          "#a9d6f2",
+          "#DBF2FC"
+        ]
+      },
+      "night-hairline": {
+        "role": "neutral",
+        "displayName": "Night Hairline",
+        "canonical": "#12406f",
+        "tonalRamp": [
+          "#04172f",
+          "#072D59",
+          "#0d3a6e",
+          "#164f9c",
+          "#3d84d6",
+          "#8cc4f2",
+          "#a9d6f2",
+          "#DBF2FC"
+        ]
+      },
+      "night-hairline-strong": {
+        "role": "neutral",
+        "displayName": "Night Hairline Strong",
+        "canonical": "#1f5288",
+        "tonalRamp": [
+          "#04172f",
+          "#072D59",
+          "#0d3a6e",
+          "#164f9c",
+          "#3d84d6",
+          "#8cc4f2",
+          "#a9d6f2",
+          "#DBF2FC"
+        ]
+      },
+      "night-crimson-ink": {
+        "role": "primary",
+        "displayName": "Night Crimson Ink",
+        "canonical": "#ff9cae",
+        "tonalRamp": [
+          "#5a1424",
+          "#8a1f37",
+          "#c22d52",
+          "#e44b6b",
+          "#FD6E88",
+          "#ff9cae",
+          "#ffc6d1",
+          "#ffe8ed"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Home hero headline only; italic second line on its own line."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Home section heads and closing band."
+      },
+      "headline-app": {
+        "displayName": "Headline App",
+        "purpose": "Page title on app pages."
+      },
+      "title-lg": {
+        "displayName": "Title Large",
+        "purpose": "Step titles inside app cards."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Panel, stage and block heads."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Sentence under a headline, in ink-secondary."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default text."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Form labels, tabs, nav links."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "File trees, raw markdown, tool file names."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ambient-card",
+        "value": "0 1px 2px rgba(7,45,89,.05), 0 12px 32px -8px rgba(7,45,89,.12)",
+        "purpose": "Cards and the hero idea field (light mode)."
+      },
+      {
+        "name": "ambient-card-dark",
+        "value": "0 16px 40px -12px rgba(0,0,0,.45)",
+        "purpose": "Cards in dark mode."
+      },
+      {
+        "name": "pink-glow",
+        "value": "0 6px 16px -4px rgba(253,110,136,.55)",
+        "purpose": "Primary button only (dark: 0 8px 22px -6px rgba(253,110,136,.5))."
+      },
+      {
+        "name": "floating-card",
+        "value": "0 30px 60px -24px rgba(0,0,0,.35)",
+        "purpose": "Card floating over the glass object."
+      },
+      {
+        "name": "focus-halo",
+        "value": "0 0 0 4px rgba(253,110,136,.28)",
+        "purpose": "Input and idea-field focus."
+      },
+      {
+        "name": "orb-rim",
+        "value": "inset 34px 0 60px -14px rgba(253,110,136,.95), inset 8px 0 18px rgba(255,190,205,.55), -30px 0 90px -20px rgba(253,110,136,.55)",
+        "purpose": "Pink rim and spill on the sphere."
+      }
+    ],
+    "gradients": [
+      {
+        "name": "sky",
+        "value": "linear-gradient(180deg, #eef8fd 0%, #dbf2fc 38%, #a9d6f2 72%, #5f9fdc 100%)",
+        "purpose": "Hero, closing band, app sky band (light)."
+      },
+      {
+        "name": "sky-dark",
+        "value": "linear-gradient(180deg, #04172f 0%, #062246 45%, #0b3a74 80%, #1a5aa6 100%)",
+        "purpose": "Same, dark mode."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-soft",
+        "value": "cubic-bezier(.2,.8,.2,1)",
+        "purpose": "Button lift, arrow slide, reveals, progress bar, FAQ plus rotation."
+      },
+      {
+        "name": "ease-drift",
+        "value": "cubic-bezier(.45,0,.55,1)",
+        "purpose": "Sphere drift, 16s alternate infinite."
+      },
+      {
+        "name": "duration-control",
+        "value": "200ms",
+        "purpose": "Button color, shadow and transform."
+      },
+      {
+        "name": "duration-field",
+        "value": "150ms",
+        "purpose": "Input border and halo."
+      },
+      {
+        "name": "duration-reveal",
+        "value": "900ms",
+        "purpose": "Scroll reveal (24px rise and fade); hero copy rises with blur over 1s, staggered 80ms."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "prefers-reduced-motion: reduce",
+        "purpose": "Stops sphere drift, reveals and hero rise."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "560px"
+      },
+      {
+        "name": "app-phone",
+        "value": "640px"
+      },
+      {
+        "name": "tablet",
+        "value": "980px"
+      },
+      {
+        "name": "app-glass-hide",
+        "value": "1180px"
+      }
+    ],
+    "darkMode": {
+      "strategy": "prefers-color-scheme",
+      "tokens": {
+        "bg": "#04172f",
+        "surface": "#072D59",
+        "surface-2": "#082448",
+        "raised": "#0d3a6e",
+        "hover": "#0b3363",
+        "text": "#eaf7fd",
+        "text-2": "#bcdcef",
+        "text-3": "#d8eef9",
+        "muted": "#93b6d2",
+        "faint": "#84a6c4",
+        "border": "#12406f",
+        "border-strong": "#1f5288",
+        "accent": "#FD6E88",
+        "accent-ink": "#ff9cae",
+        "accent-soft": "#3a1f3e",
+        "danger": "#ff8f9f",
+        "success": "#7fe0b8",
+        "warn-bg": "#3a2a12",
+        "warn-text": "#f4d6b0"
+      }
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one crimson pink action per screen; navy label, pink glow, drawn arrow.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Start <span class=\"ds-arrow\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 8h10M9 4l4 4-4 4\"/></svg></span></button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:48px;padding:0 26px;border-radius:999px;border:1px solid transparent;font-family:\"Hanken Grotesk\",-apple-system,\"Segoe UI\",Roboto,sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:background-color .2s,box-shadow .2s,transform .2s cubic-bezier(.2,.8,.2,1);white-space:nowrap}.ds-btn-primary{background:var(--accent,#FD6E88);color:var(--on-accent,#072D59);box-shadow:var(--btn-shadow,0 6px 16px -4px rgba(253,110,136,.55))}.ds-btn-primary:hover{background:#ff8399;transform:translateY(-1px)}.ds-btn-primary:active{transform:translateY(0)}.ds-btn-primary:focus-visible{outline:2px solid #FD6E88;outline-offset:3px}.ds-arrow{display:inline-flex;transition:transform .2s cubic-bezier(.2,.8,.2,1)}.ds-btn-primary:hover .ds-arrow{transform:translateX(3px)}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Seal-blue pill for supporting actions (Copy, Save changes, Skip).",
+      "html": "<button class=\"ds-btn ds-btn-secondary\">Save changes</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:48px;padding:0 26px;border-radius:999px;border:1px solid transparent;font-family:\"Hanken Grotesk\",-apple-system,\"Segoe UI\",Roboto,sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:background-color .2s,box-shadow .2s,transform .2s cubic-bezier(.2,.8,.2,1);white-space:nowrap}.ds-btn-secondary{background:var(--btn-2-bg,#dbf2fc);color:var(--btn-2-fg,#072D59);border-color:var(--btn-2-border,#b9dcef)}.ds-btn-secondary:hover{background:var(--btn-2-hover,#c9eafa)}.ds-btn-secondary:focus-visible{outline:2px solid #FD6E88;outline-offset:3px}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Transparent pill with a strong hairline for tertiary actions (Sign out, Send to Azure DevOps before it is ready).",
+      "html": "<button class=\"ds-btn ds-btn-outline\">Sign out</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:48px;padding:0 26px;border-radius:999px;border:1px solid transparent;font-family:\"Hanken Grotesk\",-apple-system,\"Segoe UI\",Roboto,sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:background-color .2s,box-shadow .2s,transform .2s cubic-bezier(.2,.8,.2,1);white-space:nowrap}.ds-btn-outline{background:transparent;color:var(--text,#072D59);border-color:var(--border-strong,#a3cbe2)}.ds-btn-outline:hover{background:var(--hover,#e7f5fc);border-color:var(--text,#072D59)}.ds-btn-outline:focus-visible{outline:2px solid #FD6E88;outline-offset:3px}"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "White field, 14px radius, pink caret, pink border and halo on focus.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"XXXX-XXXX-XXXX\">",
+      "css": ".ds-input{width:280px;font-family:\"Hanken Grotesk\",-apple-system,\"Segoe UI\",Roboto,sans-serif;font-size:16px;color:var(--text,#072D59);background:var(--surface,#fff);border:1px solid var(--border-strong,#a3cbe2);border-radius:14px;padding:13px 16px;caret-color:#FD6E88;transition:border-color .15s,box-shadow .15s}.ds-input::placeholder{color:var(--faint,#5b7a9c)}.ds-input:focus{outline:none;border-color:#FD6E88;box-shadow:0 0 0 4px rgba(253,110,136,.28)}"
+    },
+    {
+      "name": "Idea Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Hero pill that holds the idea input and the Start button together.",
+      "html": "<form class=\"ds-idea\" onsubmit=\"return false\"><input placeholder=\"An app that helps HR track onboarding\"><button class=\"ds-idea-btn\">Start</button></form>",
+      "css": ".ds-idea{display:flex;gap:8px;max-width:540px;padding:7px;border-radius:999px;background:var(--surface,#fff);border:1px solid var(--border,#cbe5f2);box-shadow:0 1px 2px rgba(7,45,89,.05),0 12px 32px -8px rgba(7,45,89,.12)}.ds-idea:focus-within{border-color:#FD6E88;box-shadow:0 0 0 4px rgba(253,110,136,.28),0 12px 32px -8px rgba(7,45,89,.12)}.ds-idea input{flex:1;min-width:0;border:0;background:transparent;padding:0 18px;height:48px;font-family:\"Hanken Grotesk\",-apple-system,\"Segoe UI\",Roboto,sans-serif;font-size:16px;color:var(--text,#072D59);outline:none;caret-color:#FD6E88}.ds-idea-btn{height:48px;padding:0 26px;border:0;border-radius:999px;background:#FD6E88;color:#072D59;font:600 16px \"Hanken Grotesk\",sans-serif;cursor:pointer;box-shadow:0 6px 16px -4px rgba(253,110,136,.55)}.ds-idea-btn:hover{background:#ff8399}"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "App container: white surface, 24px radius, hairline, ambient navy shadow.",
+      "html": "<div class=\"ds-card\"><h3>Sign in</h3><p>Enter the code your organization gave you.</p></div>",
+      "css": ".ds-card{max-width:360px;padding:32px;background:var(--surface,#fff);border:1px solid var(--border,#cbe5f2);border-radius:24px;box-shadow:0 1px 2px rgba(7,45,89,.05),0 12px 32px -8px rgba(7,45,89,.12);font-family:\"Hanken Grotesk\",-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--text,#072D59)}.ds-card h3{margin:0 0 8px;font-size:40px;font-weight:300;letter-spacing:-.04em;line-height:1.1}.ds-card p{margin:0;color:var(--muted,#44658c);font-size:17px}"
+    },
+    {
+      "name": "Chips",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Work item type pills; the epic inverts to navy.",
+      "html": "<span class=\"ds-chip ds-chip-epic\">Epic</span> <span class=\"ds-chip\">Story</span>",
+      "css": ".ds-chip{display:inline-block;font:600 12px \"Hanken Grotesk\",sans-serif;padding:2px 10px;border-radius:999px;background:var(--raised,#dbf2fc);color:var(--text,#072D59)}.ds-chip-epic{background:#072D59;color:#DBF2FC}"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "nav",
+      "refersTo": "segmented-tab-active",
+      "description": "Pill group with a strong hairline; the active tab is a seal-blue pill.",
+      "html": "<div class=\"ds-seg\"><button class=\"on\">Document</button><button>Markdown</button></div>",
+      "css": ".ds-seg{display:inline-flex;padding:4px;gap:2px;border:1px solid var(--border-strong,#a3cbe2);border-radius:999px}.ds-seg button{background:none;border:0;color:var(--muted,#44658c);font:500 15px \"Hanken Grotesk\",sans-serif;padding:8px 18px;border-radius:999px;cursor:pointer}.ds-seg button:hover{color:var(--text,#072D59)}.ds-seg button.on{background:var(--raised,#dbf2fc);color:var(--text,#072D59)}.ds-seg button:focus-visible{outline:2px solid #FD6E88;outline-offset:3px}"
+    },
+    {
+      "name": "Question Card",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "One question at a time: seal-blue header, radio rows, pink chosen dot.",
+      "html": "<div class=\"ds-q\"><div class=\"ds-qh\"><b>Who adds a new hire?</b><small>2 of 7</small></div><label class=\"ds-qo on\"><i></i>HR managers</label><label class=\"ds-qo\"><i></i>Hiring managers</label></div>",
+      "css": ".ds-q{width:340px;border:1px solid var(--border-strong,#a3cbe2);border-radius:18px;overflow:hidden;background:var(--q-body,#fff);font-family:\"Hanken Grotesk\",-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--text,#072D59)}.ds-qh{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:16px 20px;background:var(--q-head,#e7f5fc)}.ds-qh b{font-weight:500;font-size:18px}.ds-qh small{font-size:14px;color:var(--muted,#44658c);font-variant-numeric:tabular-nums}.ds-qo{display:flex;gap:16px;align-items:center;padding:16px 20px;border-top:1px solid var(--border,#cbe5f2);cursor:pointer;font-size:17px;font-weight:500}.ds-qo:hover{background:var(--hover,#e7f5fc)}.ds-qo i{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--q-radio,#8fb3cc);display:grid;place-items:center}.ds-qo.on i{background:#FD6E88;border-color:#FD6E88}.ds-qo.on i::after{content:\"\";width:8px;height:8px;border-radius:50%;background:#fff}"
+    },
+    {
+      "name": "Glass and Sphere",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "The signature object: a deep blue sphere with a pink rim behind vertical fluted-glass ribs.",
+      "html": "<div class=\"ds-glass\"><i class=\"ds-orb\"></i><i class=\"ds-ribs\"></i></div>",
+      "css": ".ds-glass{position:relative;overflow:hidden;isolation:isolate;width:360px;height:300px;background:linear-gradient(180deg,#eef8fd 0%,#dbf2fc 38%,#a9d6f2 72%,#5f9fdc 100%)}.ds-orb{position:absolute;z-index:0;border-radius:50%;aspect-ratio:1;width:92%;left:18%;top:6%;background:radial-gradient(circle at 64% 38%,#8cc4f2 0%,#3d84d6 22%,#164f9c 46%,#072D59 74%,#041a36 100%);box-shadow:inset 34px 0 60px -14px rgba(253,110,136,.95),inset 8px 0 18px rgba(255,190,205,.55),-30px 0 90px -20px rgba(253,110,136,.55);animation:ds-drift 16s cubic-bezier(.45,0,.55,1) infinite alternate}.ds-ribs{position:absolute;z-index:1;inset:0 40% 0 0;-webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%);background:repeating-linear-gradient(90deg,rgba(255,255,255,.42) 0,rgba(255,255,255,.06) 9px,rgba(7,45,89,.10) 22px,rgba(253,110,136,.16) 30px,rgba(255,255,255,.38) 34px);-webkit-mask-image:linear-gradient(90deg,transparent,#000 28%,#000 100%);mask-image:linear-gradient(90deg,transparent,#000 28%,#000 100%)}@keyframes ds-drift{from{translate:0 0}to{translate:-4% 3%}}@media (prefers-reduced-motion:reduce){.ds-orb{animation:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Through the Fluted Glass",
+    "overview": "A calm, icy world of cold daylight. The ground is a pale seal blue that deepens toward a saturated sky at the bottom of the hero; ink is a deep navy; one crimson pink marks the single thing to do. The idea goes in on the left as light, large type and a pill-shaped field, and on the right a deep blue sphere with a pink rim sits behind vertical fluted-glass ribs that refract it and shift with the pointer. That glass-and-sphere is the one signature object, and it recurs as the same object at reduced scale behind the top of every app page.\n\nDensity is generous on the persuasion surface (128px section rhythm, 60 to 96px light headlines) and moderate in the app (860 to 960px column, cards with 24 to 32px padding). Everything interactive is a pill; everything that contains is a softly rounded rectangle on a white surface with a hairline border and a navy-tinted ambient shadow. Light and dark mode follow the device: in dark, the ground becomes a near-black navy, surfaces become navy, and the pink stays the same pink.\n\nThe world refuses the SaaS split hero with a product screenshot and a row of fake customer logos. Proof is limited to the real tools the product sends to, set as plain type.",
+    "keyCharacteristics": [
+      "Seal-blue ground, navy ink, a single crimson pink accent.",
+      "Hanken Grotesk at weight 300 for display, with an italic second line on its own line.",
+      "Pill controls, 14 to 28px rounded containers.",
+      "One glass-and-sphere object per viewport, never scattered blur.",
+      "Soft navy-tinted ambient shadows; a pink glow only under the primary button.",
+      "Device decides light or dark; no toggle."
+    ],
+    "rules": [
+      {
+        "name": "The One Pink Rule",
+        "body": "Crimson pink marks the one primary action on a screen plus state (selection, focus, checked, progress). Secondary actions use seal blue or an outline pill. Two pink buttons on one screen is a bug.",
+        "section": "colors"
+      },
+      {
+        "name": "The Navy-On-Pink Rule",
+        "body": "Text and icons on crimson pink are navy (`navy`). White on pink fails contrast and is not part of this world.",
+        "section": "colors"
+      },
+      {
+        "name": "The Device Decides Rule",
+        "body": "Light and dark come from `prefers-color-scheme` only. Every color token has a dark counterpart; the pink is the one value that does not change.",
+        "section": "colors"
+      },
+      {
+        "name": "The Italic Second Line Rule",
+        "body": "Display and headline text is light 300 with the second phrase in italic 300, set on its own line (\"Rough idea in. *Buildable spec out.*\"). The italic never goes bold.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sentence Case Rule",
+        "body": "Headings and labels are sentence case. There is no uppercase tracked label style in this system.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Object Rule",
+        "body": "The glass-and-sphere appears once per viewport as one specific object: the hero, the closing band, or the sky band on app pages. It hides below 1180px on app pages and below 980px in the closing band. Never break it into scattered blurred shapes.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Earned Blur Rule",
+        "body": "Backdrop blur belongs to the glass ribs, the sticky top bar, and a card floating over the glass. It is not a general card treatment.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do give each screen exactly one crimson pink action and set its label in navy.",
+      "Do set display and headline text in Hanken Grotesk 300 with the italic phrase on its own line.",
+      "Do make every control a pill (999px) and every container a 14 to 28px rounded rectangle on `surface` with a 1px hairline.",
+      "Do show the glass-and-sphere as one object per viewport, and hide it rather than squeeze it at narrow widths.",
+      "Do derive every color from the token pair so dark mode follows the device.",
+      "Do draw icons as stroked SVG (1.7 to 1.8px stroke, round caps) in `currentColor`."
+    ],
+    "donts": [
+      "Don't build a split hero with a product screenshot or a row of customer logos; name only the real tools the product sends to, as plain type.",
+      "Don't put white text on crimson pink or use pink as a large background fill.",
+      "Don't scatter blurred shapes or apply backdrop blur to ordinary cards.",
+      "Don't add uppercase tracked labels above headings.",
+      "Don't use `faint-slate` for running text or notes people need to read; it is for placeholders and axis labels.",
+      "Don't use emoji or text characters as icons."
+    ]
+  }
+}

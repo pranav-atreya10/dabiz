@@ -7,7 +7,7 @@
     color-scheme: light dark;
     --seal: #DBF2FC; --navy: #072D59; --pink: #FD6E88;
     --bg: #eef8fd; --surface: #ffffff; --surface-2: #f4fbfe; --raised: #dbf2fc; --hover: #e7f5fc;
-    --text: #072D59; --text-2: #24466f; --text-3: #0d3463; --muted: #44658c; --faint: #5b7a9c;
+    --text: #072D59; --text-2: #24466f; --text-3: #0d3463; --muted: #44658c; --faint: #4f6f92;
     --border: #cbe5f2; --border-strong: #a3cbe2; --focus: #FD6E88;
     --accent: #FD6E88; --accent-ink: #c22d52; --accent-soft: #ffe8ed; --accent-line: #FD6E88;
     --on-accent: #072D59;
@@ -65,8 +65,13 @@
     /* Sky band with the glass object behind the top of a page (markup: <div class="sky"><div class="glass">...) */
     .sky { position: absolute; z-index: -1; top: 0; left: 0; right: 0; height: 560px; overflow: hidden; background: var(--sky);
       -webkit-mask-image: linear-gradient(#000 40%, transparent); mask-image: linear-gradient(#000 40%, transparent); }
-    .sky .glass { position: absolute; inset: 0 0 0 auto; width: 26%; --orb-size: 120%; --orb-x: 22%; --orb-y: -18%; --ribs-right: 48%; }
-  @media (max-width: 1180px) { .sky .glass { display: none; } }
+    .sky .glass { position: absolute; inset: 0 0 0 auto; width: calc((100vw - 1000px) / 2);
+      -webkit-mask-image: linear-gradient(transparent 30px, #000 110px); mask-image: linear-gradient(transparent 30px, #000 110px); --orb-size: 170%; --orb-x: 30%; --orb-y: 16%; --ribs-right: 40%; }
+  @media (max-width: 1400px) { .sky .glass { display: none; } }
+  /* Drawn thumbs for ratings */
+  .thumb { display: inline-block; width: 18px; height: 18px; vertical-align: -3px; background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9v8H3V9h3zm0 0l3.5-6c1.2 0 2 .9 1.8 2.1L10.8 8H15a2 2 0 0 1 2 2.3l-1 5.4A2 2 0 0 1 14 17H6'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9v8H3V9h3zm0 0l3.5-6c1.2 0 2 .9 1.8 2.1L10.8 8H15a2 2 0 0 1 2 2.3l-1 5.4A2 2 0 0 1 14 17H6'/%3E%3C/svg%3E") center / contain no-repeat; }
+  .thumb.down { transform: scaleY(-1); }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body {
