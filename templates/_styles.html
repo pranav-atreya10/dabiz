@@ -1,37 +1,42 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   /* Light by default; dark when the visitor's device or browser is set to dark. */
   :root {
     color-scheme: light dark;
-    --bg: #f5f7fb; --surface: #ffffff; --surface-2: #eef2f8; --raised: #e6ecf5; --hover: #f3f6fb;
-    --text: #0b132b; --text-2: #3a506b; --text-3: #1c2541; --muted: #55657d; --faint: #8592a6;
-    --border: #e1e7f0; --border-strong: #cfd8e5; --focus: #5bc0de;
-    --accent: #d97706; --accent-soft: #fdf1e2; --accent-line: #5bc0de;
-    --danger: #c62828; --success: #1f9d55; --warn-bg: #fdf1e2; --warn-text: #8a4b05;
-    --topbar-bg: rgba(255,255,255,.85); --topbar-border: #e6ecf5;
-    --shadow: 0 1px 2px rgba(11,19,43,.04), 0 10px 30px rgba(11,19,43,.07);
-    --btn-bg: linear-gradient(180deg, #f59e0b 0%, #d97706 55%, #b45309 100%); --btn-fg: #fff;
-    --btn-shadow: 0 6px 16px rgba(217,119,6,.28), inset 0 1px 0 rgba(255,255,255,.28);
-    --btn-2-bg: #ffffff; --btn-2-fg: #0b132b; --btn-2-border: #cfd8e5; --btn-2-hover: #f3f6fb;
-    --q-head: #eef2f8; --q-body: #ffffff; --q-radio: #a9b5c6;
-    /* Gradient artwork: navy to sky, with an amber sphere */
-    --art-bg: linear-gradient(165deg, #e9f2fa 0%, #a8d8ea 30%, #3a506b 68%, #0b132b 100%);
+    /* Egyptian blue #03203D, stone blue #639CC5, scarlet red #EB2F33 */
+    --egypt: #03203D; --stone: #639CC5; --scarlet: #EB2F33;
+    --display: "Anton", Impact, "Arial Narrow", sans-serif;
+    --bg: #eef3f8; --surface: #ffffff; --surface-2: #e5edf5; --raised: #d9e5f0; --hover: #eaf1f8;
+    --text: #03203D; --text-2: #2a4867; --text-3: #0a2c4f; --muted: #4c6784; --faint: #86a0b9;
+    --border: #d5e1ec; --border-strong: #b9cde0; --focus: #639CC5;
+    --accent: #EB2F33; --accent-soft: #fde3e3; --accent-line: #EB2F33;
+    --danger: #c4161c; --success: #1f9d55; --warn-bg: #fde8e3; --warn-text: #8f1d14;
+    --topbar-bg: rgba(238,243,248,.78); --topbar-border: rgba(3,32,61,.08);
+    --shadow: 0 1px 2px rgba(3,32,61,.05), 0 12px 32px rgba(3,32,61,.09);
+    --btn-bg: linear-gradient(180deg, #f5494c 0%, #EB2F33 55%, #c81d22 100%); --btn-fg: #fff;
+    --btn-shadow: 0 8px 20px rgba(235,47,51,.32), inset 0 1px 0 rgba(255,255,255,.3);
+    --btn-2-bg: #ffffff; --btn-2-fg: #03203D; --btn-2-border: #b9cde0; --btn-2-hover: #eaf1f8;
+    --q-head: #e5edf5; --q-body: #ffffff; --q-radio: #9fb4c9;
+    --spot: rgba(99,156,197,.22);
+    /* Gradient artwork: stone blue to Egyptian blue, with a scarlet sphere */
+    --art-bg: linear-gradient(165deg, #d3e4f2 0%, #639CC5 34%, #0d3d69 70%, #03203D 100%);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #0b132b; --surface: #1c2541; --surface-2: #141c36; --raised: #26314f; --hover: #222c4a;
-      --text: #f1f4fa; --text-2: #c3cddd; --text-3: #dce3ee; --muted: #9aa8bf; --faint: #6c7a93;
-      --border: #2a3656; --border-strong: #3a506b; --focus: #5bc0de;
-      --accent: #f59e0b; --accent-soft: #3a2a12; --accent-line: #5bc0de;
-      --danger: #ff8a80; --success: #7ee2a8; --warn-bg: #3a2a12; --warn-text: #f4d6b0;
-      --topbar-bg: rgba(11,19,43,.85); --topbar-border: #1c2541;
-      --shadow: 0 10px 30px rgba(0,0,0,.25);
-      --btn-shadow: 0 6px 18px rgba(245,158,11,.25), inset 0 1px 0 rgba(255,255,255,.28);
-      --btn-2-bg: #26314f; --btn-2-fg: #f1f4fa; --btn-2-border: transparent; --btn-2-hover: #2f3b5c;
-      --q-head: #26314f; --q-body: #1c2541; --q-radio: #6c7a93;
-      --art-bg: linear-gradient(165deg, #3a506b 0%, #1c2541 45%, #0b132b 100%);
+      --bg: #021526; --surface: #03203D; --surface-2: #021a32; --raised: #0a2f55; --hover: #082a4c;
+      --text: #eef4fa; --text-2: #bfd2e5; --text-3: #dbe7f2; --muted: #8fabc6; --faint: #5f7f9e;
+      --border: #0d3459; --border-strong: #174573; --focus: #639CC5;
+      --accent: #ff4448; --accent-soft: #3a1016; --accent-line: #ff4448;
+      --danger: #ff8a80; --success: #7ee2a8; --warn-bg: #3a1016; --warn-text: #ffc9c4;
+      --topbar-bg: rgba(2,21,38,.75); --topbar-border: rgba(99,156,197,.14);
+      --shadow: 0 12px 34px rgba(0,0,0,.35);
+      --btn-shadow: 0 8px 22px rgba(255,68,72,.3), inset 0 1px 0 rgba(255,255,255,.28);
+      --btn-2-bg: #0a2f55; --btn-2-fg: #eef4fa; --btn-2-border: transparent; --btn-2-hover: #0f3a66;
+      --q-head: #0a2f55; --q-body: #03203D; --q-radio: #5f7f9e;
+      --spot: rgba(99,156,197,.16);
+      --art-bg: linear-gradient(165deg, #2a5d86 0%, #0d3d69 40%, #03203D 75%, #021526 100%);
     }
   }
   /* Gradient artwork (home page): glassy stripes plus a glowing amber sphere. */
@@ -40,15 +45,15 @@
     content: ""; position: absolute; inset: 0; z-index: -1;
     background:
       repeating-linear-gradient(90deg, rgba(255,255,255,.28) 0 1.5px, rgba(255,255,255,0) 1.5px 26px),
-      linear-gradient(90deg, rgba(91,192,222,0) 40%, rgba(91,192,222,.35) 75%, rgba(244,214,176,.25) 100%);
+      linear-gradient(90deg, rgba(99,156,197,0) 40%, rgba(99,156,197,.4) 75%, rgba(255,214,214,.22) 100%);
     -webkit-mask-image: linear-gradient(90deg, transparent 0 42%, #000 72%);
     mask-image: linear-gradient(90deg, transparent 0 42%, #000 72%);
   }
   .art::after {
     content: ""; position: absolute; z-index: -2; border-radius: 50%;
     width: var(--ss, 70%); aspect-ratio: 1; left: var(--sx, 52%); top: var(--sy, 18%);
-    background: radial-gradient(circle at 32% 28%, #fff1d9 0%, #f4d6b0 10%, #f59e0b 24%, #d97706 36%, #3a506b 64%, #0b132b 90%);
-    box-shadow: 0 0 120px rgba(217,119,6,.35), inset -30px -40px 80px rgba(11,19,43,.55);
+    background: radial-gradient(circle at 32% 28%, #ffe3e3 0%, #ff9c9e 10%, #EB2F33 26%, #b5161b 40%, #0d3d69 66%, #03203D 90%);
+    box-shadow: 0 0 120px rgba(235,47,51,.35), inset -30px -40px 80px rgba(3,32,61,.55);
     animation: orbit 18s ease-in-out infinite alternate;
   }
   @keyframes orbit {
@@ -121,4 +126,62 @@
   /* "—— Label" section eyebrow */
   .eyebrow { display: inline-flex; align-items: center; gap: 14px; color: var(--muted); font-size: 15px; font-weight: 500; }
   .eyebrow::before { content: ""; width: 32px; height: 1.5px; background: var(--accent-line); }
+
+  /* Poster-style display headings (Anton), like the Egyptian blue + scarlet reference. */
+  html body main h1:not(.doc *), .display {
+    font-family: var(--display); font-weight: 400; text-transform: uppercase;
+    letter-spacing: .005em; line-height: .98;
+  }
+  ::selection { background: var(--scarlet); color: #fff; }
+
+  /* Smooth scrolling (Lenis) */
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+  .lenis.lenis-stopped { overflow: hidden; }
+
+  /* Scroll progress line under the top bar */
+  .scroll-progress {
+    position: fixed; left: 0; top: 0; height: 3px; width: 100%; z-index: 50; pointer-events: none;
+    background: linear-gradient(90deg, var(--stone), var(--scarlet)); transform-origin: 0 50%; transform: scaleX(0);
+  }
+
+  /* Spotlight cards: a soft light follows the pointer (set by _motion.html). */
+  .card { position: relative; }
+  .card::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0;
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), var(--spot), transparent 60%);
+    transition: opacity .3s;
+  }
+  .card:hover::after { opacity: 1; }
+
+  /* Shiny text: a light sweep across the words. */
+  .shiny {
+    background: linear-gradient(110deg, currentColor 40%, color-mix(in srgb, currentColor 30%, #fff) 50%, currentColor 60%);
+    background-size: 220% 100%; -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; animation: shine 4s linear infinite;
+  }
+  @keyframes shine { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+
+  /* Split text: each letter sits in a clipped line so it can rise into place. */
+  .split-word { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .06em; margin-bottom: -.06em; }
+  .split-char { display: inline-block; will-change: transform; }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+  /* Click spark on primary buttons */
+  .spark { position: fixed; width: 2px; height: 12px; margin: -6px 0 0 -1px; border-radius: 2px; background: var(--scarlet); pointer-events: none; z-index: 60; }
+
+  /* Sideways-looping list (speeds up with scrolling) */
+  .marquee { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
+  .marquee-track { display: flex; width: max-content; }
+  .marquee-track > * { flex: none; }
+
+  /* Fade-in on scroll. Without JavaScript or with reduced motion, everything just shows. */
+  .js-motion .reveal { opacity: 0; transform: translateY(28px); }
+  @media (prefers-reduced-motion: reduce) {
+    .js-motion .reveal { opacity: 1; transform: none; }
+    .shiny { animation: none; }
+  }
 </style>
+<script>document.documentElement.classList.add("js-motion");</script>

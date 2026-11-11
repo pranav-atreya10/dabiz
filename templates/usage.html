@@ -6,8 +6,8 @@
   <title>Usage · Requirements Studio</title>
   {% include "_styles.html" %}
   <style>
-    :root { --bar: #3a506b; --bar-hover: #5bc0de; --grid: #e6ecf5; }
-    @media (prefers-color-scheme: dark) { :root { --bar: #5bc0de; --bar-hover: #8fd5ea; --grid: #26314f; } }
+    :root { --bar: #0d3d69; --bar-hover: #EB2F33; --grid: #d9e5f0; }
+    @media (prefers-color-scheme: dark) { :root { --bar: #639CC5; --bar-hover: #ff4448; --grid: #0d3459; } }
     main { max-width: 960px; margin: 0 auto; padding: 56px 20px 64px; }
     .nav { display: flex; align-items: center; gap: 8px; }
     .nav a.link { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; padding: 6px 12px; border-radius: 999px; }
@@ -270,5 +270,6 @@
   load();
 </script>
 {% endif %}
+{% include "_motion.html" %}
 </body>
 </html>
