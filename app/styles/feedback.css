@@ -1,0 +1,26 @@
+/* Styles for the feedback page. Everything is scoped under .pg-feedback. */
+.pg-feedback main { max-width: 860px; margin: 0 auto; padding: 56px 20px 64px; }
+.pg-feedback .nav { display: flex; align-items: center; gap: 8px; }
+.pg-feedback .nav a.link { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; padding: 6px 12px; border-radius: 999px; }
+.pg-feedback .nav a.link:hover { color: var(--text); }
+.pg-feedback .nav a.link.here { color: var(--text); background: var(--raised); }
+.pg-feedback h1 { font-size: clamp(40px, 7vw, 60px); font-weight: 700; letter-spacing: -.045em; line-height: 1.05; margin: 0 0 12px; }
+.pg-feedback .lead { font-size: 18px; color: var(--text-2); margin: 0 0 28px; }
+.pg-feedback .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+.pg-feedback .tile { padding: 24px; }
+.pg-feedback .tile .label { color: var(--muted); font-size: 14px; }
+.pg-feedback .tile .value { font-size: clamp(32px, 5vw, 44px); font-weight: 600; letter-spacing: -.03em; line-height: 1.15; margin-top: 6px; }
+.pg-feedback .item { padding: 22px 24px; border-top: 1px solid var(--border); }
+.pg-feedback .item:first-child { border-top: 0; }
+.pg-feedback .item-head { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.pg-feedback .item-head .r { font-size: 20px; }
+.pg-feedback .item-head a { color: var(--text); font-weight: 500; text-decoration: none; }
+.pg-feedback .item-head a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.pg-feedback .meta { color: var(--muted); font-size: 14px; }
+.pg-feedback .comment { margin: 10px 0 0; color: var(--text-3); white-space: pre-wrap; }
+.pg-feedback .nocomment { margin: 10px 0 0; color: var(--faint); font-size: 14px; }
+.pg-feedback .empty { text-align: center; padding: 48px 24px; color: var(--muted); }
+@media (max-width: 640px) {
+.pg-feedback .tiles { grid-template-columns: 1fr; }
+.pg-feedback .topbar .brand span { display: none; }
+}

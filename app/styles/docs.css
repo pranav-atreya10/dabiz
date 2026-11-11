@@ -1,0 +1,27 @@
+/* Styles for the docs page. Everything is scoped under .pg-docs. */
+.pg-docs main { max-width: 860px; margin: 0 auto; padding: 56px 20px 64px; }
+.pg-docs .nav { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.pg-docs .nav a.link { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; padding: 6px 12px; border-radius: 999px; white-space: nowrap; }
+.pg-docs .nav a.link:hover { color: var(--text); }
+.pg-docs .nav a.link.here { color: var(--text); background: var(--raised); }
+.pg-docs .head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; }
+.pg-docs h1 { font-size: clamp(40px, 7vw, 60px); font-weight: 700; letter-spacing: -.045em; line-height: 1.05; margin: 0 0 8px; }
+.pg-docs .lead { font-size: 18px; color: var(--text-2); margin: 0; }
+.pg-docs a.btn { text-decoration: none; }
+.pg-docs .list { padding: 8px 0; }
+.pg-docs .doc-row { display: flex; align-items: center; gap: 16px; padding: 18px 24px; border-top: 1px solid var(--border); }
+.pg-docs .doc-row:first-child { border-top: 0; }
+.pg-docs .doc-row a.title { flex: 1; min-width: 0; color: var(--text); text-decoration: none; font-weight: 500; font-size: 17px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pg-docs .doc-row a.title:hover { text-decoration: underline; text-underline-offset: 4px; }
+.pg-docs .when { color: var(--muted); font-size: 14px; white-space: nowrap; }
+.pg-docs .rate { width: 24px; text-align: center; }
+.pg-docs .del { background: none; border: 0; color: var(--faint); cursor: pointer; font: inherit; font-size: 14px; padding: 6px 8px; border-radius: 8px; }
+.pg-docs .del:hover { color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, transparent); }
+.pg-docs .empty { text-align: center; padding: 48px 24px; color: var(--muted); }
+.pg-docs .empty .btn { margin-top: 18px; }
+@media (max-width: 640px) {
+.pg-docs .topbar .brand span { display: none; }
+.pg-docs .doc-row { flex-wrap: wrap; padding: 16px 18px; gap: 6px 12px; }
+.pg-docs .doc-row a.title { flex-basis: 100%; white-space: normal; }
+}

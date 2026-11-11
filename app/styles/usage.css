@@ -1,0 +1,62 @@
+/* Styles for the usage page. Everything is scoped under .pg-usage. */
+:root { --bar: #0d3d69; --bar-hover: #EB2F33; --grid: #d9e5f0; }
+@media (prefers-color-scheme: dark) { :root { --bar: #639CC5; --bar-hover: #ff4448; --grid: #0d3459; } }
+.pg-usage main { max-width: 960px; margin: 0 auto; padding: 56px 20px 64px; }
+.pg-usage .nav { display: flex; align-items: center; gap: 8px; }
+.pg-usage .nav a.link { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; padding: 6px 12px; border-radius: 999px; }
+.pg-usage .nav a.link:hover { color: var(--text); }
+.pg-usage .nav a.link.here { color: var(--text); background: var(--raised); }
+.pg-usage h1 { font-size: clamp(44px, 8vw, 64px); font-weight: 700; letter-spacing: -.045em; line-height: 1.02; margin: 0 0 12px; }
+.pg-usage .lead { font-size: 18px; color: var(--text-2); margin: 0 0 28px; }
+.pg-usage .seg { display: inline-flex; padding: 4px; gap: 2px; border: 1px solid var(--border-strong); border-radius: 999px; margin-bottom: 24px; }
+.pg-usage .seg button { background: none; border: 0; color: var(--muted); font: inherit; font-weight: 500; font-size: 15px; padding: 8px 18px; border-radius: 999px; cursor: pointer; }
+.pg-usage .seg button.active { background: var(--raised); color: var(--text); }
+.pg-usage .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+.pg-usage .tile { padding: 24px; }
+.pg-usage .tile .label { color: var(--muted); font-size: 14px; }
+.pg-usage .tile .value { font-size: clamp(32px, 5vw, 44px); font-weight: 600; letter-spacing: -.03em; line-height: 1.15; margin-top: 6px; }
+.pg-usage .tile .sub { color: var(--faint); font-size: 13px; margin-top: 4px; }
+.pg-usage .tile .value a { color: inherit; font-size: 18px; font-weight: 500; }
+.pg-usage .card.block { padding: 28px; margin-bottom: 16px; }
+.pg-usage .block-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+.pg-usage .block-head h2 { font-size: 22px; font-weight: 500; letter-spacing: -.02em; margin: 0; }
+.pg-usage .linkish { background: none; border: 0; color: var(--muted); font: inherit; font-size: 14px; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+.pg-usage .chart { position: relative; }
+.pg-usage .chart svg { display: block; width: 100%; height: 260px; overflow: visible; }
+.pg-usage .chart .axis { fill: var(--faint); font-size: 12px; font-variant-numeric: tabular-nums; }
+.pg-usage .chart .gridline { stroke: var(--grid); stroke-width: 1; }
+.pg-usage .chart .bar { fill: var(--bar); }
+.pg-usage .chart .bar.hot { fill: var(--bar-hover); }
+.pg-usage .tip {
+      position: absolute; pointer-events: none; background: var(--text); color: var(--bg); border-radius: 12px;
+      padding: 10px 12px; font-size: 13px; line-height: 1.45; white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,.4);
+      transform: translate(-50%, calc(-100% - 10px)); opacity: 0; transition: opacity .1s; }
+.pg-usage .tip.show { opacity: 1; }
+.pg-usage .tip b { font-weight: 600; }
+.pg-usage .empty { color: var(--muted); text-align: center; padding: 60px 0; }
+.pg-usage .rows { display: grid; gap: 14px; }
+.pg-usage .hrow { display: grid; grid-template-columns: minmax(120px, 200px) 1fr auto; gap: 14px; align-items: center; }
+.pg-usage .hrow .name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pg-usage .hrow .track { height: 12px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+.pg-usage .hrow .fill { height: 100%; border-radius: 6px; background: var(--bar); min-width: 4px; }
+.pg-usage .hrow .num { font-variant-numeric: tabular-nums; color: var(--text-3); text-align: right; font-size: 14px; white-space: nowrap; }
+.pg-usage .hrow .num span { color: var(--faint); margin-left: 8px; }
+.pg-usage table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.pg-usage th, .pg-usage td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.pg-usage th:first-child, .pg-usage td:first-child { text-align: left; }
+.pg-usage th { color: var(--muted); font-weight: 500; }
+.pg-usage .table-wrap { max-height: 360px; overflow: auto; margin-top: 8px; }
+.pg-usage .prices { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; }
+.pg-usage .prices > div { min-width: 0; }
+.pg-usage .prices label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+.pg-usage .note { color: var(--faint); font-size: 13px; margin: 12px 0 0; }
+.pg-usage .off { background: var(--warn-bg); color: var(--warn-text); border-radius: 16px; padding: 18px 20px; }
+@media (max-width: 720px) {
+.pg-usage .tiles { grid-template-columns: 1fr; }
+.pg-usage .hrow { grid-template-columns: 1fr auto; }
+.pg-usage .hrow .track { grid-column: 1 / -1; grid-row: 2; }
+.pg-usage .prices { grid-template-columns: 1fr 1fr; }
+.pg-usage .prices .btn { grid-column: 1 / -1; }
+.pg-usage .card.block { padding: 22px 18px; }
+.pg-usage .topbar .brand span { display: none; }
+}

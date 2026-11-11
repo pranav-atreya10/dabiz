@@ -1,4 +1,7 @@
-"""Requirements helper MVP.
+"""Requirements Studio: the API behind the pages.
+
+The pages themselves are a Next.js app (the app/ folder). This file is the "engine":
+sign-in, the AI calls, saved documents, usage and the admin actions, all under /api/.
 
 Flow: person types their main idea -> the AI asks workflow/product-flow
 questions -> person answers -> the AI writes a requirements doc to download.
@@ -12,7 +15,7 @@ from functools import wraps
 from urllib.parse import urlparse
 
 import openai
-from flask import Flask, Response, flash, g, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, Response, g, jsonify, request, session
 from pydantic import BaseModel
 
 import db
@@ -47,7 +50,9 @@ def same_site_posts_only():
     if request.method in ("GET", "HEAD", "OPTIONS"):
         return None
     source = request.headers.get("Origin") or request.headers.get("Referer") or ""
-    if urlparse(source).netloc != request.host:
+    # Behind the Next.js dev server (or Vercel), the address the visitor used is in X-Forwarded-Host.
+    hosts = {request.host, request.headers.get("X-Forwarded-Host", "").split(",")[0].strip()}
+    if urlparse(source).netloc not in hosts:
         return jsonify(error="That request came from another site, so it was blocked."), 403
     return None
 
@@ -240,35 +245,47 @@ def login_required(view):
         g.org = current_org()
         if g.org:
             return view(*args, **kwargs)
-        if request.path.startswith("/api/"):
-            return jsonify(error="Your session has ended. Please refresh and sign in again."), 401
-        return redirect(url_for("login"))
-
+        return jsonify(error="Your session has ended. Please refresh and sign in again."), 401
     return wrapper
 
 
-@app.route("/login", methods=["GET", "POST"])
+def site_locked():
+    return not (SECRET_KEY and db.available())
+
+
+def admin_locked():
+    return not (SECRET_KEY and ADMIN_PASSWORD and db.available())
+
+
+def when(value):
+    """A date and time as short text, like 2026-10-31 14:05."""
+    return str(value or "")[:16]
+
+
+@app.get("/api/me")
+def me():
+    """Who is signed in. The pages (Next.js) use this to decide what to show."""
+    org = current_org()
+    return jsonify(org={"name": org["name"]} if org else None, admin=is_admin(),
+                   locked=site_locked(), admin_locked=admin_locked())
+
+
+@app.post("/api/login")
 def login():
-    error = None
-    locked = not (SECRET_KEY and db.available())
-    if locked:
-        error = "This site is locked. The owner needs to set SECRET_KEY and DATABASE_URL."
-    elif request.method == "POST":
-        org = db.find_org_by_code(request.form.get("code", ""))
-        if org:
-            session.update(org_id=org["id"], code_version=org["code_version"])
-            return redirect(url_for("index"))
-        error = "That org code isn't right."
-    elif current_org():
-        return redirect(url_for("index"))
-    return render_template("login.html", error=error, locked=locked)
+    if site_locked():
+        return jsonify(error="This site is locked. The owner needs to set SECRET_KEY and DATABASE_URL."), 503
+    org = db.find_org_by_code(str((request.json or {}).get("code", "")))
+    if not org:
+        return jsonify(error="That org code isn't right."), 401
+    session.update(org_id=org["id"], code_version=org["code_version"])
+    return jsonify(ok=True, org={"name": org["name"]})
 
 
-@app.post("/logout")
+@app.post("/api/logout")
 def logout():
     session.pop("org_id", None)
     session.pop("code_version", None)
-    return redirect(url_for("login"))
+    return jsonify(ok=True)
 
 
 # ---------- Admin: create orgs, give out codes, set each org's Azure DevOps ----------
@@ -278,113 +295,115 @@ def admin_token():
     return hmac.new(SECRET_KEY.encode(), ADMIN_PASSWORD.encode(), "sha256").hexdigest()
 
 
+def is_admin():
+    return bool(not admin_locked() and hmac.compare_digest(session.get("admin", ""), admin_token()))
+
+
 def admin_required(view):
     @wraps(view)
     def wrapper(*args, **kwargs):
-        if SECRET_KEY and ADMIN_PASSWORD and db.available() and hmac.compare_digest(session.get("admin", ""), admin_token()):
+        if is_admin():
             return view(*args, **kwargs)
-        return redirect(url_for("admin_login"))
-
+        return jsonify(error="Please sign in as admin."), 401
     return wrapper
 
 
-@app.route("/admin/login", methods=["GET", "POST"])
+def org_json(org):
+    """An org for the admin page. The access token itself is never sent, only whether one is saved."""
+    has_pat = bool(org["azdo_pat_encrypted"])
+    return {
+        "id": org["id"], "name": org["name"],
+        "azdo_org_url": org["azdo_org_url"] or "", "azdo_project": org["azdo_project"] or "",
+        "azdo_story_type": org["azdo_story_type"] or "User Story", "has_pat": has_pat,
+        "connected": bool(org["azdo_org_url"] and org["azdo_project"] and has_pat),
+    }
+
+
+@app.post("/api/admin/login")
 def admin_login():
-    error = None
-    locked = not (SECRET_KEY and ADMIN_PASSWORD and db.available())
-    if locked:
-        error = "The admin page is locked. The owner needs to set SECRET_KEY, ADMIN_PASSWORD and DATABASE_URL."
-    elif request.method == "POST":
-        if hmac.compare_digest(request.form.get("password", "").encode(), ADMIN_PASSWORD.encode()):
-            session["admin"] = admin_token()
-            return redirect(url_for("admin"))
-        error = "That admin password isn't right."
-    return render_template("admin_login.html", error=error, locked=locked)
+    if admin_locked():
+        return jsonify(error="The admin page is locked. The owner needs to set SECRET_KEY, ADMIN_PASSWORD and DATABASE_URL."), 503
+    password = str((request.json or {}).get("password", ""))
+    if not hmac.compare_digest(password.encode(), ADMIN_PASSWORD.encode()):
+        return jsonify(error="That admin password isn't right."), 401
+    session["admin"] = admin_token()
+    return jsonify(ok=True)
 
 
-@app.post("/admin/logout")
+@app.post("/api/admin/logout")
 def admin_logout():
     session.pop("admin", None)
-    return redirect(url_for("admin_login"))
+    return jsonify(ok=True)
 
 
-@app.get("/admin")
+@app.get("/api/admin/orgs")
 @admin_required
-def admin():
-    return render_template("admin.html", orgs=db.list_orgs())
+def admin_orgs():
+    return jsonify(orgs=[org_json(o) for o in db.list_orgs()])
 
 
-@app.post("/admin/orgs")
+@app.post("/api/admin/orgs")
 @admin_required
 def admin_create_org():
-    name = request.form.get("name", "").strip()
+    name = str((request.json or {}).get("name", "")).strip()[:120]
     if not name:
-        flash("Give the org a name.", "error")
-    else:
-        org_id, code = db.create_org(name)
-        flash(f"{name}|{code}", "code")
-    return redirect(url_for("admin"))
+        return jsonify(error="Give the org a name."), 400
+    org_id, code = db.create_org(name)
+    return jsonify(id=org_id, name=name, code=code)
 
 
-@app.post("/admin/orgs/<int:org_id>/code")
+@app.post("/api/admin/orgs/<int:org_id>/code")
 @admin_required
 def admin_new_code(org_id):
     org = db.get_org(org_id)
-    if org:
-        flash(f"{org['name']}|{db.regenerate_code(org_id)}", "code")
-    return redirect(url_for("admin"))
+    if not org:
+        return jsonify(error="That org doesn't exist."), 404
+    return jsonify(name=org["name"], code=db.regenerate_code(org_id))
 
 
-@app.post("/admin/orgs/<int:org_id>/devops")
+@app.post("/api/admin/orgs/<int:org_id>/devops")
 @admin_required
 def admin_devops(org_id):
-    f = request.form
+    f = request.json or {}
+    if not db.get_org(org_id):
+        return jsonify(error="That org doesn't exist."), 404
     pat = None
     if f.get("clear_pat"):
         pat = ""
-    elif f.get("pat", "").strip():
-        pat = f["pat"]
-    db.update_devops(org_id, f.get("org_url", ""), f.get("project", ""), f.get("story_type", ""), pat)
-    flash("Azure DevOps settings saved.", "ok")
-    return redirect(url_for("admin") + f"#org-{org_id}")
+    elif str(f.get("pat", "")).strip():
+        pat = str(f["pat"])
+    db.update_devops(org_id, str(f.get("org_url", "")), str(f.get("project", "")), str(f.get("story_type", "")), pat)
+    return jsonify(ok=True, org=org_json(db.get_org(org_id)))
 
 
-@app.get("/admin/feedback")
-@admin_required
-def admin_feedback():
-    items = db.all_feedback()
-    ups = sum(1 for i in items if i["rating"] == 1)
-    return render_template("admin_feedback.html", items=items, ups=ups, downs=len(items) - ups)
-
-
-@app.get("/admin/documents/<int:doc_id>")
-@admin_required
-def admin_document(doc_id):
-    doc = db.get_document_any_org(doc_id)
-    if not doc:
-        return redirect(url_for("admin_feedback"))
-    return render_template("admin_document.html", doc=doc)
-
-
-@app.post("/admin/orgs/<int:org_id>/delete")
+@app.delete("/api/admin/orgs/<int:org_id>")
 @admin_required
 def admin_delete(org_id):
     org = db.get_org(org_id)
     if org:
         db.delete_org(org_id)
-        flash(f"Deleted {org['name']} and its documents. Anyone signed in with its code is signed out.", "ok")
-    return redirect(url_for("admin"))
+    return jsonify(ok=True)
 
 
-@app.get("/")
-def home():
-    return render_template("home.html")
+@app.get("/api/admin/feedback")
+@admin_required
+def admin_feedback():
+    items = db.all_feedback()
+    ups = sum(1 for i in items if i["rating"] == 1)
+    return jsonify(ups=ups, downs=len(items) - ups, items=[
+        {"id": i["id"], "title": i["title"], "rating": i["rating"], "feedback": i["feedback"] or "",
+         "org_name": i["org_name"] or "", "when": when(i["feedback_at"])} for i in items
+    ])
 
 
-@app.get("/app")
-@login_required
-def index():
-    return render_template("index.html", org=g.org)
+@app.get("/api/admin/documents/<int:doc_id>")
+@admin_required
+def admin_document(doc_id):
+    doc = db.get_document_any_org(doc_id)
+    if not doc:
+        return jsonify(error="That document doesn't exist."), 404
+    return jsonify(id=doc["id"], title=doc["title"], org_name=doc["org_name"] or "", rating=doc["rating"],
+                   feedback=doc["feedback"] or "", idea=doc["idea"], content=doc["content"])
 
 
 def _qa_text(qa):
@@ -443,10 +462,13 @@ def requirements():
 
 # ---------- Saved documents ----------
 
-@app.get("/docs")
+@app.get("/api/documents")
 @login_required
-def docs_page():
-    return render_template("docs.html", org=g.org, docs=db.list_documents(g.org["id"]))
+def list_documents():
+    return jsonify(documents=[
+        {"id": d["id"], "title": d["title"], "rating": d["rating"], "updated": when(d["updated_at"])}
+        for d in db.list_documents(g.org["id"])
+    ])
 
 
 @app.get("/api/documents/<int:doc_id>")
@@ -564,11 +586,6 @@ def export_for_tool(doc_id, tool):
                     headers={"Content-Disposition": f'attachment; filename="{filename}"'})
 
 
-@app.get("/privacy")
-def privacy():
-    return render_template("privacy.html")
-
-
 @app.get("/api/devops/status")
 @login_required
 def devops_status():
@@ -602,37 +619,13 @@ def _days():
     return {"7": 7, "90": 90}.get(request.args.get("days"), 30)
 
 
-@app.get("/usage")
-@login_required
-def usage_page():
-    return render_template(
-        "usage.html", tracking=True, scope=g.org["name"], show_orgs=False,
-        can_edit_prices=False, api_url=url_for("usage_data"),
-        nav=[("Tool", url_for("index"), False), ("Documents", url_for("docs_page"), False),
-             ("Usage", url_for("usage_page"), True)],
-        signout_url=url_for("logout"),
-    )
-
-
 @app.get("/api/usage")
 @login_required
 def usage_data():
     return jsonify(usage.summary(g.org["id"], days=_days()))
 
 
-@app.get("/admin/usage")
-@admin_required
-def admin_usage():
-    return render_template(
-        "usage.html", tracking=True, scope="all orgs", show_orgs=True,
-        can_edit_prices=True, prices_url=url_for("admin_prices"), api_url=url_for("admin_usage_data"),
-        nav=[("Orgs", url_for("admin"), False), ("Usage", url_for("admin_usage"), True),
-             ("Feedback", url_for("admin_feedback"), False)],
-        signout_url=url_for("admin_logout"),
-    )
-
-
-@app.get("/admin/api/usage")
+@app.get("/api/admin/usage")
 @admin_required
 def admin_usage_data():
     data = usage.summary(all_orgs=True, days=_days())
@@ -642,15 +635,16 @@ def admin_usage_data():
     return jsonify(data)
 
 
-@app.post("/admin/usage/prices")
+@app.post("/api/admin/usage/prices")
 @admin_required
 def admin_prices():
+    f = request.json or {}
     try:
-        usage.set_prices(float(request.form.get("input") or 0), float(request.form.get("output") or 0))
-    except ValueError:
-        flash("Prices must be numbers.", "error")
-    return redirect(url_for("admin_usage"))
+        usage.set_prices(float(f.get("input") or 0), float(f.get("output") or 0))
+    except (TypeError, ValueError):
+        return jsonify(error="Prices must be numbers."), 400
+    return jsonify(ok=True)
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5328)
