@@ -24,9 +24,23 @@ admin page (`/admin`), and sets each org's Azure DevOps connection there too.
 | `DATABASE_URL` | A Postgres connection string (`POSTGRES_URL`, or the same names with a `REQ_` prefix from the Vercel Neon integration, also work). Required on Vercel (for example a free Neon database from the Vercel Marketplace). Without it the app uses a local `orgs.db` file, which only works on your own computer. |
 | `OPENAI_MODEL` | Optional. Default `gpt-5`. |
 
+## How it's built
+
+- **The pages** are a Next.js (React) app: the `app/`, `components/` and `lib/` folders.
+  Smooth scrolling is [Lenis](https://lenis.darkroom.engineering/), animations are
+  [GSAP](https://gsap.com/), and the effects in `components/reactbits/` come from
+  [React Bits](https://reactbits.dev/) (split-letter titles, blur-in text, count-up numbers,
+  magnetic buttons, spotlight cards, the scroll-speed marquee and click sparks).
+- **The engine** is the Python (Flask) app in `app.py`. It only answers `/api/...` requests:
+  sign-in, the AI calls, saved documents, usage and the admin actions.
+- On Vercel, both deploy together: Next.js serves the pages and `api/index.py` runs the Python app.
+
 ## Run it
 
+You need two terminals: one for the Python engine, one for the pages.
+
 ```bash
+# Terminal 1: the Python API (port 5328)
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -34,9 +48,13 @@ export OPENAI_API_KEY=your-key-here                          # https://platform.
 export SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
 export ADMIN_PASSWORD=pick-an-admin-password
 python app.py
+
+# Terminal 2: the pages (port 3000)
+npm install
+npm run dev
 ```
 
-Then open http://localhost:5000 (landing page). Go to `/admin` to create an org and get its code,
+Then open http://localhost:3000 (landing page). Go to `/admin` to create an org and get its code,
 then sign in at `/login` with that code. The tool is at `/app`.
 
 ## Usage tracking

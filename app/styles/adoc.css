@@ -1,0 +1,10 @@
+/* Styles for the adoc page. Everything is scoped under .pg-adoc. */
+.pg-adoc main { max-width: 860px; margin: 0 auto; padding: 48px 20px 64px; }
+.pg-adoc .back { color: var(--muted); text-decoration: none; font-weight: 500; }
+.pg-adoc .back:hover { color: var(--text); }
+.pg-adoc h1 { font-size: clamp(32px, 6vw, 48px); font-weight: 700; letter-spacing: -.045em; line-height: 1.1; margin: 20px 0 8px; }
+.pg-adoc .meta { color: var(--muted); margin: 0 0 24px; }
+.pg-adoc .box { padding: 24px 28px; margin-bottom: 16px; }
+.pg-adoc .box h2 { font-size: 18px; font-weight: 500; margin: 0 0 10px; color: var(--muted); }
+.pg-adoc .box p { margin: 0; white-space: pre-wrap; color: var(--text-3); }
+.pg-adoc pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; color: var(--text-3); font: 14px/1.6 ui-monospace, "SF Mono", Consolas, monospace; }

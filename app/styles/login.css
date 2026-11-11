@@ -1,0 +1,8 @@
+/* Styles for the login page. Everything is scoped under .pg-login. */
+.pg-login .wrap { min-height: calc(100vh - 64px); display: grid; place-items: center; padding: 32px 16px; }
+.pg-login .login { width: 100%; max-width: 440px; padding: 40px 32px; }
+.pg-login h1 { font-size: 40px; font-weight: 700; letter-spacing: -.045em; line-height: 1.1; margin: 28px 0 10px; }
+.pg-login .lead { font-size: 17px; margin: 0 0 28px; }
+.pg-login label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+.pg-login .btn { width: 100%; margin-top: 18px; }
+.pg-login .note { margin: 24px 0 0; font-size: 13px; color: var(--faint); text-align: center; }

@@ -1,0 +1,44 @@
+/* Styles for the admin page. Everything is scoped under .pg-admin. */
+.pg-admin main { max-width: 860px; margin: 0 auto; padding: 56px 20px 64px; }
+.pg-admin h1 { font-size: clamp(40px, 7vw, 60px); font-weight: 700; letter-spacing: -.045em; line-height: 1.05; margin: 0 0 12px; }
+.pg-admin .lead { font-size: 18px; color: var(--text-2); margin: 0 0 36px; }
+.pg-admin .who { display: flex; align-items: center; gap: 12px; }
+.pg-admin .navlink { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; }
+.pg-admin .navlink:hover { color: var(--text); }
+.pg-admin .tag { font-size: 13px; color: var(--muted); border: 1px solid var(--border-strong); border-radius: 999px; padding: 4px 12px; }
+.pg-admin .card { padding: 28px; margin-bottom: 16px; }
+.pg-admin h2 { font-size: 22px; font-weight: 500; letter-spacing: -.02em; margin: 0 0 6px; }
+.pg-admin label { display: block; font-size: 14px; font-weight: 500; margin: 16px 0 8px; }
+.pg-admin .inline { display: flex; gap: 12px; flex-wrap: wrap; }
+.pg-admin .inline input { flex: 1 1 240px; }
+.pg-admin .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+.pg-admin .hintline { font-size: 13px; color: var(--faint); margin: 6px 0 0; }
+.pg-admin .flash { padding: 14px 18px; border-radius: 14px; margin-bottom: 16px; font-size: 15px; }
+.pg-admin .flash.ok { background: color-mix(in srgb, var(--success) 14%, var(--surface)); color: var(--success); }
+.pg-admin .flash.error { background: color-mix(in srgb, var(--danger) 12%, var(--surface)); color: var(--danger); }
+.pg-admin .newcode { background: var(--surface); border: 1px solid var(--border-strong); box-shadow: var(--shadow); border-radius: 22px; padding: 28px; margin-bottom: 16px; }
+.pg-admin .newcode .code {
+      font: 600 clamp(26px, 6vw, 40px)/1.2 ui-monospace, "SF Mono", Consolas, monospace; letter-spacing: .06em;
+      margin: 14px 0; word-break: break-all; }
+.pg-admin .newcode .warn { color: var(--warn-text); font-size: 14px; margin: 12px 0 0; }
+.pg-admin .org-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.pg-admin .status { font-size: 13px; padding: 3px 12px; border-radius: 999px; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
+.pg-admin .status.on { color: var(--success); }
+.pg-admin details { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px; }
+.pg-admin summary { cursor: pointer; font-weight: 500; color: var(--muted); list-style: none; }
+.pg-admin summary::-webkit-details-marker { display: none; }
+.pg-admin summary::before { content: "+ "; }
+.pg-admin details[open] summary::before { content: "– "; }
+.pg-admin .row-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+.pg-admin .btn-danger { background: transparent; color: var(--danger); border-color: color-mix(in srgb, var(--danger) 35%, transparent); }
+.pg-admin .btn-danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 10%, transparent); }
+.pg-admin .check { display: flex; align-items: center; gap: 8px; font-weight: 400; color: var(--muted); }
+.pg-admin .empty { color: var(--muted); text-align: center; padding: 40px 20px; }
+.pg-admin form.inline-form { display: inline; }
+@media (max-width: 640px) {
+.pg-admin .topbar .brand span { display: none; }
+.pg-admin .tag { display: none; }
+.pg-admin .grid { grid-template-columns: 1fr; }
+.pg-admin .card, .pg-admin .newcode { padding: 22px 18px; }
+.pg-admin .row-actions .btn, .pg-admin .inline .btn { flex: 1 1 auto; }
+}

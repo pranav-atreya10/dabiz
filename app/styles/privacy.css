@@ -1,0 +1,10 @@
+/* Styles for the privacy page. Everything is scoped under .pg-privacy. */
+.pg-privacy main { max-width: 720px; margin: 0 auto; padding: 64px 20px 72px; }
+.pg-privacy h1 { font-size: clamp(40px, 7vw, 60px); font-weight: 700; letter-spacing: -.045em; line-height: 1.05; margin: 0 0 12px; }
+.pg-privacy .lead { font-size: 18px; color: var(--text-2); margin: 0 0 40px; }
+.pg-privacy h2 { font-size: 22px; font-weight: 500; letter-spacing: -.02em; margin: 36px 0 10px; }
+.pg-privacy p, .pg-privacy li { color: var(--text-3); font-size: 16px; }
+.pg-privacy ul { padding-left: 22px; }
+.pg-privacy li { margin: 6px 0; }
+.pg-privacy a { color: var(--text); }
+.pg-privacy .updated { color: var(--faint); font-size: 14px; margin-top: 48px; }

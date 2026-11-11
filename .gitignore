@@ -5,3 +5,9 @@ app.db
 
 # Impeccable engine binary (downloaded by `npx impeccable install`)
 .claude/skills/impeccable/scripts/bin/
+
+# Next.js
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
